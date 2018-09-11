@@ -11,8 +11,10 @@ export default {
     addTodo: (state, payload) => {
       state.todos.push(payload)
     },
-    editTodo: (state, todoId) => {
-      const editTodo = state.todos.find(todo => todo.id === todoId);
+    editTodo: (state, {
+      id
+    }) => {
+      const editTodo = state.todos.find(todo => todo.id === id);
       editTodo.completed = !editTodo.completed;
     },
     removeTodo: (state, todoId) => {
@@ -24,6 +26,7 @@ export default {
     async fetchTodos({
       commit
     }) {
+      commit('clearError');
       commit('setLoading', true);
 
       try {
@@ -42,12 +45,14 @@ export default {
         commit('setTodos', resultTodos);
       } catch (error) {
         commit('setLoading', false);
+        commit('setError', error.message)
         throw error
       }
     },
     async addTodo({
       commit
     }, newTodo) {
+      commit('clearError');
       commit('setLoading', true);
 
       try {
@@ -60,6 +65,7 @@ export default {
         });
       } catch (error) {
         commit('setLoading', false);
+        commit('setError', error.message)
         throw error
       }
     },
@@ -69,6 +75,7 @@ export default {
       id,
       completed
     }) {
+      commit('clearError');
       commit('setLoading', true);
 
       try {
@@ -77,15 +84,19 @@ export default {
         });
 
         commit('setLoading', false)
-        commit('editTodo', id)
+        commit('editTodo', {
+          id
+        })
       } catch (error) {
         commit('setLoading', false);
+        commit('setError', error.message)
         throw error
       }
     },
     async removeTodo({
       commit
     }, todoId) {
+      commit('clearError');
       commit('setLoading', true);
 
       try {
@@ -95,11 +106,18 @@ export default {
         commit('removeTodo', todoId);
       } catch (error) {
         commit('setLoading', false);
+        commit('setError', error.message)
         throw error
       }
     }
   },
   getters: {
-    todos: state => state.todos
+    todos: (state, getters) => {
+      if (getters.user) {
+        return state.todos.filter(todo => todo.ownerId === getters.user.id);
+      } else {
+        return state.todos.filter(todo => !todo.ownerId);
+      }
+    }
   }
 };

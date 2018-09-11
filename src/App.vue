@@ -1,66 +1,74 @@
 <template>
   <v-app>
-    <v-content>
-      <v-container>
-        <v-layout column justify-center style="max-width: 600px; margin: auto;">
-          <h1 class="text--secondary text-xs-center mb-3">My Todo List</h1>
-          <v-flex xs12 sm6 md3>
-            <v-text-field
-              label="Add your todo"
-              type="text"
-              clearable
-              @keyup.enter="addTodo"
-              v-model="text"              
-            ></v-text-field>
-          </v-flex>
+    <v-navigation-drawer
+      app
+      temporary
+      v-model="drawer"
+    >
+      <v-list>
+        <v-list-tile
+          v-for="link of links"
+          :key="link.title"
+          :to="link.url"
+        >
+          <v-list-tile-action>
+            <v-icon>{{link.icon}}</v-icon>
+          </v-list-tile-action>
 
-          <v-flex xs12 sm6 md3>
-            <v-btn 
-              v-for="button in filterButtons" 
-              :key="button.text"
-              :color="button.color"
-              :flat="filter !== button.text"
-              @click="filterToggle(button.text)"
+          <v-list-tile-content>
+            <v-list-tile-title v-text="link.title"></v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-toolbar app dark color="primary">
+        <v-toolbar-side-icon
+            @click="drawer = !drawer"
+            class="hidden-md-and-up"
+        ></v-toolbar-side-icon>
+
+        <v-toolbar-title>
+            <router-link to="/" tag="span" class="pointer">My Todo List</router-link>
+        </v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <v-toolbar-items class="hidden-sm-and-down">
+            <v-btn
+                v-for="link of links"
+                :key="link.title"
+                :to="link.url"
+                flat
             >
-            {{ button.text }}
+            <v-icon left>{{link.icon}}</v-icon>
+                {{link.title}}
             </v-btn>
-          </v-flex>
+        </v-toolbar-items>
+    </v-toolbar>
 
-          <v-flex xs12 :class="['text-xs-center pt-5', { backdrop: loading }]" v-if="loading">
-            <v-progress-circular
-                class="loading"
-                :size="100"
-                :width="4"
-                color="primary"
-                indeterminate
-            ></v-progress-circular>
-          </v-flex>
-
-          <v-flex xs12 sm6 md3 style="max-height: 600px; overflow: auto">
-            <v-list>
-              <v-list-tile @click="todoToggle(todo)" v-for="todo in filteredTodos" :key="todo.id">
-                <v-list-tile-action>
-                  <v-checkbox 
-                    :input-value="todo.completed"
-                  ></v-checkbox>
-                </v-list-tile-action>
-
-                <v-list-tile-content :class="{'completed': todo.completed}">
-                  <v-list-tile-title>{{todo.text}}</v-list-tile-title>
-                </v-list-tile-content>
-
-                <v-list-tile-action>
-                  <v-btn icon ripple @click.stop="removeTodo(todo.id)">
-                    <v-icon color="grey lighten-1">delete</v-icon>
-                  </v-btn>
-              </v-list-tile-action>
-              </v-list-tile>
-            </v-list>
-          </v-flex>
-
-        </v-layout>
-      </v-container>
+    <v-content>
+      <router-view></router-view>
     </v-content>
+
+    <template v-if="error">
+      <v-snackbar
+        :multi-line="true"
+        :timeout="5000"
+        color="error"
+        @input="closeError"
+        :value="true"
+      >
+        {{error}}
+        <v-btn
+          dark
+          flat
+          @click.native="closeError"
+        >
+          Close
+        </v-btn>
+      </v-snackbar>
+    </template>
 
   </v-app>
 </template>
@@ -68,83 +76,45 @@
 <script>
 export default {
   computed: {
-    todos() {
-      return this.$store.getters.todos;
+    error() {
+      return this.$store.getters.error;
     },
-    filteredTodos() {
-      switch (this.filter) {
-        case "active":
-          return this.todos.filter(i => !i.completed);
-        case "completed":
-          return this.todos.filter(i => i.completed);
-        default:
-          return this.todos;
+    isUserLoggedIn() {
+      return this.$store.getters.isUserLoggedIn;
+    },
+    links() {
+      if (this.isUserLoggedIn) {
+        return [{ title: "Loguot", icon: "exit_to_app", url: "/logout" }];
       }
-    },
-    loading() {
-      return this.$store.getters.loading;
+      return [
+        { title: "Login", icon: "lock", url: "/login" },
+        { title: "Registration", icon: "face", url: "/registration" }
+      ];
     }
   },
   data() {
     return {
-      text: "",
-      filter: "all",
-      filterButtons: [
-        { text: "all" },
-        { text: "active", color: "success" },
-        { text: "completed", color: "info" }
-      ],
-      resource: {}
+      drawer: false
     };
   },
   methods: {
-    addTodo() {
-      if (!this.text) return;
-
-      const todo = {
-        text: this.text,
-        completed: false
-      };
-      this.$store.dispatch("addTodo", todo);
-      this.text = "";
-    },
-    todoToggle({ id, completed }) {
-      this.$store.dispatch("editTodo", { id, completed });
-    },
-    removeTodo(todoId) {
-      this.$store.dispatch("removeTodo", todoId);
-    },
-    filterToggle(filter) {
-      this.filter = filter;
+    closeError() {
+      this.$store.dispatch("clearError");
     }
   },
+  beforeCreate() {
+    this.$store.dispatch("authCheckState");
+  },
   created() {
-    this.$store.dispatch("fetchTodos");
+    if (this.isUserLoggedIn) {
+      this.$store.dispatch("fetchTodos");
+    }
   }
 };
 </script>
 
-<style>
-.completed {
-  text-decoration: line-through;
-  color: grey;
-}
-
-.backdrop {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.loading {
-  position: fixed;
-  z-index: 500;
-  transition: all 0.3s ease-out;
-  top: 25%;
-  left: 48%;
+<style scoped>
+.pointer {
+  cursor: pointer;
 }
 </style>
