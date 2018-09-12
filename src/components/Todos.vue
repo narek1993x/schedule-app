@@ -23,14 +23,8 @@
         </v-btn>
       </v-flex>
 
-      <v-flex xs12 :class="['text-xs-center pt-5', { backdrop: loading }]" v-if="loading">
-        <v-progress-circular
-            class="loading"
-            :size="100"
-            :width="4"
-            color="primary"
-            indeterminate
-        ></v-progress-circular>
+      <v-flex xs12 :class="{ backdrop: loading }" v-if="loading">
+        <app-loading></app-loading>
       </v-flex>
 
       <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
@@ -61,6 +55,8 @@
 </template>
 
 <script>
+import Loading from "./Loading";
+
 export default {
   computed: {
     user() {
@@ -118,6 +114,9 @@ export default {
     filterToggle(filter) {
       this.filter = filter;
     }
+  },
+  components: {
+    appLoading: Loading
   }
 };
 </script>
