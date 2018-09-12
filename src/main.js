@@ -15,6 +15,7 @@ Vue.use(Vuetify, {
     primary: '#009688'
   }
 })
+Vue.config.productionTip = false
 
 new Vue({
   el: '#app',
