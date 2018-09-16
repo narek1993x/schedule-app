@@ -9,6 +9,9 @@ export default {
       state.todos = payload;
     },
     addTodo: (state, payload) => {
+      if (!payload.id) {
+        payload.id = state.todos.length + 1;
+      }
       state.todos.push(payload)
     },
     editTodo: (state, {
