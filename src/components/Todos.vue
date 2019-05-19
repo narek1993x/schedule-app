@@ -7,13 +7,13 @@
           type="text"
           clearable
           @keyup.enter="addTodo"
-          v-model="text"              
+          v-model="text"
         ></v-text-field>
       </v-flex>
 
       <v-flex xs12 sm6 sm3>
-        <v-btn 
-          v-for="button in filterButtons" 
+        <v-btn
+          v-for="button in filterButtons"
           :key="button.text"
           :color="button.color"
           :flat="filter !== button.text"
@@ -28,16 +28,16 @@
       </v-flex>
 
       <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
-        <v-list>
+        <v-list three-line>
           <v-list-tile @click="todoToggle(todo)" v-for="todo in filteredTodos" :key="todo.id">
             <v-list-tile-action>
-              <v-checkbox 
+              <v-checkbox
                 :input-value="todo.completed"
               ></v-checkbox>
             </v-list-tile-action>
 
-            <v-list-tile-content :class="{'completed': todo.completed}">
-              <v-list-tile-title>{{todo.text}}</v-list-tile-title>
+            <v-list-tile-content :class="{'todo-content': true, 'completed': todo.completed}">
+              <v-list-tile-title class="todo-text">{{todo.text}}</v-list-tile-title>
             </v-list-tile-content>
 
             <v-list-tile-action>
@@ -125,6 +125,19 @@ export default {
 .completed {
   text-decoration: line-through;
   color: grey;
+}
+
+.todo-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.todo-text {
+  overflow: unset;
+  text-overflow: unset;
+  white-space: initial;
+  height: auto;
 }
 
 .backdrop {
