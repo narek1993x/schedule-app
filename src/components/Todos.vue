@@ -36,7 +36,7 @@
               ></v-checkbox>
             </v-list-tile-action>
 
-            <v-list-tile-content :class="{'todo-content': true, 'completed': todo.completed}">
+            <v-list-tile-content :class="{'completed': todo.completed}">
               <v-list-tile-title class="todo-text">{{todo.text}}</v-list-tile-title>
             </v-list-tile-content>
 
@@ -127,17 +127,11 @@ export default {
   color: grey;
 }
 
-.todo-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .todo-text {
-  overflow: unset;
-  text-overflow: unset;
-  white-space: initial;
-  height: auto;
+  overflow: initial !important;
+  text-overflow: initial !important;
+  white-space: initial !important;
+  height: auto !important;
 }
 
 .backdrop {
