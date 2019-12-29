@@ -156,25 +156,25 @@ export default {
 @media (max-width: 767px) {
   .todo-text {
     font-size: 13px;
-    line-height: unset;
+    line-height: unset !important;
   }
 
   .filter-button {
-    font-size: 12px;
-    padding: 0 5px;
-    min-width: 80px;
+    font-size: 12px !important;
+    padding: 0 5px !important;
+    min-width: 80px !important;
   }
 
   .v-list__tile {
-    padding: 0 10px;
+    padding: 0 10px !important;
   }
 
   .item-content {
-    padding: 0 5px;
+    padding: 0 5px !important;
   }
 
   .item-action {
-    min-width: 24px;
+    min-width: 24px !important;
   }
 }
 </style>
