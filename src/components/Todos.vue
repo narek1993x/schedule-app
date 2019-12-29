@@ -18,6 +18,7 @@
           :color="button.color"
           :flat="filter !== button.text"
           @click="filterToggle(button.text)"
+          class="filter-button"
         >
         {{ button.text }}
         </v-btn>
@@ -30,17 +31,17 @@
       <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
         <v-list three-line>
           <v-list-tile @click="todoToggle(todo)" v-for="todo in filteredTodos" :key="todo.id">
-            <v-list-tile-action>
+            <v-list-tile-action class="item-action">
               <v-checkbox
                 :input-value="todo.completed"
               ></v-checkbox>
             </v-list-tile-action>
 
-            <v-list-tile-content :class="{'completed': todo.completed}">
+            <v-list-tile-content :class="{'item-content': true, 'completed': todo.completed}">
               <v-list-tile-title class="todo-text">{{todo.text}}</v-list-tile-title>
             </v-list-tile-content>
 
-            <v-list-tile-action>
+            <v-list-tile-action class="item-action">
               <v-btn icon ripple @click.stop="removeTodo(todo.id)">
                 <v-icon color="grey lighten-1">delete</v-icon>
               </v-btn>
@@ -150,5 +151,30 @@ export default {
   transition: all 0.3s ease-out;
   top: 25%;
   left: 48%;
+}
+
+@media (max-width: 767px) {
+  .todo-text {
+    font-size: 13px;
+    line-height: unset;
+  }
+
+  .filter-button {
+    font-size: 12px;
+    padding: 0 5px;
+    min-width: 80px;
+  }
+
+  .v-list__tile {
+    padding: 0 10px;
+  }
+
+  .item-content {
+    padding: 0 5px;
+  }
+
+  .item-action {
+    min-width: 24px;
+  }
 }
 </style>

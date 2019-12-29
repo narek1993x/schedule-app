@@ -30,7 +30,8 @@ export default {
       isSignup = false
     }) {
       const method = isSignup ? 'createUserWithEmailAndPassword' : 'signInWithEmailAndPassword'
-      const expirationDate = 10 * 60
+      // Set expiration date to one month
+      const expirationDate = 30 * 24 * 60 * 60
 
       commit('clearError')
       commit('setLoading', true)
