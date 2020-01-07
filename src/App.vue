@@ -84,7 +84,11 @@ export default {
     },
     links() {
       if (this.isUserLoggedIn) {
-        return [{ title: "Loguot", icon: "exit_to_app", url: "/logout" }];
+        return [
+          { title: "Todos", icon: "gavel", url: "/" },
+          { title: "Schedule", icon: "event", url: "/schedule" },
+          { title: "Loguot", icon: "exit_to_app", url: "/logout" }
+        ];
       }
       return [
         { title: "Login", icon: "lock", url: "/login" },
@@ -108,6 +112,7 @@ export default {
   created() {
     if (this.isUserLoggedIn) {
       this.$store.dispatch("fetchTodos");
+      this.$store.dispatch("fetchSchedules");
     }
   }
 };

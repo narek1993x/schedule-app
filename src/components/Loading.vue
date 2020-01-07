@@ -24,8 +24,8 @@ export default {};
   color: official;
   display: inline-block;
   position: relative;
-  top: calc(50% - 64px);
-  left: calc(50% - 64px);
+  top: calc(50% - 32px);
+  left: calc(50% - 32px);
   width: 64px;
   height: 64px;
 }

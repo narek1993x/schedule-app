@@ -75,6 +75,7 @@ export default {
           .dispatch("authUser", user)
           .then(() => {
             this.$store.dispatch("fetchTodos");
+            this.$store.dispatch("fetchSchedules");
             this.$router.push("/");
           })
           .catch(() => {});
