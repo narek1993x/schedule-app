@@ -24,9 +24,7 @@
         </v-btn>
       </v-flex>
 
-      <v-flex xs12 :class="{ backdrop: loading }" v-if="loading">
-        <app-loading></app-loading>
-      </v-flex>
+      <app-loading :loading="loading"></app-loading>
 
       <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
         <v-list three-line>
@@ -56,7 +54,6 @@
 </template>
 
 <script>
-import Loading from "./Loading";
 
 export default {
   computed: {
@@ -115,9 +112,6 @@ export default {
     filterToggle(filter) {
       this.filter = filter;
     }
-  },
-  components: {
-    appLoading: Loading
   }
 };
 </script>
@@ -133,24 +127,6 @@ export default {
   text-overflow: initial !important;
   white-space: initial !important;
   height: auto !important;
-}
-
-.backdrop {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.loading {
-  position: fixed;
-  z-index: 500;
-  transition: all 0.3s ease-out;
-  top: 25%;
-  left: 48%;
 }
 
 @media (max-width: 767px) {

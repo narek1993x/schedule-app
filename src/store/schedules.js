@@ -3,13 +3,13 @@ import * as firebase from "firebase";
 export default {
   state: {
     schedules: [
-      { title: "Monday", key: "monday", color: "blue", content: "" },
-      { title: "Tuesday", key: "tuesday", color: "light-blue", content: "" },
-      { title: "Wednesday", key: "wednesday", color: "cyan", content: "" },
-      { title: "Thursday", key: "thursday", color: "teal", content: "" },
-      { title: "Friday", key: "friday", color: "green", content: "" },
-      { title: "Saturday", key: "saturday", color: "light-green", content: "" },
-      { title: "Sunday", key: "sunday", color: "lime", content: "" }
+      { title: "Monday", key: "monday", color: "red accent-2", content: "" },
+      { title: "Tuesday", key: "tuesday", color: "#FF8F00", content: "" },
+      { title: "Wednesday", key: "wednesday", color: "#F9A825", content: "" },
+      { title: "Thursday", key: "thursday", color: "green darken-2", content: "" },
+      { title: "Friday", key: "friday", color: "#3598a7", content: "" },
+      { title: "Saturday", key: "saturday", color: "indigo accent-2", content: "" },
+      { title: "Sunday", key: "sunday", color: "deep-purple accent-2", content: "" }
     ]
   },
   mutations: {
@@ -17,7 +17,7 @@ export default {
       state.schedules = state.schedules.map((s, index) => {
         const payloadSchedule = payload[index];
         if (payloadSchedule && payloadSchedule.key === s.key) {
-          return payloadSchedule;
+          return { ...s, ...payloadSchedule};
         }
 
         return s;

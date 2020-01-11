@@ -7,6 +7,7 @@ import {
 } from './store'
 import router from './router'
 import FirebaseConfig from '../config/config.json'
+import Loading from '@/components/Loading'
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify, {
@@ -15,6 +16,7 @@ Vue.use(Vuetify, {
     primary: '#009688'
   }
 })
+Vue.component('app-loading', Loading)
 
 new Vue({
   el: '#app',

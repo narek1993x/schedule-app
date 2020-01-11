@@ -3,15 +3,13 @@
     <v-card>
       <v-container fluid grid-list-lg style="min-height: 0;">
         <v-layout row wrap>
+          <app-loading :loading="loading"></app-loading>
           <v-flex xs12 sm6 md4 v-for="schedule in schedules" :key="schedule.key">
-            <v-card :color="schedule.color" class="white--text">
+            <v-card hover :color="schedule.color" class="white--text">
               <v-card-title primary-title>
                 <div class="headline">{{schedule.title}}</div>
               </v-card-title>
-              <v-card-text
-                v-if="editId !== schedule.key"
-                style="font-size: 16px; line-height: 18px; white-space: pre-wrap;"
-              >{{schedule.content}}</v-card-text>
+              <v-card-text v-if="editId !== schedule.key" class="card-text">{{schedule.content}}</v-card-text>
               <v-card-text v-else>
                 <v-text-field
                   v-model="scheduleText"
@@ -49,8 +47,6 @@
 </template>
 
 <script>
-import Loading from "./Loading";
-
 export default {
   computed: {
     user() {
@@ -63,7 +59,7 @@ export default {
       return this.$store.getters.schedules;
     },
     isSaveDisabled() {
-      return (key) => {
+      return key => {
         const schedule = this.schedules.find(d => d.key === key) || {};
         return schedule.content === this.scheduleText;
       };
@@ -90,10 +86,11 @@ export default {
     saveHandler(key) {
       if (!this.scheduleText) return;
 
-      const scheduleDay = this.schedules.find(d => d.key === key);
+      const { color, title, ...otherProps } =
+        this.schedules.find(d => d.key === key) || {};
 
       const schedule = {
-        ...scheduleDay,
+        ...otherProps,
         content: this.scheduleText,
         ...(this.user ? { ownerId: this.user.id } : {})
       };
@@ -106,6 +103,29 @@ export default {
 
 <style>
 .schedule-textarea textarea {
-  color: #fff !important;
+  font-weight: bold !important;
+  color: white !important;
+}
+
+.headline,
+.card-text {
+  font-weight: bold;
+  text-shadow: rgb(0, 0, 0) 1px 1px 3px;
+}
+
+.card-text {
+  font-size: 16px;
+  line-height: 18px;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 767px) {
+  .headline {
+    font-size: 22px !important;
+  }
+
+  .card-text {
+    font-size: 13px;
+  }
 }
 </style>
