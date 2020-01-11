@@ -86,8 +86,7 @@ export default {
     saveHandler(key) {
       if (!this.scheduleText) return;
 
-      const { color, title, ...otherProps } =
-        this.schedules.find(d => d.key === key) || {};
+      const { color, title, ...otherProps } = this.schedules.find(d => d.key === key) || {};
 
       const schedule = {
         ...otherProps,

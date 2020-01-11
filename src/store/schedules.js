@@ -14,13 +14,13 @@ export default {
   },
   mutations: {
     setSchedules: (state, payload) => {
-      state.schedules = state.schedules.map((s, index) => {
-        const payloadSchedule = payload[index];
-        if (payloadSchedule && payloadSchedule.key === s.key) {
-          return { ...s, ...payloadSchedule};
+      state.schedules = state.schedules.map((schedule) => {
+        const payloadSchedule = payload.find(r => r.key === schedule.key);
+        if (payloadSchedule) {
+          return { ...schedule, ...payloadSchedule};
         }
 
-        return s;
+        return schedule;
       })
     },
     editSchedule: (state, payload) => {
@@ -28,13 +28,13 @@ export default {
 
       state.schedules = [
         ...state.schedules.slice(0, scheduleIndex),
-        payload,
+        {...state.schedules[scheduleIndex], ...payload},
         ...state.schedules.slice(scheduleIndex + 1)
       ]
     }
   },
   actions: {
-    async fetchSchedules({ commit }) {
+    async fetchSchedules({ commit, getters }) {
       commit("clearError");
       commit("setLoading", true);
 
@@ -44,13 +44,16 @@ export default {
           .ref("schedules")
           .once("value");
         const schedules = fbVal.val();
+        const user = getters.user;
 
         const resultSchedules = [];
         for (let key in schedules) {
-          resultSchedules.push({
-            ...schedules[key],
-            id: key
-          });
+          if (user && schedules[key].ownerId === user.id) {
+            resultSchedules.push({
+              ...schedules[key],
+              id: key
+            });
+          }
         }
 
         commit("setLoading", false);
@@ -95,6 +98,6 @@ export default {
     }
   },
   getters: {
-    schedules: state => state.schedules
+    schedules: (state) => state.schedules
   }
 };
