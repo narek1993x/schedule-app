@@ -108,7 +108,7 @@ export default {
 
 .headline,
 .card-text {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 
 .card-text {
