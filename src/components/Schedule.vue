@@ -109,7 +109,6 @@ export default {
 .headline,
 .card-text {
   font-weight: bold;
-  text-shadow: rgb(0, 0, 0) 1px 1px 3px;
 }
 
 .card-text {
@@ -125,6 +124,10 @@ export default {
 
   .card-text {
     font-size: 13px;
+  }
+
+  .schedule-textarea textarea {
+    font-size: 13px !important;
   }
 }
 </style>
