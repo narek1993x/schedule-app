@@ -5,13 +5,21 @@
   "display": "standalone",
   "background_color": "#3e9789",
   "description": "A simply Todo app.",
-  "icons": [ {
-    "src": "/images/todo-icon-192.png",
-    "type": "image/png",
-    "sizes": "192x192"
-  }, {
-    "src": "/images/todo-icon-512.png",
-    "type": "image/png",
-    "sizes": "512x512"
-  }]
+  "icons": [
+    {
+      "src": "/images/todo-icon-128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/images/todo-icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/todo-icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
 }
