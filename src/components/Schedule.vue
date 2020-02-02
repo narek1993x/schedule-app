@@ -1,111 +1,256 @@
 <template>
-  <v-layout column>
-    <v-card>
-      <v-container fluid grid-list-lg style="min-height: 0;">
-        <v-layout row wrap>
-          <app-loading :loading="loading"></app-loading>
-          <v-flex
-            xs12
-            sm6
-            md4
-            v-for="schedule in schedules"
-            :key="schedule.key"
-          >
-            <v-card hover :color="schedule.color" class="white--text">
-              <v-card-title primary-title>
-                <div class="headline">{{ schedule.title }}</div>
-              </v-card-title>
-              <v-card-text v-if="editId !== schedule.key" class="card-text">
-                {{ schedule.content }}
-              </v-card-text>
-              <v-card-text v-else>
-                <v-text-field
-                  v-model="scheduleText"
-                  class="schedule-textarea"
-                  style="margin-top: 0; padding-top: 0;"
-                  color="white"
-                  :name="schedule.key"
-                  multi-line
-                ></v-text-field>
-              </v-card-text>
-              <v-card-actions v-if="editId !== schedule.key">
-                <v-btn icon dark @click="editHandler(schedule.key)">
-                  <v-icon size="22">mdi-pencil</v-icon>
-                </v-btn>
-              </v-card-actions>
-              <v-card-actions v-else>
-                <v-btn
-                  :disabled="isSaveDisabled(schedule.key)"
-                  text
-                  dark
-                  @click="saveHandler(schedule.key)"
-                >
-                  <v-icon size="22" left>mdi-content-save</v-icon>
-                  Save
-                </v-btn>
-                <v-btn text dark @click="cancelHandler">
-                  <v-icon size="22" left>mdi-close-circle</v-icon>
-                  Cancel
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-card>
+  <v-layout justify-center>
+    <v-row justify="center">
+      <v-col sm="12" lg="24">
+        <v-sheet height="800">
+          <v-calendar
+            ref="calendar"
+            v-model="start"
+            :type="type"
+            :start="start"
+            :end="end"
+            :min-weeks="minWeeks"
+            :max-days="maxDays"
+            :now="now"
+            :dark="dark"
+            :weekdays="weekdays"
+            :first-interval="intervals.first"
+            :interval-minutes="intervals.minutes"
+            :interval-count="intervals.count"
+            :interval-height="intervals.height"
+            :interval-style="intervalStyle"
+            :show-interval-label="showIntervalLabel"
+            :short-intervals="shortIntervals"
+            :short-months="shortMonths"
+            :short-weekdays="shortWeekdays"
+            :color="color"
+            :events="events"
+            :event-overlap-mode="mode"
+            :event-overlap-threshold="45"
+            :event-color="getEventColor"
+            @change="getEvents"
+          ></v-calendar>
+        </v-sheet>
+      </v-col>
+    </v-row>
   </v-layout>
 </template>
 
 <script>
-export default {
-  computed: {
-    user() {
-      return this.$store.getters.user;
-    },
-    loading() {
-      return this.$store.getters.loading;
-    },
-    schedules() {
-      return this.$store.getters.schedules;
-    },
-    isSaveDisabled() {
-      return key => {
-        const schedule = this.schedules.find(d => d.key === key) || {};
-        return schedule.content === this.scheduleText;
-      };
-    }
+const weekdaysDefault = [0, 1, 2, 3, 4, 5, 6];
+
+const intervalsDefault = {
+  first: 0,
+  minutes: 60,
+  count: 24,
+  height: 48
+};
+
+const stylings = {
+  default(interval) {
+    return undefined;
   },
-  data() {
+  workday(interval) {
+    const inactive =
+      interval.weekday === 0 ||
+      interval.weekday === 6 ||
+      interval.hour < 9 ||
+      interval.hour >= 17;
+    const startOfHour = interval.minute === 0;
+    const dark = this.dark;
+    const mid = dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+
     return {
-      scheduleText: "",
-      editId: ""
+      backgroundColor: inactive
+        ? dark
+          ? "rgba(0,0,0,0.4)"
+          : "rgba(0,0,0,0.05)"
+        : undefined,
+      borderTop: startOfHour ? undefined : "1px dashed " + mid
     };
   },
+  past(interval) {
+    return {
+      backgroundColor: interval.past
+        ? this.dark
+          ? "rgba(0,0,0,0.4)"
+          : "rgba(0,0,0,0.05)"
+        : undefined
+    };
+  }
+};
+
+export default {
+  data: () => ({
+    dark: true,
+    startMenu: false,
+    start: "2019-01-12",
+    endMenu: false,
+    end: "2019-01-27",
+    nowMenu: false,
+    minWeeks: 1,
+    now: null,
+    events: [],
+    colors: [
+      "blue",
+      "indigo",
+      "deep-purple",
+      "cyan",
+      "green",
+      "orange",
+      "grey darken-1"
+    ],
+    names: [
+      "Meeting",
+      "Holiday",
+      "PTO",
+      "Travel",
+      "Event",
+      "Birthday",
+      "Conference",
+      "Party"
+    ],
+    type: "week",
+    typeOptions: [
+      { text: "Day", value: "day" },
+      { text: "4 Day", value: "4day" },
+      { text: "Week", value: "week" },
+      { text: "Month", value: "month" },
+      { text: "Custom Daily", value: "custom-daily" },
+      { text: "Custom Weekly", value: "custom-weekly" }
+    ],
+    mode: "stack",
+    modeOptions: [
+      { text: "Stack", value: "stack" },
+      { text: "Column", value: "column" }
+    ],
+    weekdays: weekdaysDefault,
+    weekdaysOptions: [
+      { text: "Sunday - Saturday", value: weekdaysDefault },
+      { text: "Mon, Wed, Fri", value: [1, 3, 5] },
+      { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
+      { text: "Mon - Sun", value: [1, 2, 3, 4, 5, 6, 0] }
+    ],
+    intervals: intervalsDefault,
+    intervalsOptions: [
+      { text: "Default", value: intervalsDefault },
+      {
+        text: "Workday",
+        value: { first: 16, minutes: 30, count: 20, height: 48 }
+      }
+    ],
+    maxDays: 7,
+    maxDaysOptions: [
+      { text: "7 days", value: 7 },
+      { text: "5 days", value: 5 },
+      { text: "4 days", value: 4 },
+      { text: "3 days", value: 3 }
+    ],
+    styleInterval: "default",
+    styleIntervalOptions: [
+      { text: "Default", value: "default" },
+      { text: "Workday", value: "workday" },
+      { text: "Past", value: "past" }
+    ],
+    color: "primary",
+    colorOptions: [
+      { text: "Primary", value: "primary" },
+      { text: "Secondary", value: "secondary" },
+      { text: "Accent", value: "accent" },
+      { text: "Red", value: "red" },
+      { text: "Pink", value: "pink" },
+      { text: "Purple", value: "purple" },
+      { text: "Deep Purple", value: "deep-purple" },
+      { text: "Indigo", value: "indigo" },
+      { text: "Blue", value: "blue" },
+      { text: "Light Blue", value: "light-blue" },
+      { text: "Cyan", value: "cyan" },
+      { text: "Teal", value: "teal" },
+      { text: "Green", value: "green" },
+      { text: "Light Green", value: "light-green" },
+      { text: "Lime", value: "lime" },
+      { text: "Yellow", value: "yellow" },
+      { text: "Amber", value: "amber" },
+      { text: "Orange", value: "orange" },
+      { text: "Deep Orange", value: "deep-orange" },
+      { text: "Brown", value: "brown" },
+      { text: "Blue Gray", value: "blue-gray" },
+      { text: "Gray", value: "gray" },
+      { text: "Black", value: "black" }
+    ],
+    shortIntervals: false,
+    shortMonths: false,
+    shortWeekdays: true
+  }),
+  computed: {
+    intervalStyle() {
+      return stylings[this.styleInterval].bind(this);
+    },
+    hasIntervals() {
+      return (
+        this.type in
+        {
+          week: 1,
+          day: 1,
+          "4day": 1,
+          "custom-daily": 1
+        }
+      );
+    },
+    hasEnd() {
+      return (
+        this.type in
+        {
+          "custom-weekly": 1,
+          "custom-daily": 1
+        }
+      );
+    }
+  },
   methods: {
-    editHandler(key) {
-      this.cancelHandler();
-
-      const schedule = this.schedules.find(s => s.key === key);
-      this.scheduleText = schedule.content;
-      this.editId = key;
+    viewDay({ date }) {
+      this.start = date;
+      this.type = "day";
     },
-    cancelHandler() {
-      this.editId = "";
-      this.scheduleText = "";
+    getEventColor(event) {
+      return event.color;
     },
-    saveHandler(key) {
-      if (!this.scheduleText) return;
+    showIntervalLabel(interval) {
+      return interval.minute === 0;
+    },
+    getEvents({ start, end }) {
+      const events = [];
 
-      const { color, title, ...otherProps } =
-        this.schedules.find(d => d.key === key) || {};
+      const min = new Date(`${start.date}T00:00:00`);
+      const max = new Date(`${end.date}T23:59:59`);
+      const days = (max.getTime() - min.getTime()) / 86400000;
+      const eventCount = this.rnd(days, days + 20);
 
-      const schedule = {
-        ...otherProps,
-        content: this.scheduleText,
-        ...(this.user ? { ownerId: this.user.id } : {})
-      };
-      this.$store.dispatch("editSchedule", schedule);
-      this.cancelHandler();
+      for (let i = 0; i < eventCount; i++) {
+        const allDay = this.rnd(0, 3) === 0;
+        const firstTimestamp = this.rnd(min.getTime(), max.getTime());
+        const first = new Date(firstTimestamp - (firstTimestamp % 900000));
+        const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000;
+        const second = new Date(first.getTime() + secondTimestamp);
+
+        events.push({
+          name: this.names[this.rnd(0, this.names.length - 1)],
+          start: this.formatDate(first, !allDay),
+          end: this.formatDate(second, !allDay),
+          color: this.colors[this.rnd(0, this.colors.length - 1)]
+        });
+      }
+
+      this.events = events;
+    },
+    rnd(a, b) {
+      return Math.floor((b - a + 1) * Math.random()) + a;
+    },
+    formatDate(a, withTime) {
+      return withTime
+        ? `${a.getFullYear()}-${a.getMonth() +
+            1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
+        : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`;
     }
   }
 };
