@@ -1,60 +1,61 @@
 <template>
-  <v-container>
-    <v-layout column justify-center style="max-width: 600px; margin: auto;">
-      <v-flex xs12 sm6 sm3>
-        <v-text-field
-          label="Add your todo"
-          type="text"
-          clearable
-          @keyup.enter="addTodo"
-          v-model="text"
-        ></v-text-field>
-      </v-flex>
+  <v-layout column justify-center style="max-width: 600px; margin: auto;">
+    <v-flex xs12 sm6 sm3>
+      <v-text-field
+        label="Add your todo"
+        type="text"
+        clearable
+        @keyup.enter="addTodo"
+        v-model="text"
+      ></v-text-field>
+    </v-flex>
 
-      <v-flex xs12 sm6 sm3>
-        <v-btn
-          v-for="button in filterButtons"
-          :key="button.text"
-          :color="button.color"
-          :flat="filter !== button.text"
-          @click="filterToggle(button.text)"
-          class="filter-button"
-        >
+    <v-flex xs12 sm6 sm3>
+      <v-btn
+        v-for="button in filterButtons"
+        :key="button.text"
+        :color="button.color"
+        :text="filter !== button.text"
+        @click="filterToggle(button.text)"
+        class="filter-button"
+      >
         {{ button.text }}
-        </v-btn>
-      </v-flex>
+      </v-btn>
+    </v-flex>
 
-      <app-loading :loading="loading"></app-loading>
+    <app-loading :loading="loading"></app-loading>
 
-      <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
-        <v-list three-line>
-          <v-list-tile @click="todoToggle(todo)" v-for="todo in filteredTodos" :key="todo.id">
-            <v-list-tile-action class="item-action">
-              <v-checkbox
-                :input-value="todo.completed"
-              ></v-checkbox>
-            </v-list-tile-action>
+    <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
+      <v-list three-line nav>
+        <v-list-item
+          @click="todoToggle(todo)"
+          v-for="todo in filteredTodos"
+          :key="todo.id"
+        >
+          <v-list-item-action class="item-action">
+            <v-checkbox :input-value="todo.completed"></v-checkbox>
+          </v-list-item-action>
 
-            <v-list-tile-content :class="{'item-content': true, 'completed': todo.completed}">
-              <v-list-tile-title class="todo-text">{{todo.text}}</v-list-tile-title>
-            </v-list-tile-content>
+          <v-list-item-content
+            :class="{ 'item-content': true, completed: todo.completed }"
+          >
+            <v-list-item-title class="todo-text">
+              {{ todo.text }}
+            </v-list-item-title>
+          </v-list-item-content>
 
-            <v-list-tile-action class="item-action">
-              <v-btn icon ripple @click.stop="removeTodo(todo.id)">
-                <v-icon color="grey lighten-1">delete</v-icon>
-              </v-btn>
-          </v-list-tile-action>
-          </v-list-tile>
-        </v-list>
-      </v-flex>
-
-    </v-layout>
-  </v-container>
-
+          <v-list-item-action class="item-action">
+            <v-btn icon ripple @click.stop="removeTodo(todo.id)">
+              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
-
 export default {
   computed: {
     user() {
@@ -127,6 +128,14 @@ export default {
   text-overflow: initial !important;
   white-space: initial !important;
   height: auto !important;
+}
+
+.filter-button {
+  margin: 6px 8px;
+}
+
+.item-action {
+  align-self: center !important;
 }
 
 @media (max-width: 767px) {

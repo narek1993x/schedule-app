@@ -1,31 +1,30 @@
 <template>
   <v-flex xs12 :class="{ backdrop: loading }" v-if="loading">
     <div class="lds-spinner">
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
     </div>
   </v-flex>
 </template>
 
 <script>
 export default {
-  props: ['loading'],
+  props: ["loading"]
 };
 </script>
 
 <style scoped>
-
- .backdrop {
+.backdrop {
   width: 100%;
   height: 100%;
   position: fixed;

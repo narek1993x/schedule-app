@@ -1,11 +1,9 @@
-import * as firebase from 'firebase'
-import {
-  UserToken
-} from '../storage'
+import * as firebase from "firebase";
+import { UserToken } from "../storage";
 
 class User {
   constructor(id) {
-    this.id = id
+    this.id = id;
   }
 }
 
@@ -15,65 +13,55 @@ export default {
   },
   mutations: {
     setUser(state, payload) {
-      state.user = payload
+      state.user = payload;
     },
     removeUser(state) {
-      state.user = null
+      state.user = null;
     }
   },
   actions: {
-    async authUser({
-      commit
-    }, {
-      email,
-      password,
-      isSignup = false
-    }) {
-      const method = isSignup ? 'createUserWithEmailAndPassword' : 'signInWithEmailAndPassword'
+    async authUser({ commit }, { email, password, isSignup = false }) {
+      const method = isSignup
+        ? "createUserWithEmailAndPassword"
+        : "signInWithEmailAndPassword";
       // Set expiration date to one month
-      const expirationDate = 30 * 24 * 60 * 60
+      const expirationDate = 30 * 24 * 60 * 60;
 
-      commit('clearError')
-      commit('setLoading', true)
+      commit("clearError");
+      commit("setLoading", true);
       try {
         const {
-          user: {
-            uid
-          }
-        } = await firebase.auth()[method](email, password)
-        const user = new User(uid)
-        UserToken.set(user, expirationDate)
+          user: { uid }
+        } = await firebase.auth()[method](email, password);
+        const user = new User(uid);
+        UserToken.set(user, expirationDate);
 
-        commit('setUser', user)
-        commit('setLoading', false)
+        commit("setUser", user);
+        commit("setLoading", false);
       } catch (err) {
-        commit('setLoading', false)
-        commit('setError', err.message)
-        throw err
+        commit("setLoading", false);
+        commit("setError", err.message);
+        throw err;
       }
     },
-    authCheckState({
-      commit
-    }) {
-      const token = UserToken.get()
+    authCheckState({ commit }) {
+      const token = UserToken.get();
 
       if (token) {
-        commit('setUser', token)
+        commit("setUser", token);
       }
     },
-    removeUser({
-      commit
-    }) {
-      UserToken.remove()
-      commit('removeUser')
+    removeUser({ commit }) {
+      UserToken.remove();
+      commit("removeUser");
     }
   },
   getters: {
     user(state) {
-      return state.user
+      return state.user;
     },
     isUserLoggedIn(state) {
-      return state.user !== null
+      return state.user !== null;
     }
   }
-}
+};

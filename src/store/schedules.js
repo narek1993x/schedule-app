@@ -6,31 +6,48 @@ export default {
       { title: "Monday", key: "monday", color: "red accent-2", content: "" },
       { title: "Tuesday", key: "tuesday", color: "#FF8F00", content: "" },
       { title: "Wednesday", key: "wednesday", color: "#F9A825", content: "" },
-      { title: "Thursday", key: "thursday", color: "green darken-2", content: "" },
+      {
+        title: "Thursday",
+        key: "thursday",
+        color: "green darken-2",
+        content: ""
+      },
       { title: "Friday", key: "friday", color: "#3598a7", content: "" },
-      { title: "Saturday", key: "saturday", color: "indigo accent-2", content: "" },
-      { title: "Sunday", key: "sunday", color: "deep-purple accent-2", content: "" }
+      {
+        title: "Saturday",
+        key: "saturday",
+        color: "indigo accent-2",
+        content: ""
+      },
+      {
+        title: "Sunday",
+        key: "sunday",
+        color: "deep-purple accent-2",
+        content: ""
+      }
     ]
   },
   mutations: {
     setSchedules: (state, payload) => {
-      state.schedules = state.schedules.map((schedule) => {
+      state.schedules = state.schedules.map(schedule => {
         const payloadSchedule = payload.find(r => r.key === schedule.key);
         if (payloadSchedule) {
-          return { ...schedule, ...payloadSchedule};
+          return { ...schedule, ...payloadSchedule };
         }
 
         return schedule;
-      })
+      });
     },
     editSchedule: (state, payload) => {
-      const scheduleIndex = state.schedules.findIndex(s => s.key === payload.key);
+      const scheduleIndex = state.schedules.findIndex(
+        s => s.key === payload.key
+      );
 
       state.schedules = [
         ...state.schedules.slice(0, scheduleIndex),
-        {...state.schedules[scheduleIndex], ...payload},
+        { ...state.schedules[scheduleIndex], ...payload },
         ...state.schedules.slice(scheduleIndex + 1)
-      ]
+      ];
     }
   },
   actions: {
@@ -98,6 +115,6 @@ export default {
     }
   },
   getters: {
-    schedules: (state) => state.schedules
+    schedules: state => state.schedules
   }
 };

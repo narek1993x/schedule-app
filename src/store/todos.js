@@ -1,4 +1,4 @@
-import * as firebase from 'firebase'
+import * as firebase from "firebase";
 
 export default {
   state: {
@@ -12,11 +12,9 @@ export default {
       if (!payload.id) {
         payload.id = state.todos.length + 1;
       }
-      state.todos.push(payload)
+      state.todos.push(payload);
     },
-    editTodo: (state, {
-      id
-    }) => {
+    editTodo: (state, { id }) => {
       const editTodo = state.todos.find(todo => todo.id === id);
       editTodo.completed = !editTodo.completed;
     },
@@ -26,14 +24,15 @@ export default {
     }
   },
   actions: {
-    async fetchTodos({
-      commit
-    }) {
-      commit('clearError');
-      commit('setLoading', true);
+    async fetchTodos({ commit }) {
+      commit("clearError");
+      commit("setLoading", true);
 
       try {
-        const fbVal = await firebase.database().ref('todos').once('value')
+        const fbVal = await firebase
+          .database()
+          .ref("todos")
+          .once("value");
         const todos = fbVal.val();
 
         const resultTodos = [];
@@ -41,76 +40,78 @@ export default {
           resultTodos.push({
             ...todos[key],
             id: key
-          })
+          });
         }
 
-        commit('setLoading', false)
-        commit('setTodos', resultTodos);
+        commit("setLoading", false);
+        commit("setTodos", resultTodos);
       } catch (error) {
-        commit('setLoading', false);
-        commit('setError', error.message)
-        throw error
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
       }
     },
-    async addTodo({
-      commit
-    }, newTodo) {
-      commit('clearError');
-      commit('setLoading', true);
+    async addTodo({ commit }, newTodo) {
+      commit("clearError");
+      commit("setLoading", true);
 
       try {
-        const todo = await firebase.database().ref('todos').push(newTodo);
+        const todo = await firebase
+          .database()
+          .ref("todos")
+          .push(newTodo);
 
-        commit('setLoading', false)
-        commit('addTodo', {
+        commit("setLoading", false);
+        commit("addTodo", {
           ...newTodo,
           id: todo.key
         });
       } catch (error) {
-        commit('setLoading', false);
-        commit('setError', error.message)
-        throw error
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
       }
     },
-    async editTodo({
-      commit
-    }, {
-      id,
-      completed
-    }) {
-      commit('clearError');
-      commit('setLoading', true);
+    async editTodo({ commit }, { id, completed }) {
+      commit("clearError");
+      commit("setLoading", true);
 
       try {
-        await firebase.database().ref('todos').child(id).update({
-          completed: !completed
-        });
+        await firebase
+          .database()
+          .ref("todos")
+          .child(id)
+          .update({
+            completed: !completed
+          });
 
-        commit('setLoading', false)
-        commit('editTodo', {
+        commit("setLoading", false);
+        commit("editTodo", {
           id
-        })
+        });
       } catch (error) {
-        commit('setLoading', false);
-        commit('setError', error.message)
-        throw error
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
       }
     },
-    async removeTodo({
-      commit
-    }, todoId) {
-      commit('clearError');
-      commit('setLoading', true);
+    async removeTodo({ commit }, todoId) {
+      commit("clearError");
+      commit("setLoading", true);
 
       try {
-        await firebase.database().ref('todos').child(todoId).remove();
+        await firebase
+          .database()
+          .ref("todos")
+          .child(todoId)
+          .remove();
 
-        commit('setLoading', false)
-        commit('removeTodo', todoId);
+        commit("setLoading", false);
+        commit("removeTodo", todoId);
       } catch (error) {
-        commit('setLoading', false);
-        commit('setError', error.message)
-        throw error
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
       }
     }
   },

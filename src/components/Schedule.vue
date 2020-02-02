@@ -4,12 +4,20 @@
       <v-container fluid grid-list-lg style="min-height: 0;">
         <v-layout row wrap>
           <app-loading :loading="loading"></app-loading>
-          <v-flex xs12 sm6 md4 v-for="schedule in schedules" :key="schedule.key">
+          <v-flex
+            xs12
+            sm6
+            md4
+            v-for="schedule in schedules"
+            :key="schedule.key"
+          >
             <v-card hover :color="schedule.color" class="white--text">
               <v-card-title primary-title>
-                <div class="headline">{{schedule.title}}</div>
+                <div class="headline">{{ schedule.title }}</div>
               </v-card-title>
-              <v-card-text v-if="editId !== schedule.key" class="card-text">{{schedule.content}}</v-card-text>
+              <v-card-text v-if="editId !== schedule.key" class="card-text">
+                {{ schedule.content }}
+              </v-card-text>
               <v-card-text v-else>
                 <v-text-field
                   v-model="scheduleText"
@@ -21,21 +29,23 @@
                 ></v-text-field>
               </v-card-text>
               <v-card-actions v-if="editId !== schedule.key">
-                <v-btn flat dark @click="editHandler(schedule.key)">
-                  <v-icon left>edit</v-icon>Edit
+                <v-btn icon dark @click="editHandler(schedule.key)">
+                  <v-icon size="22">mdi-pencil</v-icon>
                 </v-btn>
               </v-card-actions>
               <v-card-actions v-else>
                 <v-btn
                   :disabled="isSaveDisabled(schedule.key)"
-                  flat
+                  text
                   dark
                   @click="saveHandler(schedule.key)"
                 >
-                  <v-icon left>save</v-icon>Save
+                  <v-icon size="22" left>mdi-content-save</v-icon>
+                  Save
                 </v-btn>
-                <v-btn flat dark @click="cancelHandler">
-                  <v-icon left>cancel</v-icon>Cancel
+                <v-btn text dark @click="cancelHandler">
+                  <v-icon size="22" left>mdi-close-circle</v-icon>
+                  Cancel
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -86,7 +96,8 @@ export default {
     saveHandler(key) {
       if (!this.scheduleText) return;
 
-      const { color, title, ...otherProps } = this.schedules.find(d => d.key === key) || {};
+      const { color, title, ...otherProps } =
+        this.schedules.find(d => d.key === key) || {};
 
       const schedule = {
         ...otherProps,

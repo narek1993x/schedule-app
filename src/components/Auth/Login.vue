@@ -9,20 +9,22 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" validation>
               <v-text-field
-                prepend-icon="person"
+                prepend-icon="mdi-account"
                 name="email"
                 label="Email"
                 type="email"
                 :rules="emailRules"
-                v-model="email"></v-text-field>
+                v-model="email"
+              ></v-text-field>
               <v-text-field
-                prepend-icon="lock"
+                prepend-icon="mdi-lock"
                 name="password"
                 label="Password"
                 type="password"
                 :counter="6"
                 :rules="passwordRules"
-                v-model="password"></v-text-field>
+                v-model="password"
+              ></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -31,7 +33,10 @@
               color="primary"
               :disabled="!valid || loading"
               :loading="loading"
-              @click="onSubmit">Login</v-btn>
+              @click="onSubmit"
+            >
+              Login
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -85,5 +90,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

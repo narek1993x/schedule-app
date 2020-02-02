@@ -9,28 +9,31 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field
-                prepend-icon="person"
+                prepend-icon="mdi-account"
                 name="email"
                 label="Email"
                 type="email"
                 :rules="emailRules"
-                v-model="email"></v-text-field>
+                v-model="email"
+              ></v-text-field>
               <v-text-field
-                prepend-icon="lock"
+                prepend-icon="mdi-lock"
                 name="password"
                 label="Password"
                 type="password"
                 :counter="6"
                 :rules="passwordRules"
-                v-model="password"></v-text-field>
+                v-model="password"
+              ></v-text-field>
               <v-text-field
-                prepend-icon="lock"
+                prepend-icon="mdi-lock"
                 name="confirm-password"
                 label="Confirm Password"
                 type="password"
                 :counter="6"
                 :rules="confirmPasswordRules"
-                v-model="confirmPassword"></v-text-field>
+                v-model="confirmPassword"
+              ></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -39,7 +42,10 @@
               color="primary"
               :disabled="!valid || loading"
               :loading="loading"
-              @click="onSubmit">Create Account</v-btn>
+              @click="onSubmit"
+            >
+              Create Account
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -48,49 +54,50 @@
 </template>
 
 <script>
-    export default {
-        computed: {
-            loading () {
-                return this.$store.getters.loading
-            }
-        },
-        data () {
-            return {
-                valid: false,
-                email: '',
-                password: '',
-                confirmPassword: '',
-                emailRules: [
-                    v => !!v || 'E-mail is required',
-                    v => /.+@.+/.test(v) || 'E-mail must be valid'
-                ],
-                passwordRules: [
-                    v => !!v || 'Password is required',
-                    v => (v && v.length >= 6) || 'Password must be equal or more than 6 characters'
-                ],
-                confirmPasswordRules: [
-                    v => !!v || 'Confirm password is required',
-                    v => v === this.password || 'Confirm password must be mutch'
-                ]
-            }
-        },
-        methods: {
-        onSubmit () {
-                if (this.$refs.form.validate()) {
-                    const user = {
-                        email: this.email,
-                        password: this.password,
-                        isSignup: true
-                    }
-                    this.$store.dispatch('authUser', user)
-                        .then(() => this.$router.push('/'))
-                        .catch(() => {})
-                }
-            }
-        }
+export default {
+  computed: {
+    loading() {
+      return this.$store.getters.loading;
     }
+  },
+  data() {
+    return {
+      valid: false,
+      email: "",
+      password: "",
+      confirmPassword: "",
+      emailRules: [
+        v => !!v || "E-mail is required",
+        v => /.+@.+/.test(v) || "E-mail must be valid"
+      ],
+      passwordRules: [
+        v => !!v || "Password is required",
+        v =>
+          (v && v.length >= 6) ||
+          "Password must be equal or more than 6 characters"
+      ],
+      confirmPasswordRules: [
+        v => !!v || "Confirm password is required",
+        v => v === this.password || "Confirm password must be mutch"
+      ]
+    };
+  },
+  methods: {
+    onSubmit() {
+      if (this.$refs.form.validate()) {
+        const user = {
+          email: this.email,
+          password: this.password,
+          isSignup: true
+        };
+        this.$store
+          .dispatch("authUser", user)
+          .then(() => this.$router.push("/"))
+          .catch(() => {});
+      }
+    }
+  }
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
