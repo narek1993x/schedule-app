@@ -33,7 +33,10 @@
           :key="todo.id"
         >
           <v-list-item-action class="item-action">
-            <v-checkbox :input-value="todo.completed"></v-checkbox>
+            <v-checkbox
+              color="secondary"
+              :input-value="todo.completed"
+            ></v-checkbox>
           </v-list-item-action>
 
           <v-list-item-content
@@ -86,7 +89,7 @@ export default {
       text: "",
       filter: "all",
       filterButtons: [
-        { text: "all" },
+        { text: "all", color: "primary" },
         { text: "active", color: "success" },
         { text: "completed", color: "info" }
       ]

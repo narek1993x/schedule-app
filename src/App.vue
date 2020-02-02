@@ -14,29 +14,27 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-card flat>
-      <v-toolbar dark color="primary">
-        <v-app-bar-nav-icon
-          @click="drawer = !drawer"
-          class="hidden-md-and-up"
-        ></v-app-bar-nav-icon>
+    <v-app-bar app dark color="primary">
+      <v-app-bar-nav-icon
+        @click="drawer = !drawer"
+        class="hidden-md-and-up"
+      ></v-app-bar-nav-icon>
 
-        <v-toolbar-title>
-          <router-link to="/" tag="span" class="pointer">
-            My Todo List
-          </router-link>
-        </v-toolbar-title>
+      <v-toolbar-title>
+        <router-link to="/" tag="span" class="pointer">
+          My Todo List
+        </router-link>
+      </v-toolbar-title>
 
-        <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
-        <v-toolbar-items class="hidden-sm-and-down">
-          <v-btn text v-for="link of links" :key="link.title" :to="link.url">
-            <v-icon size="24" left>{{ link.icon }}</v-icon>
-            {{ link.title }}
-          </v-btn>
-        </v-toolbar-items>
-      </v-toolbar>
-    </v-card>
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-btn text v-for="link of links" :key="link.title" :to="link.url">
+          <v-icon size="24" left>{{ link.icon }}</v-icon>
+          {{ link.title }}
+        </v-btn>
+      </v-toolbar-items>
+    </v-app-bar>
 
     <v-content>
       <v-container fluid>
