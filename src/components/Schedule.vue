@@ -1,42 +1,85 @@
 <template>
-  <v-layout justify-center>
-    <v-row justify="center">
-      <v-col sm="12" lg="24">
-        <v-sheet height="800">
-          <v-calendar
-            ref="calendar"
-            v-model="start"
-            :type="type"
-            :start="start"
-            :end="end"
-            :min-weeks="minWeeks"
-            :max-days="maxDays"
-            :now="now"
-            :dark="dark"
-            :weekdays="weekdays"
-            :first-interval="intervals.first"
-            :interval-minutes="intervals.minutes"
-            :interval-count="intervals.count"
-            :interval-height="intervals.height"
-            :interval-style="intervalStyle"
-            :show-interval-label="showIntervalLabel"
-            :short-intervals="shortIntervals"
-            :short-months="shortMonths"
-            :short-weekdays="shortWeekdays"
-            :color="color"
-            :events="events"
-            :event-overlap-mode="mode"
-            :event-overlap-threshold="45"
-            :event-color="getEventColor"
-            @change="getEvents"
-          ></v-calendar>
-        </v-sheet>
-      </v-col>
-    </v-row>
-  </v-layout>
+  <div>
+    <v-sheet
+      tile
+      height="54"
+      color="grey lighten-3"
+      class="d-flex align-center"
+    >
+      <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
+        <v-icon>mdi-chevron-left</v-icon>
+      </v-btn>
+      <v-switch
+        v-model="dark"
+        :label="`${dark ? 'Dark' : 'Light'} Mode`"
+      ></v-switch>
+      <v-select
+        v-model="type"
+        :items="typeOptions"
+        dense
+        outlined
+        hide-details
+        class="ma-2"
+        label="type"
+      ></v-select>
+      <v-select
+        v-model="mode"
+        :items="modeOptions"
+        dense
+        outlined
+        hide-details
+        label="event-overlap-mode"
+        class="ma-2"
+      ></v-select>
+      <v-select
+        v-model="weekdays"
+        :items="weekdaysOptions"
+        dense
+        outlined
+        hide-details
+        label="weekdays"
+        class="ma-2"
+      ></v-select>
+      <v-spacer></v-spacer>
+      <v-btn icon class="ma-2" @click="$refs.calendar.next()">
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
+    </v-sheet>
+    <v-sheet height="800">
+      <v-calendar
+        ref="calendar"
+        v-model="start"
+        :type="type"
+        :start="start"
+        :end="end"
+        :min-weeks="minWeeks"
+        :max-days="maxDays"
+        :now="now"
+        :dark="dark"
+        :weekdays="weekdays"
+        :first-interval="intervals.first"
+        :interval-minutes="intervals.minutes"
+        :interval-count="intervals.count"
+        :interval-height="intervals.height"
+        :interval-style="intervalStyle"
+        :show-interval-label="showIntervalLabel"
+        :short-intervals="shortIntervals"
+        :short-months="shortMonths"
+        :short-weekdays="shortWeekdays"
+        color="secondary"
+        :events="events"
+        :event-overlap-mode="mode"
+        :event-overlap-threshold="45"
+        :event-color="getEventColor"
+        @change="getEvents"
+      ></v-calendar>
+    </v-sheet>
+  </div>
 </template>
 
 <script>
+import moment from "moment";
+
 const weekdaysDefault = [0, 1, 2, 3, 4, 5, 6];
 
 const intervalsDefault = {
@@ -80,13 +123,22 @@ const stylings = {
   }
 };
 
+console.log(
+  "endDate: ",
+  moment()
+    .add("days", 17)
+    .format("YYYY-MM-DD")
+);
+
 export default {
   data: () => ({
     dark: true,
     startMenu: false,
-    start: "2019-01-12",
+    start: moment().format("YYYY-MM-DD"),
+    end: moment()
+      .add("days", 6)
+      .format("YYYY-MM-DD"),
     endMenu: false,
-    end: "2019-01-27",
     nowMenu: false,
     minWeeks: 1,
     now: null,
@@ -180,7 +232,7 @@ export default {
     ],
     shortIntervals: false,
     shortMonths: false,
-    shortWeekdays: true
+    shortWeekdays: false
   }),
   computed: {
     intervalStyle() {
@@ -219,6 +271,7 @@ export default {
       return interval.minute === 0;
     },
     getEvents({ start, end }) {
+      console.log("start", start, "end: ", end);
       const events = [];
 
       const min = new Date(`${start.date}T00:00:00`);
@@ -240,6 +293,8 @@ export default {
           color: this.colors[this.rnd(0, this.colors.length - 1)]
         });
       }
+
+      console.log("events", events);
 
       this.events = events;
     },
