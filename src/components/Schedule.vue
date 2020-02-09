@@ -9,8 +9,11 @@
       <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
+      <v-toolbar-title>{{ title }}</v-toolbar-title>
+      <v-spacer></v-spacer>
       <v-switch
         v-model="dark"
+        class="mr-4"
         :label="`${dark ? 'Dark' : 'Light'} Mode`"
       ></v-switch>
       <v-select
@@ -22,7 +25,7 @@
         class="ma-2"
         label="type"
       ></v-select>
-      <v-select
+      <!-- <v-select
         v-model="mode"
         :items="modeOptions"
         dense
@@ -30,7 +33,7 @@
         hide-details
         label="event-overlap-mode"
         class="ma-2"
-      ></v-select>
+      ></v-select>-->
       <v-select
         v-model="weekdays"
         :items="weekdaysOptions"
@@ -48,6 +51,7 @@
     <v-sheet height="800">
       <v-calendar
         ref="calendar"
+        color="secondary"
         v-model="start"
         :type="type"
         :start="start"
@@ -57,22 +61,49 @@
         :now="now"
         :dark="dark"
         :weekdays="weekdays"
-        :first-interval="intervals.first"
-        :interval-minutes="intervals.minutes"
-        :interval-count="intervals.count"
-        :interval-height="intervals.height"
-        :interval-style="intervalStyle"
-        :show-interval-label="showIntervalLabel"
-        :short-intervals="shortIntervals"
         :short-months="shortMonths"
         :short-weekdays="shortWeekdays"
-        color="secondary"
+        :short-intervals="false"
+        :show-interval-label="showIntervalLabel"
         :events="events"
         :event-overlap-mode="mode"
         :event-overlap-threshold="45"
         :event-color="getEventColor"
+        @click:event="showEvent"
+        @click:more="viewDay"
+        @click:date="viewDay"
         @change="getEvents"
       ></v-calendar>
+      <v-menu
+        v-model="selectedOpen"
+        :close-on-content-click="false"
+        :activator="selectedElement"
+        offset-x
+      >
+        <v-card color="grey lighten-4" min-width="350px" flat>
+          <v-toolbar :color="selectedEvent.color" dark>
+            <v-btn icon>
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-heart</v-icon>
+            </v-btn>
+            <v-btn icon>
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-card-text>
+            <span v-html="selectedEvent.content"></span>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn text color="secondary" @click="selectedOpen = false">
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-menu>
     </v-sheet>
   </div>
 </template>
@@ -80,58 +111,15 @@
 <script>
 import moment from "moment";
 
-const weekdaysDefault = [0, 1, 2, 3, 4, 5, 6];
-
-const intervalsDefault = {
-  first: 0,
-  minutes: 60,
-  count: 24,
-  height: 48
-};
-
-const stylings = {
-  default(interval) {
-    return undefined;
-  },
-  workday(interval) {
-    const inactive =
-      interval.weekday === 0 ||
-      interval.weekday === 6 ||
-      interval.hour < 9 ||
-      interval.hour >= 17;
-    const startOfHour = interval.minute === 0;
-    const dark = this.dark;
-    const mid = dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
-
-    return {
-      backgroundColor: inactive
-        ? dark
-          ? "rgba(0,0,0,0.4)"
-          : "rgba(0,0,0,0.05)"
-        : undefined,
-      borderTop: startOfHour ? undefined : "1px dashed " + mid
-    };
-  },
-  past(interval) {
-    return {
-      backgroundColor: interval.past
-        ? this.dark
-          ? "rgba(0,0,0,0.4)"
-          : "rgba(0,0,0,0.05)"
-        : undefined
-    };
-  }
-};
-
-console.log(
-  "endDate: ",
-  moment()
-    .add("days", 17)
-    .format("YYYY-MM-DD")
-);
+const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   data: () => ({
+    titleStart: "",
+    titleEnd: "",
+    selectedEvent: {},
+    selectedElement: null,
+    selectedOpen: false,
     dark: true,
     startMenu: false,
     start: moment().format("YYYY-MM-DD"),
@@ -171,25 +159,17 @@ export default {
       { text: "Custom Daily", value: "custom-daily" },
       { text: "Custom Weekly", value: "custom-weekly" }
     ],
-    mode: "stack",
+    mode: "column",
     modeOptions: [
       { text: "Stack", value: "stack" },
       { text: "Column", value: "column" }
     ],
     weekdays: weekdaysDefault,
     weekdaysOptions: [
-      { text: "Sunday - Saturday", value: weekdaysDefault },
+      { text: "Sunday - Saturday", value: [0, 1, 2, 3, 4, 5, 6] },
       { text: "Mon, Wed, Fri", value: [1, 3, 5] },
       { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
-      { text: "Mon - Sun", value: [1, 2, 3, 4, 5, 6, 0] }
-    ],
-    intervals: intervalsDefault,
-    intervalsOptions: [
-      { text: "Default", value: intervalsDefault },
-      {
-        text: "Workday",
-        value: { first: 16, minutes: 30, count: 20, height: 48 }
-      }
+      { text: "Mon - Sun", value: weekdaysDefault }
     ],
     maxDays: 7,
     maxDaysOptions: [
@@ -204,59 +184,44 @@ export default {
       { text: "Workday", value: "workday" },
       { text: "Past", value: "past" }
     ],
-    color: "primary",
-    colorOptions: [
-      { text: "Primary", value: "primary" },
-      { text: "Secondary", value: "secondary" },
-      { text: "Accent", value: "accent" },
-      { text: "Red", value: "red" },
-      { text: "Pink", value: "pink" },
-      { text: "Purple", value: "purple" },
-      { text: "Deep Purple", value: "deep-purple" },
-      { text: "Indigo", value: "indigo" },
-      { text: "Blue", value: "blue" },
-      { text: "Light Blue", value: "light-blue" },
-      { text: "Cyan", value: "cyan" },
-      { text: "Teal", value: "teal" },
-      { text: "Green", value: "green" },
-      { text: "Light Green", value: "light-green" },
-      { text: "Lime", value: "lime" },
-      { text: "Yellow", value: "yellow" },
-      { text: "Amber", value: "amber" },
-      { text: "Orange", value: "orange" },
-      { text: "Deep Orange", value: "deep-orange" },
-      { text: "Brown", value: "brown" },
-      { text: "Blue Gray", value: "blue-gray" },
-      { text: "Gray", value: "gray" },
-      { text: "Black", value: "black" }
-    ],
     shortIntervals: false,
     shortMonths: false,
     shortWeekdays: false
   }),
   computed: {
-    intervalStyle() {
-      return stylings[this.styleInterval].bind(this);
+    title() {
+      const { titleStart, titleEnd } = this;
+      if (!titleStart || !titleEnd) {
+        return "";
+      }
+
+      const startMonth = this.monthFormatter(titleStart);
+      const endMonth = this.monthFormatter(titleEnd);
+      const suffixMonth = startMonth === endMonth ? "" : endMonth;
+
+      const startYear = titleStart.year;
+      const endYear = titleEnd.year;
+      const suffixYear = startYear === endYear ? "" : endYear;
+
+      const startDay = titleStart.day + this.nth(titleStart.day);
+      const endDay = titleEnd.day + this.nth(titleEnd.day);
+
+      switch (this.type) {
+        case "month":
+          return `${startMonth} ${startYear}`;
+        case "week":
+        case "4day":
+          return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`;
+        case "day":
+          return `${startMonth} ${startDay} ${startYear}`;
+      }
+      return "";
     },
-    hasIntervals() {
-      return (
-        this.type in
-        {
-          week: 1,
-          day: 1,
-          "4day": 1,
-          "custom-daily": 1
-        }
-      );
-    },
-    hasEnd() {
-      return (
-        this.type in
-        {
-          "custom-weekly": 1,
-          "custom-daily": 1
-        }
-      );
+    monthFormatter() {
+      return this.$refs.calendar.getFormatter({
+        timeZone: "UTC",
+        month: "long"
+      });
     }
   },
   methods: {
@@ -270,8 +235,23 @@ export default {
     showIntervalLabel(interval) {
       return interval.minute === 0;
     },
+    showEvent({ nativeEvent, event }) {
+      const open = () => {
+        this.selectedEvent = event;
+        this.selectedElement = nativeEvent.target;
+        setTimeout(() => (this.selectedOpen = true), 10);
+      };
+
+      if (this.selectedOpen) {
+        this.selectedOpen = false;
+        setTimeout(open, 10);
+      } else {
+        open();
+      }
+
+      nativeEvent.stopPropagation();
+    },
     getEvents({ start, end }) {
-      console.log("start", start, "end: ", end);
       const events = [];
 
       const min = new Date(`${start.date}T00:00:00`);
@@ -290,16 +270,22 @@ export default {
           name: this.names[this.rnd(0, this.names.length - 1)],
           start: this.formatDate(first, !allDay),
           end: this.formatDate(second, !allDay),
-          color: this.colors[this.rnd(0, this.colors.length - 1)]
+          color: this.colors[this.rnd(0, this.colors.length - 1)],
+          content: `Why do we use it? It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).`
         });
       }
 
-      console.log("events", events);
-
+      this.titleStart = start;
+      this.titleEnd = end;
       this.events = events;
     },
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a;
+    },
+    nth(d) {
+      return d > 3 && d < 21
+        ? "th"
+        : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
     },
     formatDate(a, withTime) {
       return withTime
@@ -312,33 +298,6 @@ export default {
 </script>
 
 <style>
-.schedule-textarea textarea {
-  font-weight: bold !important;
-  color: white !important;
-}
-
-.headline,
-.card-text {
-  font-weight: bold !important;
-}
-
-.card-text {
-  font-size: 16px;
-  line-height: 18px;
-  white-space: pre-wrap;
-}
-
 @media (max-width: 767px) {
-  .headline {
-    font-size: 22px !important;
-  }
-
-  .card-text {
-    font-size: 13px;
-  }
-
-  .schedule-textarea textarea {
-    font-size: 13px !important;
-  }
 }
 </style>
