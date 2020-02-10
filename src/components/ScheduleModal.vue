@@ -24,7 +24,7 @@
               <v-col cols="12">
                 <v-textarea
                   name="input-7-4"
-                  label="Filled textarea"
+                  label="Content"
                   value=""
                   hint="content of event"
                 ></v-textarea>
