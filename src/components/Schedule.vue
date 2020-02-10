@@ -13,7 +13,7 @@
       <v-spacer></v-spacer>
       <v-switch
         v-model="dark"
-        class="mr-4"
+        class="mr-2"
         :label="`${dark ? 'Dark' : 'Light'} Mode`"
       ></v-switch>
       <v-select
@@ -43,6 +43,7 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
+      <schedule-modal></schedule-modal>
       <v-spacer></v-spacer>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
@@ -110,6 +111,7 @@
 
 <script>
 import moment from "moment";
+import ScheduleModal from "./ScheduleModal.vue";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
@@ -223,6 +225,9 @@ export default {
         month: "long"
       });
     }
+  },
+  components: {
+    "schedule-modal": ScheduleModal
   },
   methods: {
     viewDay({ date }) {
