@@ -13,7 +13,7 @@
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-form ref="form" v-model="valid" validation>
+            <v-form ref="form" v-model="valid" lazy-validation>
               <v-row>
                 <v-col cols="12">
                   <v-text-field
@@ -35,7 +35,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-row class="d-flex justify-space-between">
-                    <v-col :cols="persistant ? '2' : '12'">
+                    <v-col cols="2">
                       <v-switch
                         v-model="persistant"
                         :label="`${persistant ? 'Persistant' : 'Normal'}`"
@@ -49,100 +49,102 @@
                         label="Week*"
                       ></v-select>
                     </v-col>
+                    <v-col v-else cols="6">
+                      <v-menu
+                        v-model="dateMenu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-text-field
+                            v-model="date"
+                            :rules="dateRules"
+                            label="Date*"
+                            hint="Event data"
+                            persistent-hint
+                            prepend-icon="mdi-calendar-outline"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="date"
+                          no-title
+                          @input="dateMenu = false"
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-col>
                   </v-row>
                 </v-col>
-                <v-col v-if="persistant" cols="12" sm="6">
-                  <v-menu
-                    ref="startTimer"
-                    v-model="startTimerMenu"
-                    :close-on-content-click="false"
-                    :nudge-right="30"
-                    :return-value.sync="startTime"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        v-model="startTime"
-                        :rules="startTimeRules"
-                        label="Start*"
-                        prepend-icon="mdi-timer"
-                        readonly
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-time-picker
-                      v-if="startTimerMenu"
-                      v-model="startTime"
-                      scrollable
-                      full-width
-                      :max="endTime"
-                      @click:minute="$refs.startTimer.save(startTime)"
-                    ></v-time-picker>
-                  </v-menu>
-                </v-col>
-                <v-col v-if="persistant" cols="12" sm="6">
-                  <v-menu
-                    ref="endTimer"
-                    v-model="endTimerMenu"
-                    :close-on-content-click="false"
-                    :nudge-right="30"
-                    :return-value.sync="endTime"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        v-model="endTime"
-                        :rules="endTimeRules"
-                        label="End*"
-                        prepend-icon="mdi-timer"
-                        readonly
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-time-picker
-                      v-if="endTimerMenu"
-                      v-model="endTime"
-                      scrollable
-                      full-width
-                      :min="startTime"
-                      @click:minute="$refs.endTimer.save(endTime)"
-                    ></v-time-picker>
-                  </v-menu>
-                </v-col>
-                <v-col v-else cols="12" sm="6">
-                  <v-menu
-                    ref="menu"
-                    v-model="dateMenu"
-                    :close-on-content-click="false"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        v-model="date"
-                        :rules="dateRules"
-                        label="Date*"
-                        hint="MM/DD/YYYY format"
-                        persistent-hint
-                        prepend-icon="mdi-calendar-outline"
-                        @blur="date = parseDate(dateFormatted)"
-                        v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="date"
-                      no-title
-                      @input="dateMenu = false"
-                    ></v-date-picker>
-                  </v-menu>
+                <v-col v-if="persistant" cols="12">
+                  <v-row class="d-flex">
+                    <v-col cols="12" sm="6">
+                      <v-menu
+                        ref="startTimer"
+                        v-model="startTimerMenu"
+                        :close-on-content-click="false"
+                        :nudge-right="30"
+                        :return-value.sync="startTime"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-text-field
+                            v-model="startTime"
+                            :rules="startTimeRules"
+                            label="Start*"
+                            prepend-icon="mdi-timer"
+                            readonly
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="startTimerMenu"
+                          v-model="startTime"
+                          scrollable
+                          full-width
+                          :max="endTime"
+                          @click:minute="$refs.startTimer.save(startTime)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-menu
+                        ref="endTimer"
+                        v-model="endTimerMenu"
+                        :close-on-content-click="false"
+                        :nudge-right="30"
+                        :return-value.sync="endTime"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-text-field
+                            v-model="endTime"
+                            :rules="endTimeRules"
+                            label="End*"
+                            prepend-icon="mdi-timer"
+                            readonly
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-time-picker
+                          v-if="endTimerMenu"
+                          v-model="endTime"
+                          scrollable
+                          full-width
+                          :min="startTime"
+                          @click:minute="$refs.endTimer.save(endTime)"
+                        ></v-time-picker>
+                      </v-menu>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-form>
@@ -150,13 +152,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">
+          <v-btn color="blue darken-1" text @click="closeHandler">
             Close
           </v-btn>
           <v-btn
             color="blue darken-1"
             text
-            :disabled="!valid"
+            :disabled="!valid || loading"
             @click="saveHandler"
           >
             Save
@@ -169,19 +171,27 @@
 
 <script>
 export default {
+  computed: {
+    user() {
+      return this.$store.getters.user;
+    },
+    loading() {
+      return this.$store.getters.loading;
+    }
+  },
   data: () => ({
     dialog: false,
-    valid: false,
+    valid: true,
     persistant: false,
     title: "",
     content: "",
-    date: null,
+    date: "",
     dateFormatted: null,
     dateMenu: false,
     startTimerMenu: false,
     endTimerMenu: false,
-    startTime: null,
-    endTime: null,
+    startTime: "",
+    endTime: "",
     week: "",
     weeks: [
       { text: "Monday", value: "monday" },
@@ -199,31 +209,46 @@ export default {
     weekRules: [v => !!v || "Week is required"]
   }),
   methods: {
-    parseDate(date) {
-      if (!date) return null;
-
-      const [month, day, year] = date.split("/");
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    clear() {
+      this.$refs.form.reset();
+      this.dialog = false;
+      this.valid = false;
+      this.persistant = false;
+      this.title = "";
+      this.content = "";
+      this.date = "";
+      this.dateFormatted = null;
+      this.dateMenu = false;
+      this.startTimerMenu = false;
+      this.endTimerMenu = false;
+      this.startTime = "";
+      this.endTime = "";
+      this.week = "";
+    },
+    closeHandler() {
+      this.dialog = false;
+      this.clear();
     },
     saveHandler() {
       if (this.$refs.form.validate()) {
         this.dialog = false;
 
         const schedule = {
-          title: this.title,
+          name: this.title,
           content: this.content,
           persistant: this.persistant,
           ...(this.persistant
             ? {
                 week: this.week,
-                startTime: this.startTime,
-                endTime: this.endTime
+                start: this.startTime,
+                end: this.endTime
               }
-            : { date: this.date })
+            : { date: this.date }),
+          ...(this.user ? { ownerId: this.user.id } : {})
         };
 
-        console.log("schedule: ", schedule);
-        this.$refs.form.reset();
+        this.$store.dispatch("editSchedule", schedule);
+        this.clear();
       }
     }
   }
