@@ -33,7 +33,7 @@
         hide-details
         label="event-overlap-mode"
         class="ma-2"
-      ></v-select>-->
+      ></v-select> -->
       <v-select
         v-model="weekdays"
         :items="weekdaysOptions"
@@ -53,28 +53,27 @@
       <v-calendar
         ref="calendar"
         color="secondary"
-        v-if="this.schedules.length > 0"
-        v-model="start"
+        v-model="focus"
         :type="type"
-        :start="start"
-        :end="end"
-        :min-weeks="minWeeks"
         :max-days="maxDays"
-        :now="now"
+        :now="today"
         :dark="dark"
         :weekdays="weekdays"
         :short-months="shortMonths"
         :short-weekdays="shortWeekdays"
-        :short-intervals="false"
+        :short-intervals="shortIntervals"
         :show-interval-label="showIntervalLabel"
-        :events="events"
+        :first-interval="7"
+        :interval-count="17"
+        :interval-height="120"
+        :events="schedules"
         :event-overlap-mode="mode"
         :event-overlap-threshold="45"
         :event-color="getEventColor"
         @click:event="showEvent"
         @click:more="viewDay"
         @click:date="viewDay"
-        @change="getEvents"
+        @change="updateRange"
       ></v-calendar>
       <v-menu
         v-model="selectedOpen"
@@ -118,22 +117,14 @@ const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   data: () => ({
-    titleStart: "",
-    titleEnd: "",
+    focus: moment().format("YYYY-MM-DD"),
+    today: moment().format("YYYY-MM-DD hh:mm:ss"),
     selectedEvent: {},
     selectedElement: null,
     selectedOpen: false,
     dark: true,
-    startMenu: false,
-    start: moment().format("YYYY-MM-DD"),
-    end: moment()
-      .add("days", 6)
-      .format("YYYY-MM-DD"),
-    endMenu: false,
-    nowMenu: false,
-    minWeeks: 1,
-    now: null,
-    events: [],
+    start: null,
+    end: null,
     colors: [
       "blue",
       "indigo",
@@ -187,7 +178,7 @@ export default {
       { text: "Workday", value: "workday" },
       { text: "Past", value: "past" }
     ],
-    shortIntervals: false,
+    shortIntervals: true,
     shortMonths: false,
     shortWeekdays: false
   }),
@@ -199,21 +190,21 @@ export default {
       return this.$store.getters.schedules;
     },
     title() {
-      const { titleStart, titleEnd } = this;
-      if (!titleStart || !titleEnd) {
+      const { start, end } = this;
+      if (!start || !end) {
         return "";
       }
 
-      const startMonth = this.monthFormatter(titleStart);
-      const endMonth = this.monthFormatter(titleEnd);
+      const startMonth = this.monthFormatter(start);
+      const endMonth = this.monthFormatter(end);
       const suffixMonth = startMonth === endMonth ? "" : endMonth;
 
-      const startYear = titleStart.year;
-      const endYear = titleEnd.year;
+      const startYear = start.year;
+      const endYear = end.year;
       const suffixYear = startYear === endYear ? "" : endYear;
 
-      const startDay = titleStart.day + this.nth(titleStart.day);
-      const endDay = titleEnd.day + this.nth(titleEnd.day);
+      const startDay = start.day + this.nth(start.day);
+      const endDay = end.day + this.nth(end.day);
 
       switch (this.type) {
         case "month":
@@ -238,7 +229,7 @@ export default {
   },
   methods: {
     viewDay({ date }) {
-      this.start = date;
+      this.focus = date;
       this.type = "day";
     },
     getEventColor(event) {
@@ -263,10 +254,9 @@ export default {
 
       nativeEvent.stopPropagation();
     },
-    getEvents({ start, end }) {
-      this.titleStart = start;
-      this.titleEnd = end;
-      this.events = this.schedules;
+    updateRange({ start, end }) {
+      this.start = start;
+      this.end = end;
     },
     nth(d) {
       return d > 3 && d < 21
@@ -278,6 +268,9 @@ export default {
 </script>
 
 <style>
+.v-calendar-daily__interval:first-child > .v-calendar-daily__interval-text {
+  top: -3px !important;
+}
 @media (max-width: 767px) {
 }
 </style>
