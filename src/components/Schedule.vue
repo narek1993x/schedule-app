@@ -43,7 +43,7 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
-      <schedule-modal></schedule-modal>
+      <schedule-modal :edit="isEdit" :editEvent="editEvent"></schedule-modal>
       <v-spacer></v-spacer>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
@@ -83,7 +83,7 @@
       >
         <v-card color="grey lighten-4" min-width="350px" flat>
           <v-toolbar :color="selectedEvent.color" dark>
-            <v-btn icon>
+            <v-btn icon @click="openEditScheduleModal(selectedEvent)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
             <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
@@ -180,7 +180,9 @@ export default {
     ],
     shortIntervals: true,
     shortMonths: false,
-    shortWeekdays: false
+    shortWeekdays: false,
+    isEdit: false,
+    editEvent: null
   }),
   computed: {
     loading() {
@@ -228,6 +230,11 @@ export default {
     "schedule-modal": ScheduleModal
   },
   methods: {
+    openEditScheduleModal(event) {
+      this.selectedOpen = false;
+      this.isEdit = true;
+      this.editEvent = event;
+    },
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";

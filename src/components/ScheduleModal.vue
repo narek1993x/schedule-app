@@ -171,6 +171,14 @@
 
 <script>
 export default {
+  props: ["edit", "editEvent"],
+  watch: {
+    edit: function(newEdit) {
+      if (newEdit) {
+        this.dialog = true;
+      }
+    }
+  },
   computed: {
     user() {
       return this.$store.getters.user;
