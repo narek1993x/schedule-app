@@ -1,6 +1,5 @@
 import * as firebase from "firebase";
-import moment from "moment";
-import { colors, rnd, capitalize } from "../helpers/utlis";
+import { setEventProps } from "../helpers/utlis";
 
 export default {
   state: {
@@ -8,25 +7,19 @@ export default {
   },
   mutations: {
     setSchedules: (state, payload) => {
-      state.schedules = payload.map(item => ({
-        ...item,
-        color: colors[rnd(0, colors.length - 1)],
-        ...(item.week
-          ? {
-              start: `${moment()
-                .day(capitalize(item.week))
-                .format("YYYY-M-DD")} ${item.start}`,
-              end: `${moment()
-                .day(capitalize(item.week))
-                .format("YYYY-M-DD")} ${item.end}`
-            }
-          : {})
+      state.schedules = payload.map(event => ({
+        ...setEventProps(event)
       }));
     },
+    addSchedule: (state, payload) => {
+      const newSchedule = {
+        ...setEventProps(payload)
+      };
+
+      state.schedules = [...state.schedules, newSchedule];
+    },
     editSchedule: (state, payload) => {
-      const scheduleIndex = state.schedules.findIndex(
-        s => s.week === payload.week
-      );
+      const scheduleIndex = state.schedules.findIndex(s => s.id === payload.id);
 
       state.schedules = [
         ...state.schedules.slice(0, scheduleIndex),
@@ -66,30 +59,42 @@ export default {
         throw error;
       }
     },
-    async editSchedule({ commit }, newSchedule) {
+    async addSchedule({ commit }, newSchedule) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        if (newSchedule && newSchedule.id) {
-          await firebase
-            .database()
-            .ref("events")
-            .child(newSchedule.id)
-            .update({ content: newSchedule.content });
+        const schedule = await firebase
+          .database()
+          .ref("events")
+          .push(newSchedule);
 
-          commit("editSchedule", newSchedule);
-        } else {
-          const schedule = await firebase
-            .database()
-            .ref("events")
-            .push(newSchedule);
+        commit("addSchedule", {
+          ...newSchedule,
+          id: schedule.key
+        });
 
-          commit("editSchedule", {
-            ...newSchedule,
-            id: schedule.key
-          });
-        }
+        commit("setLoading", false);
+      } catch (error) {
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
+      }
+    },
+    async editSchedule({ commit }, newSchedule) {
+      if (newSchedule && !newSchedule.id) return;
+
+      commit("clearError");
+      commit("setLoading", true);
+
+      try {
+        await firebase
+          .database()
+          .ref("events")
+          .child(newSchedule.id)
+          .update(newSchedule);
+
+        commit("editSchedule", newSchedule);
 
         commit("setLoading", false);
       } catch (error) {

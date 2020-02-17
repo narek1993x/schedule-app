@@ -1,4 +1,6 @@
-export const colors = [
+import moment from "moment";
+
+const colors = [
   "blue",
   "indigo",
   "deep-purple",
@@ -8,11 +10,28 @@ export const colors = [
   "grey darken-1"
 ];
 
-export const rnd = (a, b) => {
+const rnd = (a, b) => {
   return Math.floor((b - a + 1) * Math.random()) + a;
 };
 
-export const capitalize = s => {
+const capitalize = s => {
   if (typeof s !== "string") return "";
   return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+export const setEventProps = event => {
+  return {
+    ...event,
+    color: colors[rnd(0, colors.length - 1)],
+    ...(event.week
+      ? {
+          start: `${moment()
+            .day(capitalize(event.week))
+            .format("YYYY-M-DD")} ${event.start}`,
+          end: `${moment()
+            .day(capitalize(event.week))
+            .format("YYYY-M-DD")} ${event.end}`
+        }
+      : {})
+  };
 };

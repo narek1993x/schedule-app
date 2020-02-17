@@ -247,7 +247,7 @@ export default {
           ...(this.user ? { ownerId: this.user.id } : {})
         };
 
-        this.$store.dispatch("editSchedule", schedule);
+        this.$store.dispatch("addSchedule", schedule);
         this.clear();
       }
     }
