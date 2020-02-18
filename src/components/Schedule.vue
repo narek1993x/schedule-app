@@ -43,7 +43,15 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
-      <schedule-modal :edit="isEdit" :editEvent="editEvent"></schedule-modal>
+      <v-btn color="primary" @click.stop="showDialog = true">
+        Add
+        <v-icon right dark>mdi-plus</v-icon>
+      </v-btn>
+      <schedule-modal
+        :onClose="handleCloseDialog"
+        :visible="showDialog"
+        :editEvent="editEvent"
+      ></schedule-modal>
       <v-spacer></v-spacer>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
@@ -181,7 +189,7 @@ export default {
     shortIntervals: true,
     shortMonths: false,
     shortWeekdays: false,
-    isEdit: false,
+    showDialog: false,
     editEvent: null
   }),
   computed: {
@@ -230,9 +238,13 @@ export default {
     "schedule-modal": ScheduleModal
   },
   methods: {
+    handleCloseDialog() {
+      this.showDialog = false;
+      this.editEvent = null;
+    },
     openEditScheduleModal(event) {
       this.selectedOpen = false;
-      this.isEdit = true;
+      this.showDialog = true;
       this.editEvent = event;
     },
     viewDay({ date }) {

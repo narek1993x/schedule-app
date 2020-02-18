@@ -23,7 +23,7 @@ export default {
 
       state.schedules = [
         ...state.schedules.slice(0, scheduleIndex),
-        { ...state.schedules[scheduleIndex], ...payload },
+        { ...state.schedules[scheduleIndex], ...setEventProps(payload) },
         ...state.schedules.slice(scheduleIndex + 1)
       ];
     }

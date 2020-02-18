@@ -1,15 +1,11 @@
 <template>
   <v-row justify="start" class="ml-2">
-    <v-dialog dark v-model="dialog" persistent max-width="800px">
-      <template v-slot:activator="{ on }">
-        <v-btn color="primary" v-on="on">
-          Add
-          <v-icon right dark>mdi-plus</v-icon>
-        </v-btn>
-      </template>
+    <v-dialog dark v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title>
-          <span class="headline">Create schedule event</span>
+          <span class="headline">
+            {{ editEvent ? "Edit" : "Create" }} schedule event
+          </span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -152,7 +148,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeHandler">
+          <v-btn color="blue darken-1" text @click="dialog = false">
             Close
           </v-btn>
           <v-btn
@@ -161,7 +157,7 @@
             :disabled="!valid || loading"
             @click="saveHandler"
           >
-            Save
+            {{ editEvent ? "Update" : "Save" }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -170,13 +166,42 @@
 </template>
 
 <script>
+import { handleEventTime } from "../helpers/utlis";
 export default {
-  props: ["edit", "editEvent"],
+  props: ["visible", "edit", "editEvent", "onClose"],
   watch: {
-    edit: function(newEdit) {
-      if (newEdit) {
-        this.dialog = true;
+    editEvent: function(newEditEvent) {
+      if (newEditEvent) {
+        const {
+          name,
+          content,
+          persistant,
+          week,
+          start,
+          end,
+          date
+        } = newEditEvent;
+
+        this.title = name;
+        this.content = content;
+
+        if (persistant) {
+          this.persistant = persistant;
+          this.week = week;
+          this.startTime = handleEventTime(start);
+          this.endTime = handleEventTime(end);
+        } else {
+          this.date = date;
+        }
       }
+    },
+    visible: function(newVisible) {
+      if (newVisible) {
+        this.dialog = newVisible;
+      }
+    },
+    dialog: function(newDialog) {
+      if (!newDialog) this.closeHandler();
     }
   },
   computed: {
@@ -219,8 +244,8 @@ export default {
   methods: {
     clear() {
       this.$refs.form.reset();
-      this.dialog = false;
       this.valid = false;
+      this.dialog = false;
       this.persistant = false;
       this.title = "";
       this.content = "";
@@ -234,13 +259,11 @@ export default {
       this.week = "";
     },
     closeHandler() {
-      this.dialog = false;
+      this.onClose();
       this.clear();
     },
     saveHandler() {
       if (this.$refs.form.validate()) {
-        this.dialog = false;
-
         const schedule = {
           name: this.title,
           content: this.content,
@@ -252,11 +275,14 @@ export default {
                 end: this.endTime
               }
             : { date: this.date }),
-          ...(this.user ? { ownerId: this.user.id } : {})
+          ...(this.user ? { ownerId: this.user.id } : {}),
+          ...(this.editEvent ? { id: this.editEvent.id } : {})
         };
 
-        this.$store.dispatch("addSchedule", schedule);
-        this.clear();
+        const dispatchAction = this.editEvent ? "editSchedule" : "addSchedule";
+
+        this.$store.dispatch(dispatchAction, schedule);
+        this.closeHandler();
       }
     }
   }
