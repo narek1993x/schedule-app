@@ -9,14 +9,16 @@
       <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
+      <v-toolbar-title class="ToolbarTitle">{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-switch
+        v-if="!isMobile"
         v-model="dark"
         class="mr-2"
         :label="`${dark ? 'Dark' : 'Light'} Mode`"
       ></v-switch>
       <v-select
+        v-if="!isMobile"
         v-model="type"
         :items="typeOptions"
         dense
@@ -26,6 +28,7 @@
         label="type"
       ></v-select>
       <!-- <v-select
+        v-if="!isMobile"
         v-model="mode"
         :items="modeOptions"
         dense
@@ -35,6 +38,7 @@
         class="ma-2"
       ></v-select> -->
       <v-select
+        v-if="!isMobile"
         v-model="weekdays"
         :items="weekdaysOptions"
         dense
@@ -43,7 +47,7 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
-      <v-btn color="primary" @click.stop="showDialog = true">
+      <v-btn color="primary" :small="isMobile" @click.stop="showDialog = true">
         Add
         <v-icon right dark>mdi-plus</v-icon>
       </v-btn>
@@ -120,11 +124,13 @@
 <script>
 import moment from "moment";
 import ScheduleModal from "./ScheduleModal.vue";
+import { isMobile } from "../helpers/utlis";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   data: () => ({
+    isMobile: isMobile(),
     focus: moment().format("YYYY-MM-DD"),
     today: moment().format("YYYY-MM-DD hh:mm:ss"),
     selectedEvent: {},
@@ -152,7 +158,7 @@ export default {
       "Conference",
       "Party"
     ],
-    type: "week",
+    type: isMobile() ? "day" : "week",
     typeOptions: [
       { text: "Day", value: "day" },
       { text: "4 Day", value: "4day" },
@@ -291,5 +297,8 @@ export default {
   top: -3px !important;
 }
 @media (max-width: 767px) {
+  .ToolbarTitle {
+    font-size: 16px;
+  }
 }
 </style>
