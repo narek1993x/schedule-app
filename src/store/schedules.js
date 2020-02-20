@@ -26,6 +26,13 @@ export default {
         { ...state.schedules[scheduleIndex], ...setEventProps(payload) },
         ...state.schedules.slice(scheduleIndex + 1)
       ];
+    },
+    removeSchedule: (state, scheduleId) => {
+      const scheduleIndex = state.schedules.findIndex(s => s.id === scheduleId);
+      state.schedules = [
+        ...state.schedules.slice(0, scheduleIndex),
+        ...state.schedules.slice(scheduleIndex + 1)
+      ];
     }
   },
   actions: {
@@ -96,6 +103,24 @@ export default {
 
         commit("editSchedule", newSchedule);
 
+        commit("setLoading", false);
+      } catch (error) {
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
+      }
+    },
+    async removeSchedule({ commit }, scheduleId) {
+      commit("clearError");
+      commit("setLoading", true);
+      try {
+        await firebase
+          .database()
+          .ref("events")
+          .child(scheduleId)
+          .remove();
+
+        commit("removeSchedule", scheduleId);
         commit("setLoading", false);
       } catch (error) {
         commit("setLoading", false);

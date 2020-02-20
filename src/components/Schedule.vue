@@ -52,7 +52,7 @@
         <v-icon right dark>mdi-plus</v-icon>
       </v-btn>
       <schedule-modal
-        :onClose="handleCloseDialog"
+        :onClose="handleCloseScheduleModal"
         :visible="showDialog"
         :editEvent="editEvent"
       ></schedule-modal>
@@ -95,16 +95,13 @@
       >
         <v-card color="grey lighten-4" min-width="350px" flat>
           <v-toolbar :color="selectedEvent.color" dark>
-            <v-btn icon @click="openEditScheduleModal(selectedEvent)">
+            <v-btn icon @click="handleOpenScheduleModal(selectedEvent)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
             <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-heart</v-icon>
-            </v-btn>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn icon @click="handleOpenConfirmModal(selectedEvent.id)">
+              <v-icon>mdi-delete</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -117,6 +114,14 @@
           </v-card-actions>
         </v-card>
       </v-menu>
+      <confirm-modal
+        :visible="showConfirm"
+        :onConfirm="handleDeleteEvent"
+        :onClose="handleCloseConfirmModal"
+        title="Delete Event"
+        content="Are you sure you want to permanently delete this event?"
+        :width="400"
+      ></confirm-modal>
     </v-sheet>
   </div>
 </template>
@@ -124,6 +129,7 @@
 <script>
 import moment from "moment";
 import ScheduleModal from "./ScheduleModal.vue";
+import ConfirmModal from "./ConfirmModal.vue";
 import { isMobile } from "../helpers/utlis";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
@@ -196,6 +202,8 @@ export default {
     shortMonths: false,
     shortWeekdays: false,
     showDialog: false,
+    showConfirm: false,
+    deleteEventId: null,
     editEvent: null
   }),
   computed: {
@@ -241,17 +249,30 @@ export default {
     }
   },
   components: {
-    "schedule-modal": ScheduleModal
+    "schedule-modal": ScheduleModal,
+    "confirm-modal": ConfirmModal
   },
   methods: {
-    handleCloseDialog() {
+    handleCloseConfirmModal() {
+      this.deleteEventId = null;
+      this.showConfirm = false;
+    },
+    handleOpenConfirmModal(eventId) {
+      this.selectedOpen = false;
+      this.showConfirm = true;
+      this.deleteEventId = eventId;
+    },
+    handleCloseScheduleModal() {
       this.showDialog = false;
       this.editEvent = null;
     },
-    openEditScheduleModal(event) {
+    handleOpenScheduleModal(event) {
       this.selectedOpen = false;
       this.showDialog = true;
       this.editEvent = event;
+    },
+    handleDeleteEvent() {
+      this.$store.dispatch("removeSchedule", this.deleteEventId);
     },
     viewDay({ date }) {
       this.focus = date;
