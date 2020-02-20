@@ -40,7 +40,10 @@ export const setEventProps = event => {
             .day(capitalize(event.week))
             .format("YYYY-M-DD")} ${handleEventTime(event.end)}`
         }
-      : {})
+      : {
+          start: moment(event.date).format("YYYY-M-DD"),
+          end: moment(event.date).format("YYYY-M-DD")
+        })
   };
 };
 
