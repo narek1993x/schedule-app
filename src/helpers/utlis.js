@@ -41,8 +41,12 @@ export const setScheduleEventProps = event => {
             .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`
         }
       : {
-          start: moment(event.date).format("YYYY-M-DD"),
-          end: moment(event.date).format("YYYY-M-DD")
+          start: `${moment(event.date).format(
+            "YYYY-M-DD"
+          )} ${handleScheduleEventTime(event.start)}`,
+          end: `${moment(event.date).format(
+            "YYYY-M-DD"
+          )} ${handleScheduleEventTime(event.end)}`
         })
   };
 };

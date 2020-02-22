@@ -10,13 +10,14 @@
       ></v-text-field>
     </v-flex>
 
-    <v-flex xs12 sm6 sm3>
+    <v-flex xs12 sm6 sm3 class="Filters">
       <v-btn
         v-for="button in filterButtons"
         :key="button.text"
         :color="button.color"
         :text="filter !== button.text"
         @click="filterToggle(button.text)"
+        :small="isMobile"
         class="filter-button"
       >
         {{ button.text }}
@@ -59,6 +60,8 @@
 </template>
 
 <script>
+import { isMobile } from "../helpers/utlis";
+
 export default {
   computed: {
     user() {
@@ -86,6 +89,7 @@ export default {
   },
   data() {
     return {
+      isMobile: isMobile(),
       text: "",
       filter: "all",
       filterButtons: [
@@ -137,20 +141,30 @@ export default {
   margin: 6px 8px;
 }
 
+.filter-button:first-child {
+  margin-left: 0px;
+}
+.filter-button:last-child {
+  margin-right: 0px;
+}
+
 .item-action {
   align-self: center !important;
 }
 
 @media (max-width: 767px) {
-  .todo-text {
-    font-size: 13px;
-    line-height: unset !important;
+  .Filters {
+    display: flex;
+    justify-content: space-between;
   }
 
   .filter-button {
-    font-size: 12px !important;
-    padding: 0 5px !important;
     min-width: 80px !important;
+  }
+
+  .todo-text {
+    font-size: 13px;
+    line-height: unset !important;
   }
 
   .v-list__tile {

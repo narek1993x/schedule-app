@@ -2,7 +2,7 @@
   <v-row justify="start" class="ml-2">
     <v-dialog dark v-model="dialog" max-width="800px">
       <v-card>
-        <v-card-title>
+        <v-card-title class="ModalTitle">
           <span class="headline">
             {{ scheduleEvent ? "Edit" : "Create" }} schedule event
           </span>
@@ -31,13 +31,13 @@
                 </v-col>
                 <v-col cols="12">
                   <v-row class="d-flex justify-space-between">
-                    <v-col cols="2">
+                    <v-col cols="12" sm="2">
                       <v-switch
                         v-model="persistant"
                         :label="`${persistant ? 'Persistant' : 'Normal'}`"
                       ></v-switch>
                     </v-col>
-                    <v-col cols="6" v-if="persistant">
+                    <v-col v-if="persistant" cols="12" sm="6">
                       <v-select
                         v-model="week"
                         :items="weeks"
@@ -45,7 +45,7 @@
                         label="Week*"
                       ></v-select>
                     </v-col>
-                    <v-col v-else cols="6">
+                    <v-col v-else cols="12" sm="6">
                       <v-menu
                         v-model="dateMenu"
                         :close-on-content-click="false"
@@ -74,7 +74,7 @@
                     </v-col>
                   </v-row>
                 </v-col>
-                <v-col v-if="persistant" cols="12">
+                <v-col cols="12">
                   <v-row class="d-flex">
                     <v-col cols="12" sm="6">
                       <v-menu
@@ -86,7 +86,7 @@
                         transition="scale-transition"
                         offset-y
                         max-width="290px"
-                        min-width="290px"
+                        min-width="280px"
                       >
                         <template v-slot:activator="{ on }">
                           <v-text-field
@@ -101,6 +101,7 @@
                         <v-time-picker
                           v-if="startTimerMenu"
                           v-model="startTime"
+                          format="24hr"
                           scrollable
                           full-width
                           :max="endTime"
@@ -118,7 +119,7 @@
                         transition="scale-transition"
                         offset-y
                         max-width="290px"
-                        min-width="290px"
+                        min-width="280px"
                       >
                         <template v-slot:activator="{ on }">
                           <v-text-field
@@ -133,6 +134,7 @@
                         <v-time-picker
                           v-if="endTimerMenu"
                           v-model="endTime"
+                          format="24hr"
                           scrollable
                           full-width
                           :min="startTime"
@@ -185,12 +187,12 @@ export default {
 
         this.title = name;
         this.content = content;
+        this.startTime = handleScheduleEventTime(start);
+        this.endTime = handleScheduleEventTime(end);
 
         if (persistant) {
           this.persistant = persistant;
           this.week = week;
-          this.startTime = handleScheduleEventTime(start);
-          this.endTime = handleScheduleEventTime(end);
         } else {
           this.date = date;
         }
@@ -269,11 +271,11 @@ export default {
           name: this.title,
           content: this.content,
           persistant: this.persistant,
+          start: this.startTime,
+          end: this.endTime,
           ...(this.persistant
             ? {
-                week: this.week,
-                start: this.startTime,
-                end: this.endTime
+                week: this.week
               }
             : { date: this.date }),
           ...(this.user ? { ownerId: this.user.id } : {}),
@@ -292,4 +294,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+@media (max-width: 767px) {
+  .ModalTitle > .headline {
+    font-size: 20px !important;
+  }
+}
+</style>

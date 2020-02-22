@@ -96,9 +96,13 @@
         v-model="selectedOpen"
         :close-on-content-click="false"
         :activator="selectedElement"
-        offset-x
+        :offset-x="!isMobile"
       >
-        <v-card color="grey lighten-4" min-width="350px" flat>
+        <v-card
+          color="grey lighten-4"
+          :min-width="isMobile ? '250px' : '350px'"
+          flat
+        >
           <v-toolbar :color="selectedScheduleEvent.color" dark>
             <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
               <v-icon>mdi-pencil</v-icon>
