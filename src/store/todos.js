@@ -1,4 +1,4 @@
-import * as firebase from "firebase";
+import { todosRef } from "../firebase";
 
 export default {
   state: {
@@ -24,15 +24,12 @@ export default {
     }
   },
   actions: {
-    async fetchTodos({ commit }) {
+    async fetchTodos({ commit, getters }) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const fbVal = await firebase
-          .database()
-          .ref("todos")
-          .once("value");
+        const fbVal = await todosRef.child(getters.user.id).once("value");
         const todos = fbVal.val();
 
         const resultTodos = [];
@@ -51,15 +48,12 @@ export default {
         throw error;
       }
     },
-    async addTodo({ commit }, newTodo) {
+    async addTodo({ commit, getters }, newTodo) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const todo = await firebase
-          .database()
-          .ref("todos")
-          .push(newTodo);
+        const todo = await todosRef.child(getters.user.id).push(newTodo);
 
         commit("setLoading", false);
         commit("addTodo", {
@@ -72,14 +66,13 @@ export default {
         throw error;
       }
     },
-    async editTodo({ commit }, { id, completed }) {
+    async editTodo({ commit, getters }, { id, completed }) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        await firebase
-          .database()
-          .ref("todos")
+        await todosRef
+          .child(getters.user.id)
           .child(id)
           .update({
             completed: !completed
@@ -95,14 +88,13 @@ export default {
         throw error;
       }
     },
-    async removeTodo({ commit }, todoId) {
+    async removeTodo({ commit, getters }, todoId) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        await firebase
-          .database()
-          .ref("todos")
+        await todosRef
+          .child(getters.user.id)
           .child(todoId)
           .remove();
 
@@ -117,11 +109,9 @@ export default {
   },
   getters: {
     todos: (state, getters) => {
-      if (getters.user) {
-        return state.todos.filter(todo => todo.ownerId === getters.user.id);
-      } else {
-        return state.todos.filter(todo => !todo.ownerId);
-      }
+      return state.todos.filter(todo =>
+        getters.user ? !!todo.ownerId : !todo.ownerId
+      );
     }
   }
 };

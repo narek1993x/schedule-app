@@ -1,4 +1,4 @@
-import * as firebase from "firebase";
+import { scheduleEventsRef } from "../firebase";
 import { setScheduleEventProps } from "../helpers/utlis";
 
 export default {
@@ -48,21 +48,17 @@ export default {
       commit("setLoading", true);
 
       try {
-        const fbVal = await firebase
-          .database()
-          .ref("scheduleEvents")
+        const fbVal = await scheduleEventsRef
+          .child(getters.user.id)
           .once("value");
         const scheduleEvents = fbVal.val();
-        const user = getters.user;
 
         const resultScheduleEvents = [];
         for (let key in scheduleEvents) {
-          if (user && scheduleEvents[key].ownerId === user.id) {
-            resultScheduleEvents.push({
-              ...scheduleEvents[key],
-              id: key
-            });
-          }
+          resultScheduleEvents.push({
+            ...scheduleEvents[key],
+            id: key
+          });
         }
 
         commit("setLoading", false);
@@ -73,14 +69,13 @@ export default {
         throw error;
       }
     },
-    async addScheduleEvent({ commit }, newScheduleEvent) {
+    async addScheduleEvent({ commit, getters }, newScheduleEvent) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const scheduleEvent = await firebase
-          .database()
-          .ref("scheduleEvents")
+        const scheduleEvent = await scheduleEventsRef
+          .child(getters.user.id)
           .push(newScheduleEvent);
 
         commit("addScheduleEvent", {
@@ -95,16 +90,15 @@ export default {
         throw error;
       }
     },
-    async editScheduleEvent({ commit }, newScheduleEvent) {
+    async editScheduleEvent({ commit, getters }, newScheduleEvent) {
       if (newScheduleEvent && !newScheduleEvent.id) return;
 
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        await firebase
-          .database()
-          .ref("scheduleEvents")
+        await scheduleEventsRef
+          .child(getters.user.id)
           .child(newScheduleEvent.id)
           .update(newScheduleEvent);
 
@@ -117,13 +111,12 @@ export default {
         throw error;
       }
     },
-    async removeScheduleEvent({ commit }, scheduleId) {
+    async removeScheduleEvent({ commit, getters }, scheduleId) {
       commit("clearError");
       commit("setLoading", true);
       try {
-        await firebase
-          .database()
-          .ref("scheduleEvents")
+        await scheduleEventsRef
+          .child(getters.user.id)
           .child(scheduleId)
           .remove();
 
