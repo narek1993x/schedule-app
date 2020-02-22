@@ -31,7 +31,7 @@ export const setScheduleEventProps = event => {
   return {
     ...event,
     color: colors[rnd(0, colors.length - 1)],
-    ...(event.week
+    ...(event.permanent
       ? {
           start: `${moment()
             .day(capitalize(event.week))

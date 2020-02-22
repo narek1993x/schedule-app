@@ -37,9 +37,7 @@
     </v-app-bar>
 
     <v-content>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>
+      <router-view></router-view>
     </v-content>
 
     <template v-if="error">
@@ -106,7 +104,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+html {
+  overflow-y: auto !important;
+}
 .pointer {
   cursor: pointer;
 }

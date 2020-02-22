@@ -1,6 +1,6 @@
 <template>
   <v-row justify="start" class="ml-2">
-    <v-dialog dark v-model="dialog" max-width="800px">
+    <v-dialog dark :fullscreen="isMobile" v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title class="ModalTitle">
           <span class="headline">
@@ -31,13 +31,13 @@
                 </v-col>
                 <v-col cols="12">
                   <v-row class="d-flex justify-space-between">
-                    <v-col cols="12" sm="2">
+                    <v-col cols="12" sm="3">
                       <v-switch
-                        v-model="persistant"
-                        :label="`${persistant ? 'Persistant' : 'Normal'}`"
+                        v-model="permanent"
+                        :label="`${permanent ? 'Permanent' : 'One time'}`"
                       ></v-switch>
                     </v-col>
-                    <v-col v-if="persistant" cols="12" sm="6">
+                    <v-col v-if="permanent" cols="12" sm="6">
                       <v-select
                         v-model="week"
                         :items="weeks"
@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { handleScheduleEventTime } from "../../helpers/utlis";
+import { handleScheduleEventTime, isMobile } from "../../helpers/utlis";
 
 export default {
   props: ["visible", "edit", "scheduleEvent", "onClose"],
@@ -178,7 +178,7 @@ export default {
         const {
           name,
           content,
-          persistant,
+          permanent,
           week,
           start,
           end,
@@ -190,8 +190,8 @@ export default {
         this.startTime = handleScheduleEventTime(start);
         this.endTime = handleScheduleEventTime(end);
 
-        if (persistant) {
-          this.persistant = persistant;
+        if (permanent) {
+          this.permanent = permanent;
           this.week = week;
         } else {
           this.date = date;
@@ -216,9 +216,10 @@ export default {
     }
   },
   data: () => ({
+    isMobile: isMobile(),
     dialog: false,
     valid: true,
-    persistant: false,
+    permanent: false,
     title: "",
     content: "",
     date: "",
@@ -249,7 +250,7 @@ export default {
       this.$refs.form.reset();
       this.valid = false;
       this.dialog = false;
-      this.persistant = false;
+      this.permanent = false;
       this.title = "";
       this.content = "";
       this.date = "";
@@ -270,10 +271,10 @@ export default {
         const schedule = {
           name: this.title,
           content: this.content,
-          persistant: this.persistant,
+          permanent: this.permanent,
           start: this.startTime,
           end: this.endTime,
-          ...(this.persistant
+          ...(this.permanent
             ? {
                 week: this.week
               }

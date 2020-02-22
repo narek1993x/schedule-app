@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container fluid class="Container">
     <v-sheet
       tile
       height="54"
@@ -27,16 +27,6 @@
         class="ma-2"
         label="type"
       ></v-select>
-      <!-- <v-select
-        v-if="!isMobile"
-        v-model="mode"
-        :items="modeOptions"
-        dense
-        outlined
-        hide-details
-        label="event-overlap-mode"
-        class="ma-2"
-      ></v-select> -->
       <v-select
         v-if="!isMobile"
         v-model="weekdays"
@@ -66,7 +56,7 @@
       </v-btn>
     </v-sheet>
     <app-loading :loading="loading"></app-loading>
-    <v-sheet height="800">
+    <v-sheet class="CalendarSheet">
       <v-calendar
         ref="calendar"
         color="secondary"
@@ -137,7 +127,7 @@
         :width="400"
       ></confirm-modal>
     </v-sheet>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -183,15 +173,9 @@ export default {
       { text: "Day", value: "day" },
       { text: "4 Day", value: "4day" },
       { text: "Week", value: "week" },
-      { text: "Month", value: "month" },
-      { text: "Custom Daily", value: "custom-daily" },
-      { text: "Custom Weekly", value: "custom-weekly" }
+      { text: "Month", value: "month" }
     ],
     mode: "column",
-    modeOptions: [
-      { text: "Stack", value: "stack" },
-      { text: "Column", value: "column" }
-    ],
     weekdays: weekdaysDefault,
     weekdaysOptions: [
       { text: "Sunday - Saturday", value: [0, 1, 2, 3, 4, 5, 6] },
@@ -328,12 +312,22 @@ export default {
 </script>
 
 <style>
+.Container {
+  padding: 0px !important;
+}
+.CalendarSheet {
+  height: calc(100vh - 118px) !important;
+}
 .v-calendar-daily__interval:first-child > .v-calendar-daily__interval-text {
   top: -3px !important;
 }
 @media (max-width: 767px) {
   .ToolbarTitle {
     font-size: 16px;
+  }
+
+  .CalendarSheet {
+    height: calc(100vh - 110px) !important;
   }
 }
 </style>

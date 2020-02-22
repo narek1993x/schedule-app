@@ -1,62 +1,64 @@
 <template>
-  <v-layout column justify-center style="max-width: 600px; margin: auto;">
-    <v-flex xs12 sm6 sm3>
-      <v-text-field
-        label="Add your todo"
-        type="text"
-        clearable
-        @keyup.enter="addTodo"
-        v-model="text"
-      ></v-text-field>
-    </v-flex>
+  <v-container fluid class="Container">
+    <v-layout column justify-center style="max-width: 600px; margin: auto;">
+      <v-flex xs12 sm6 sm3 class="AddTodoInput">
+        <v-text-field
+          label="Add your todo"
+          type="text"
+          clearable
+          @keyup.enter="addTodo"
+          v-model="text"
+        ></v-text-field>
+      </v-flex>
 
-    <v-flex xs12 sm6 sm3 class="Filters">
-      <v-btn
-        v-for="button in filterButtons"
-        :key="button.text"
-        :color="button.color"
-        :text="filter !== button.text"
-        @click="filterToggle(button.text)"
-        :small="isMobile"
-        class="filter-button"
-      >
-        {{ button.text }}
-      </v-btn>
-    </v-flex>
-
-    <app-loading :loading="loading"></app-loading>
-
-    <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
-      <v-list three-line nav>
-        <v-list-item
-          @click="todoToggle(todo)"
-          v-for="todo in filteredTodos"
-          :key="todo.id"
+      <v-flex xs12 sm6 sm3 class="Filters">
+        <v-btn
+          v-for="button in filterButtons"
+          :key="button.text"
+          :color="button.color"
+          :text="filter !== button.text"
+          @click="filterToggle(button.text)"
+          :small="isMobile"
+          class="filter-button"
         >
-          <v-list-item-action class="item-action">
-            <v-checkbox
-              color="secondary"
-              :input-value="todo.completed"
-            ></v-checkbox>
-          </v-list-item-action>
+          {{ button.text }}
+        </v-btn>
+      </v-flex>
 
-          <v-list-item-content
-            :class="{ 'item-content': true, completed: todo.completed }"
+      <app-loading :loading="loading"></app-loading>
+
+      <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
+        <v-list three-line nav>
+          <v-list-item
+            @click="todoToggle(todo)"
+            v-for="todo in filteredTodos"
+            :key="todo.id"
           >
-            <v-list-item-title class="todo-text">
-              {{ todo.text }}
-            </v-list-item-title>
-          </v-list-item-content>
+            <v-list-item-action class="item-action">
+              <v-checkbox
+                color="secondary"
+                :input-value="todo.completed"
+              ></v-checkbox>
+            </v-list-item-action>
 
-          <v-list-item-action class="item-action">
-            <v-btn icon ripple @click.stop="removeTodo(todo.id)">
-              <v-icon color="grey lighten-1">mdi-delete</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-    </v-flex>
-  </v-layout>
+            <v-list-item-content
+              :class="{ 'item-content': true, completed: todo.completed }"
+            >
+              <v-list-item-title class="todo-text">
+                {{ todo.text }}
+              </v-list-item-title>
+            </v-list-item-content>
+
+            <v-list-item-action class="item-action">
+              <v-btn icon ripple @click.stop="removeTodo(todo.id)">
+                <v-icon color="grey lighten-1">mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -153,9 +155,18 @@ export default {
 }
 
 @media (max-width: 767px) {
+  .Container {
+    padding: 0px !important;
+  }
+
   .Filters {
     display: flex;
     justify-content: space-between;
+    padding: 0 12px;
+  }
+
+  .AddTodoInput {
+    padding: 0 12px;
   }
 
   .filter-button {
@@ -163,8 +174,11 @@ export default {
   }
 
   .todo-text {
-    font-size: 13px;
-    line-height: unset !important;
+    font-size: 15px;
+  }
+
+  .v-list {
+    padding: 0px !important;
   }
 
   .v-list__tile {
@@ -177,6 +191,13 @@ export default {
 
   .item-action {
     min-width: 24px !important;
+  }
+
+  .item-action:first-child {
+    margin-right: 10px !important;
+  }
+  .item-action:last-child {
+    margin-left: 0px !important;
   }
 }
 </style>
