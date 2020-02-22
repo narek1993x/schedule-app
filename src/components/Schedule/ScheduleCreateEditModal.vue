@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           <span class="headline">
-            {{ editEvent ? "Edit" : "Create" }} schedule event
+            {{ scheduleEvent ? "Edit" : "Create" }} schedule event
           </span>
         </v-card-title>
         <v-card-text>
@@ -157,7 +157,7 @@
             :disabled="!valid || loading"
             @click="saveHandler"
           >
-            {{ editEvent ? "Update" : "Save" }}
+            {{ scheduleEvent ? "Update" : "Save" }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -166,12 +166,13 @@
 </template>
 
 <script>
-import { handleEventTime } from "../helpers/utlis";
+import { handleScheduleEventTime } from "../../helpers/utlis";
+
 export default {
-  props: ["visible", "edit", "editEvent", "onClose"],
+  props: ["visible", "edit", "scheduleEvent", "onClose"],
   watch: {
-    editEvent: function(newEditEvent) {
-      if (newEditEvent) {
+    scheduleEvent: function(newScheduleEvent) {
+      if (newScheduleEvent) {
         const {
           name,
           content,
@@ -180,7 +181,7 @@ export default {
           start,
           end,
           date
-        } = newEditEvent;
+        } = newScheduleEvent;
 
         this.title = name;
         this.content = content;
@@ -188,8 +189,8 @@ export default {
         if (persistant) {
           this.persistant = persistant;
           this.week = week;
-          this.startTime = handleEventTime(start);
-          this.endTime = handleEventTime(end);
+          this.startTime = handleScheduleEventTime(start);
+          this.endTime = handleScheduleEventTime(end);
         } else {
           this.date = date;
         }
@@ -276,10 +277,12 @@ export default {
               }
             : { date: this.date }),
           ...(this.user ? { ownerId: this.user.id } : {}),
-          ...(this.editEvent ? { id: this.editEvent.id } : {})
+          ...(this.scheduleEvent ? { id: this.scheduleEvent.id } : {})
         };
 
-        const dispatchAction = this.editEvent ? "editSchedule" : "addSchedule";
+        const dispatchAction = this.scheduleEvent
+          ? "editScheduleEvent"
+          : "addScheduleEvent";
 
         this.$store.dispatch(dispatchAction, schedule);
         this.closeHandler();

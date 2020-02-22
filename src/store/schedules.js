@@ -1,37 +1,44 @@
 import * as firebase from "firebase";
-import { setEventProps } from "../helpers/utlis";
+import { setScheduleEventProps } from "../helpers/utlis";
 
 export default {
   state: {
-    schedules: []
+    scheduleEvents: []
   },
   mutations: {
-    setSchedules: (state, payload) => {
-      state.schedules = payload.map(event => ({
-        ...setEventProps(event)
+    setScheduleEvents: (state, payload) => {
+      state.scheduleEvents = payload.map(event => ({
+        ...setScheduleEventProps(event)
       }));
     },
-    addSchedule: (state, payload) => {
-      const newSchedule = {
-        ...setEventProps(payload)
+    addScheduleEvent: (state, payload) => {
+      const newScheduleEvent = {
+        ...setScheduleEventProps(payload)
       };
 
-      state.schedules = [...state.schedules, newSchedule];
+      state.scheduleEvents = [...state.scheduleEvents, newScheduleEvent];
     },
-    editSchedule: (state, payload) => {
-      const scheduleIndex = state.schedules.findIndex(s => s.id === payload.id);
+    editScheduleEvent: (state, payload) => {
+      const scheduleIndex = state.scheduleEvents.findIndex(
+        s => s.id === payload.id
+      );
 
-      state.schedules = [
-        ...state.schedules.slice(0, scheduleIndex),
-        { ...state.schedules[scheduleIndex], ...setEventProps(payload) },
-        ...state.schedules.slice(scheduleIndex + 1)
+      state.scheduleEvents = [
+        ...state.scheduleEvents.slice(0, scheduleIndex),
+        {
+          ...state.scheduleEvents[scheduleIndex],
+          ...setScheduleEventProps(payload)
+        },
+        ...state.scheduleEvents.slice(scheduleIndex + 1)
       ];
     },
-    removeSchedule: (state, scheduleId) => {
-      const scheduleIndex = state.schedules.findIndex(s => s.id === scheduleId);
-      state.schedules = [
-        ...state.schedules.slice(0, scheduleIndex),
-        ...state.schedules.slice(scheduleIndex + 1)
+    removeScheduleEvent: (state, scheduleId) => {
+      const scheduleIndex = state.scheduleEvents.findIndex(
+        s => s.id === scheduleId
+      );
+      state.scheduleEvents = [
+        ...state.scheduleEvents.slice(0, scheduleIndex),
+        ...state.scheduleEvents.slice(scheduleIndex + 1)
       ];
     }
   },
@@ -43,42 +50,42 @@ export default {
       try {
         const fbVal = await firebase
           .database()
-          .ref("events")
+          .ref("scheduleEvents")
           .once("value");
-        const schedules = fbVal.val();
+        const scheduleEvents = fbVal.val();
         const user = getters.user;
 
-        const resultSchedules = [];
-        for (let key in schedules) {
-          if (user && schedules[key].ownerId === user.id) {
-            resultSchedules.push({
-              ...schedules[key],
+        const resultScheduleEvents = [];
+        for (let key in scheduleEvents) {
+          if (user && scheduleEvents[key].ownerId === user.id) {
+            resultScheduleEvents.push({
+              ...scheduleEvents[key],
               id: key
             });
           }
         }
 
         commit("setLoading", false);
-        commit("setSchedules", resultSchedules);
+        commit("setScheduleEvents", resultScheduleEvents);
       } catch (error) {
         commit("setLoading", false);
         commit("setError", error.message);
         throw error;
       }
     },
-    async addSchedule({ commit }, newSchedule) {
+    async addScheduleEvent({ commit }, newScheduleEvent) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const schedule = await firebase
+        const scheduleEvent = await firebase
           .database()
-          .ref("events")
-          .push(newSchedule);
+          .ref("scheduleEvents")
+          .push(newScheduleEvent);
 
-        commit("addSchedule", {
-          ...newSchedule,
-          id: schedule.key
+        commit("addScheduleEvent", {
+          ...newScheduleEvent,
+          id: scheduleEvent.key
         });
 
         commit("setLoading", false);
@@ -88,8 +95,8 @@ export default {
         throw error;
       }
     },
-    async editSchedule({ commit }, newSchedule) {
-      if (newSchedule && !newSchedule.id) return;
+    async editScheduleEvent({ commit }, newScheduleEvent) {
+      if (newScheduleEvent && !newScheduleEvent.id) return;
 
       commit("clearError");
       commit("setLoading", true);
@@ -97,11 +104,11 @@ export default {
       try {
         await firebase
           .database()
-          .ref("events")
-          .child(newSchedule.id)
-          .update(newSchedule);
+          .ref("scheduleEvents")
+          .child(newScheduleEvent.id)
+          .update(newScheduleEvent);
 
-        commit("editSchedule", newSchedule);
+        commit("editScheduleEvent", newScheduleEvent);
 
         commit("setLoading", false);
       } catch (error) {
@@ -110,17 +117,17 @@ export default {
         throw error;
       }
     },
-    async removeSchedule({ commit }, scheduleId) {
+    async removeScheduleEvent({ commit }, scheduleId) {
       commit("clearError");
       commit("setLoading", true);
       try {
         await firebase
           .database()
-          .ref("events")
+          .ref("scheduleEvents")
           .child(scheduleId)
           .remove();
 
-        commit("removeSchedule", scheduleId);
+        commit("removeScheduleEvent", scheduleId);
         commit("setLoading", false);
       } catch (error) {
         commit("setLoading", false);
@@ -130,6 +137,6 @@ export default {
     }
   },
   getters: {
-    schedules: state => state.schedules
+    scheduleEvents: state => state.scheduleEvents
   }
 };

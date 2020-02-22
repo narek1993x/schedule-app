@@ -47,20 +47,25 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
-      <v-btn color="primary" :small="isMobile" @click.stop="showDialog = true">
+      <v-btn
+        color="primary"
+        :small="isMobile"
+        @click.stop="showCreateEditModal = true"
+      >
         Add
         <v-icon right dark>mdi-plus</v-icon>
       </v-btn>
-      <schedule-modal
+      <schedule-create-edit-modal
         :onClose="handleCloseScheduleModal"
-        :visible="showDialog"
-        :editEvent="editEvent"
-      ></schedule-modal>
+        :visible="showCreateEditModal"
+        :scheduleEvent="scheduleEvent"
+      ></schedule-create-edit-modal>
       <v-spacer></v-spacer>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
     </v-sheet>
+    <app-loading :loading="loading"></app-loading>
     <v-sheet height="800">
       <v-calendar
         ref="calendar"
@@ -78,7 +83,7 @@
         :first-interval="7"
         :interval-count="17"
         :interval-height="120"
-        :events="schedules"
+        :events="scheduleEvents"
         :event-overlap-mode="mode"
         :event-overlap-threshold="45"
         :event-color="getEventColor"
@@ -94,18 +99,23 @@
         offset-x
       >
         <v-card color="grey lighten-4" min-width="350px" flat>
-          <v-toolbar :color="selectedEvent.color" dark>
-            <v-btn icon @click="handleOpenScheduleModal(selectedEvent)">
+          <v-toolbar :color="selectedScheduleEvent.color" dark>
+            <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+            <v-toolbar-title
+              v-html="selectedScheduleEvent.name"
+            ></v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click="handleOpenConfirmModal(selectedEvent.id)">
+            <v-btn
+              icon
+              @click="handleOpenConfirmModal(selectedScheduleEvent.id)"
+            >
               <v-icon>mdi-delete</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
-            <span v-html="selectedEvent.content"></span>
+            <span v-html="selectedScheduleEvent.content"></span>
           </v-card-text>
           <v-card-actions>
             <v-btn text color="secondary" @click="selectedOpen = false">
@@ -115,7 +125,7 @@
         </v-card>
       </v-menu>
       <confirm-modal
-        :visible="showConfirm"
+        :visible="showConfirmModal"
         :onConfirm="handleDeleteEvent"
         :onClose="handleCloseConfirmModal"
         title="Delete Event"
@@ -128,9 +138,9 @@
 
 <script>
 import moment from "moment";
-import ScheduleModal from "./ScheduleModal.vue";
-import ConfirmModal from "./ConfirmModal.vue";
-import { isMobile } from "../helpers/utlis";
+import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
+import ConfirmModal from "../ConfirmModal.vue";
+import { isMobile } from "../../helpers/utlis";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
@@ -139,7 +149,7 @@ export default {
     isMobile: isMobile(),
     focus: moment().format("YYYY-MM-DD"),
     today: moment().format("YYYY-MM-DD hh:mm:ss"),
-    selectedEvent: {},
+    selectedScheduleEvent: {},
     selectedElement: null,
     selectedOpen: false,
     dark: true,
@@ -201,17 +211,17 @@ export default {
     shortIntervals: true,
     shortMonths: false,
     shortWeekdays: false,
-    showDialog: false,
-    showConfirm: false,
-    deleteEventId: null,
-    editEvent: null
+    showCreateEditModal: false,
+    showConfirmModal: false,
+    deleteScheduleEventId: null,
+    scheduleEvent: null
   }),
   computed: {
     loading() {
       return this.$store.getters.loading;
     },
-    schedules() {
-      return this.$store.getters.schedules;
+    scheduleEvents() {
+      return this.$store.getters.scheduleEvents;
     },
     title() {
       const { start, end } = this;
@@ -249,30 +259,30 @@ export default {
     }
   },
   components: {
-    "schedule-modal": ScheduleModal,
+    "schedule-create-edit-modal": ScheduleCreateEditModal,
     "confirm-modal": ConfirmModal
   },
   methods: {
     handleCloseConfirmModal() {
-      this.deleteEventId = null;
-      this.showConfirm = false;
+      this.deleteScheduleEventId = null;
+      this.showConfirmModal = false;
     },
     handleOpenConfirmModal(eventId) {
       this.selectedOpen = false;
-      this.showConfirm = true;
-      this.deleteEventId = eventId;
+      this.showConfirmModal = true;
+      this.deleteScheduleEventId = eventId;
     },
     handleCloseScheduleModal() {
-      this.showDialog = false;
-      this.editEvent = null;
+      this.showCreateEditModal = false;
+      this.scheduleEvent = null;
     },
     handleOpenScheduleModal(event) {
       this.selectedOpen = false;
-      this.showDialog = true;
-      this.editEvent = event;
+      this.showCreateEditModal = true;
+      this.scheduleEvent = event;
     },
     handleDeleteEvent() {
-      this.$store.dispatch("removeSchedule", this.deleteEventId);
+      this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
     },
     viewDay({ date }) {
       this.focus = date;
@@ -286,7 +296,7 @@ export default {
     },
     showEvent({ nativeEvent, event }) {
       const open = () => {
-        this.selectedEvent = event;
+        this.selectedScheduleEvent = event;
         this.selectedElement = nativeEvent.target;
         setTimeout(() => (this.selectedOpen = true), 10);
       };

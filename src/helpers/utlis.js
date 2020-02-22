@@ -19,7 +19,7 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export const handleEventTime = date => {
+export const handleScheduleEventTime = date => {
   if (date && date.length > 10) {
     return date.slice(10);
   }
@@ -27,7 +27,7 @@ export const handleEventTime = date => {
   return date;
 };
 
-export const setEventProps = event => {
+export const setScheduleEventProps = event => {
   return {
     ...event,
     color: colors[rnd(0, colors.length - 1)],
@@ -35,10 +35,10 @@ export const setEventProps = event => {
       ? {
           start: `${moment()
             .day(capitalize(event.week))
-            .format("YYYY-M-DD")} ${handleEventTime(event.start)}`,
+            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
           end: `${moment()
             .day(capitalize(event.week))
-            .format("YYYY-M-DD")} ${handleEventTime(event.end)}`
+            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`
         }
       : {
           start: moment(event.date).format("YYYY-M-DD"),
