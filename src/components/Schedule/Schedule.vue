@@ -316,15 +316,17 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .Container {
   padding: 0px !important;
 }
 .CalendarSheet {
   height: calc(100vh - 118px) !important;
 }
-.v-calendar-daily__interval:first-child > .v-calendar-daily__interval-text {
-  top: -3px !important;
+.v-calendar-daily__interval:first-child {
+  & .v-calendar-daily__interval-text {
+    top: -3px !important;
+  }
 }
 @media (max-width: 767px) {
   .ToolbarTitle {

@@ -126,7 +126,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .completed {
   text-decoration: line-through;
   color: grey;
@@ -141,13 +141,14 @@ export default {
 
 .filter-button {
   margin: 6px 8px;
-}
 
-.filter-button:first-child {
-  margin-left: 0px;
-}
-.filter-button:last-child {
-  margin-right: 0px;
+  &:first-child {
+    margin-left: 0px;
+  }
+
+  &:last-child {
+    margin-right: 0px;
+  }
 }
 
 .item-action {
@@ -179,25 +180,23 @@ export default {
 
   .v-list {
     padding: 0px !important;
-  }
 
-  .v-list__tile {
-    padding: 0 10px !important;
-  }
+    & .v-list-item {
+      & .item-content {
+        padding: 0 5px !important;
+      }
 
-  .item-content {
-    padding: 0 5px !important;
-  }
+      & .item-action {
+        min-width: 24px !important;
 
-  .item-action {
-    min-width: 24px !important;
-  }
-
-  .item-action:first-child {
-    margin-right: 10px !important;
-  }
-  .item-action:last-child {
-    margin-left: 0px !important;
+        &:first-child {
+          margin-right: 10px !important;
+        }
+        &:last-child {
+          margin-left: 0px !important;
+        }
+      }
+    }
   }
 }
 </style>

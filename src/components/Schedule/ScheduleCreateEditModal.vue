@@ -297,10 +297,12 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @media (max-width: 767px) {
-  .ModalTitle > .headline {
-    font-size: 20px !important;
+  .ModalTitle {
+    & .headline {
+      font-size: 20px !important;
+    }
   }
 }
 </style>
