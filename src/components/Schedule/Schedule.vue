@@ -301,6 +301,11 @@ export default {
     updateRange({ start, end }) {
       this.start = start;
       this.end = end;
+
+      this.$store.commit("setStartEndDates", {
+        start: start.date,
+        end: end.date
+      });
     },
     nth(d) {
       return d > 3 && d < 21

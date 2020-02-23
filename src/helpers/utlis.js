@@ -27,16 +27,16 @@ export const handleScheduleEventTime = date => {
   return date;
 };
 
-export const setScheduleEventProps = event => {
+export const setScheduleEventProps = (event, { start, end }) => {
   return {
     ...event,
     color: colors[rnd(0, colors.length - 1)],
     ...(event.permanent
       ? {
-          start: `${moment()
+          start: `${moment(event.week === "sunday" ? end : start)
             .day(capitalize(event.week))
             .format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
-          end: `${moment()
+          end: `${moment(event.week === "sunday" ? end : start)
             .day(capitalize(event.week))
             .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`
         }

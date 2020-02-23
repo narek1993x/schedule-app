@@ -3,17 +3,24 @@ import { setScheduleEventProps } from "../helpers/utlis";
 
 export default {
   state: {
-    scheduleEvents: []
+    scheduleEvents: [],
+    startEndDates: {}
   },
   mutations: {
+    setStartEndDates: (state, payload) => {
+      state.startEndDates = payload;
+      state.scheduleEvents = state.scheduleEvents.map(event => ({
+        ...setScheduleEventProps(event, payload)
+      }));
+    },
     setScheduleEvents: (state, payload) => {
       state.scheduleEvents = payload.map(event => ({
-        ...setScheduleEventProps(event)
+        ...setScheduleEventProps(event, state.startEndDates)
       }));
     },
     addScheduleEvent: (state, payload) => {
       const newScheduleEvent = {
-        ...setScheduleEventProps(payload)
+        ...setScheduleEventProps(payload, state.startEndDates)
       };
 
       state.scheduleEvents = [...state.scheduleEvents, newScheduleEvent];
@@ -27,7 +34,7 @@ export default {
         ...state.scheduleEvents.slice(0, scheduleIndex),
         {
           ...state.scheduleEvents[scheduleIndex],
-          ...setScheduleEventProps(payload)
+          ...setScheduleEventProps(payload, state.startEndDates)
         },
         ...state.scheduleEvents.slice(scheduleIndex + 1)
       ];
@@ -130,6 +137,7 @@ export default {
     }
   },
   getters: {
-    scheduleEvents: state => state.scheduleEvents
+    scheduleEvents: state => state.scheduleEvents,
+    startEndDates: start => start.startEndDates
   }
 };
