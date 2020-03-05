@@ -1,6 +1,11 @@
 <template>
   <v-row justify="start" class="ml-2">
-    <v-dialog dark :fullscreen="isMobile" v-model="dialog" max-width="800px">
+    <v-dialog
+      :dark="dark"
+      :fullscreen="isMobile"
+      v-model="dialog"
+      max-width="800px"
+    >
       <v-card>
         <v-card-title class="ModalTitle">
           <span class="headline">
@@ -173,7 +178,7 @@
 import { handleScheduleEventTime, isMobile } from "../../helpers/utlis";
 
 export default {
-  props: ["visible", "edit", "scheduleEvent", "onClose"],
+  props: ["visible", "dark", "edit", "scheduleEvent", "onClose"],
   watch: {
     scheduleEvent: function(newScheduleEvent) {
       if (newScheduleEvent) {
@@ -250,7 +255,6 @@ export default {
   methods: {
     clear() {
       this.$refs.form.reset();
-      this.valid = false;
       this.dialog = false;
       this.permanent = false;
       this.title = "";

@@ -76,6 +76,31 @@ export default {
         throw error;
       }
     },
+    async addDuplicateScheduleEvents({ commit, getters }, scheduleEvents) {
+      commit("clearError");
+      commit("setLoading", true);
+
+      try {
+        const newScheduleEvents = await Promise.all(
+          scheduleEvents.map(scheduleEvent =>
+            scheduleEventsRef.child(getters.user.id).push(scheduleEvent)
+          )
+        );
+
+        scheduleEvents.forEach((scheduleEvent, index) => {
+          commit("addScheduleEvent", {
+            ...scheduleEvent,
+            id: newScheduleEvents[index].key
+          });
+        });
+
+        commit("setLoading", false);
+      } catch (error) {
+        commit("setLoading", false);
+        commit("setError", error.message);
+        throw error;
+      }
+    },
     async addScheduleEvent({ commit, getters }, newScheduleEvent) {
       commit("clearError");
       commit("setLoading", true);

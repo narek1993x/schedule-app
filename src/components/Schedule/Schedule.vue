@@ -46,6 +46,7 @@
         <v-icon right dark>mdi-plus</v-icon>
       </v-btn>
       <schedule-create-edit-modal
+        :dark="darkMode"
         :onClose="handleCloseScheduleModal"
         :visible="showCreateEditModal"
         :scheduleEvent="scheduleEvent"
@@ -64,7 +65,7 @@
         :type="type"
         :max-days="maxDays"
         :now="today"
-        :dark="dark"
+        :dark="darkMode"
         :weekdays="weekdays"
         :short-months="shortMonths"
         :short-weekdays="shortWeekdays"
@@ -102,6 +103,13 @@
             ></v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn
+              v-if="selectedScheduleEvent.permanent"
+              icon
+              @click="handleOpenCopyModal(selectedScheduleEvent)"
+            >
+              <v-icon>mdi-content-duplicate</v-icon>
+            </v-btn>
+            <v-btn
               icon
               @click="handleOpenConfirmModal(selectedScheduleEvent.id)"
             >
@@ -118,14 +126,61 @@
           </v-card-actions>
         </v-card>
       </v-menu>
-      <confirm-modal
-        :visible="showConfirmModal"
-        :onConfirm="handleDeleteEvent"
-        :onClose="handleCloseConfirmModal"
-        title="Delete Event"
-        content="Are you sure you want to permanently delete this event?"
-        :width="400"
-      ></confirm-modal>
+      <modal :visible="showConfirmModal" :dark="darkMode" :width="400">
+        <v-card>
+          <v-card-title class="headline">Delete Event</v-card-title>
+          <v-card-text>
+            Are you sure you want to permanently delete this event?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="handleCloseConfirmModal">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              :disabled="loading"
+              @click="handleDeleteEvent"
+            >
+              Confirm
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </modal>
+      <modal :visible="showCopyModal" :dark="darkMode" :width="500">
+        <v-card>
+          <v-card-title class="headline">Duplicate Event</v-card-title>
+          <v-card-text>
+            <v-form ref="copyform" v-model="copyformValid" lazy-validation>
+              <v-select
+                multiple
+                chips
+                clearable
+                :item-disabled="handleDisableWeekItems"
+                v-model="selectedDuplicateWeeks"
+                :items="duplicateWeeks"
+                :rules="weekRules"
+                label="Select to which weeks to duplicate event*"
+              ></v-select>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="handleCloseCopyModal">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              :disabled="!copyformValid || loading"
+              @click="handleDuplicateEvent"
+            >
+              Duplicate
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </modal>
     </v-sheet>
   </v-container>
 </template>
@@ -133,10 +188,12 @@
 <script>
 import moment from "moment";
 import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
-import ConfirmModal from "../ConfirmModal.vue";
+import Modal from "../Modal.vue";
 import { isMobile } from "../../helpers/utlis";
+import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
+const dark = !!DarkMode.get();
 
 export default {
   data: () => ({
@@ -146,7 +203,7 @@ export default {
     selectedScheduleEvent: {},
     selectedElement: null,
     selectedOpen: false,
-    dark: true,
+    dark,
     start: null,
     end: null,
     colors: [
@@ -183,6 +240,18 @@ export default {
       { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
       { text: "Mon - Sun", value: weekdaysDefault }
     ],
+
+    selectedDuplicateWeeks: [],
+    duplicateWeeks: [
+      { text: "Monday", value: "monday" },
+      { text: "Tuesday", value: "tuesday" },
+      { text: "Wednesday", value: "wednesday" },
+      { text: "Thursday", value: "thursday" },
+      { text: "Friday", value: "friday" },
+      { text: "Saturday", value: "saturday" },
+      { text: "Sunday", value: "sunday" }
+    ],
+    weekRules: [v => !!v.length || "Weeks are required"],
     maxDays: 7,
     maxDaysOptions: [
       { text: "7 days", value: 7 },
@@ -201,10 +270,20 @@ export default {
     shortWeekdays: false,
     showCreateEditModal: false,
     showConfirmModal: false,
+    showCopyModal: false,
     deleteScheduleEventId: null,
-    scheduleEvent: null
+    scheduleEvent: null,
+    copyformValid: true
   }),
+  watch: {
+    dark: function(newDark) {
+      DarkMode.set(newDark);
+    }
+  },
   computed: {
+    darkMode() {
+      return this.dark;
+    },
     loading() {
       return this.$store.getters.loading;
     },
@@ -248,9 +327,21 @@ export default {
   },
   components: {
     "schedule-create-edit-modal": ScheduleCreateEditModal,
-    "confirm-modal": ConfirmModal
+    modal: Modal
   },
   methods: {
+    handleCloseCopyModal() {
+      this.scheduleEvent = null;
+      this.showCopyModal = false;
+
+      this.$refs.copyform.reset();
+      this.selectedDuplicateWeeks = [];
+    },
+    handleOpenCopyModal(event) {
+      this.selectedOpen = false;
+      this.showCopyModal = true;
+      this.scheduleEvent = event;
+    },
     handleCloseConfirmModal() {
       this.deleteScheduleEventId = null;
       this.showConfirmModal = false;
@@ -269,8 +360,25 @@ export default {
       this.showCreateEditModal = true;
       this.scheduleEvent = event;
     },
+    handleDuplicateEvent() {
+      const scheduleEvent = this.scheduleEvent;
+      const selectedDuplicateWeeks = this.selectedDuplicateWeeks;
+
+      if (this.$refs.copyform.validate()) {
+        const scheduleEvents = selectedDuplicateWeeks.map(week => ({
+          ...scheduleEvent,
+          week
+        }));
+        this.$store.dispatch("addDuplicateScheduleEvents", scheduleEvents);
+        this.handleCloseCopyModal();
+      }
+    },
     handleDeleteEvent() {
       this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
+      this.handleCloseConfirmModal();
+    },
+    handleDisableWeekItems(item) {
+      return this.scheduleEvent.week === item.value;
     },
     viewDay({ date }) {
       this.focus = date;

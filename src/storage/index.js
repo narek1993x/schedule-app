@@ -47,7 +47,9 @@ const store = {
 };
 
 const nameMap = {
-  USER_TOKEN: "1"
+  USER_TOKEN: "1",
+  DARK_MODE: "2"
 };
 
 export const UserToken = new Storage(store.storage, nameMap.USER_TOKEN);
+export const DarkMode = new Storage(store.storage, nameMap.DARK_MODE);
