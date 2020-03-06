@@ -13,10 +13,15 @@
 
 <script>
 export default {
-  props: ["visible", "dark", "fullscreen", "width"],
+  props: ["visible", "dark", "fullscreen", "width", "onClose"],
   watch: {
     visible: function(newVisible) {
       this.dialog = newVisible;
+
+      if (!newVisible) this.onClose();
+    },
+    dialog: function(newDialog) {
+      if (!newDialog) this.onClose();
     }
   },
   data() {

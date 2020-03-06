@@ -178,7 +178,7 @@
 import { handleScheduleEventTime, isMobile } from "../../helpers/utlis";
 
 export default {
-  props: ["visible", "dark", "edit", "scheduleEvent", "onClose"],
+  props: ["visible", "dark", "scheduleEvent", "onClose"],
   watch: {
     scheduleEvent: function(newScheduleEvent) {
       if (newScheduleEvent) {

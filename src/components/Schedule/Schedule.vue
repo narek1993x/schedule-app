@@ -89,11 +89,7 @@
         :activator="selectedElement"
         :offset-x="!isMobile"
       >
-        <v-card
-          color="grey lighten-4"
-          :min-width="isMobile ? '250px' : '350px'"
-          flat
-        >
+        <v-card color="grey lighten-4" min-width="350px" flat>
           <v-toolbar :color="selectedScheduleEvent.color" dark>
             <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
               <v-icon>mdi-pencil</v-icon>
@@ -126,7 +122,12 @@
           </v-card-actions>
         </v-card>
       </v-menu>
-      <modal :visible="showConfirmModal" :dark="darkMode" :width="400">
+      <modal
+        :width="400"
+        :dark="darkMode"
+        :visible="showConfirmModal"
+        :onClose="handleCloseConfirmModal"
+      >
         <v-card>
           <v-card-title class="headline">Delete Event</v-card-title>
           <v-card-text>
@@ -148,7 +149,12 @@
           </v-card-actions>
         </v-card>
       </modal>
-      <modal :visible="showCopyModal" :dark="darkMode" :width="500">
+      <modal
+        :width="500"
+        :dark="darkMode"
+        :visible="showCopyModal"
+        :onClose="handleCloseCopyModal"
+      >
         <v-card>
           <v-card-title class="headline">Duplicate Event</v-card-title>
           <v-card-text>
@@ -161,7 +167,7 @@
                 v-model="selectedDuplicateWeeks"
                 :items="duplicateWeeks"
                 :rules="weekRules"
-                label="Select to which weeks to duplicate event*"
+                label="Select weeks to duplicate event*"
               ></v-select>
             </v-form>
           </v-card-text>
@@ -189,7 +195,7 @@
 import moment from "moment";
 import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
 import Modal from "../Modal.vue";
-import { isMobile } from "../../helpers/utlis";
+import { isMobile, handleScheduleEventTime } from "../../helpers/utlis";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
@@ -197,34 +203,15 @@ const dark = !!DarkMode.get();
 
 export default {
   data: () => ({
+    dark,
     isMobile: isMobile(),
     focus: moment().format("YYYY-MM-DD"),
     today: moment().format("YYYY-MM-DD hh:mm:ss"),
     selectedScheduleEvent: {},
     selectedElement: null,
     selectedOpen: false,
-    dark,
     start: null,
     end: null,
-    colors: [
-      "blue",
-      "indigo",
-      "deep-purple",
-      "cyan",
-      "green",
-      "orange",
-      "grey darken-1"
-    ],
-    names: [
-      "Meeting",
-      "Holiday",
-      "PTO",
-      "Travel",
-      "Event",
-      "Birthday",
-      "Conference",
-      "Party"
-    ],
     type: isMobile() ? "day" : "week",
     typeOptions: [
       { text: "Day", value: "day" },
@@ -240,7 +227,6 @@ export default {
       { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
       { text: "Mon - Sun", value: weekdaysDefault }
     ],
-
     selectedDuplicateWeeks: [],
     duplicateWeeks: [
       { text: "Monday", value: "monday" },
@@ -273,6 +259,7 @@ export default {
     showCopyModal: false,
     deleteScheduleEventId: null,
     scheduleEvent: null,
+    copyScheduleEvent: null,
     copyformValid: true
   }),
   watch: {
@@ -331,16 +318,14 @@ export default {
   },
   methods: {
     handleCloseCopyModal() {
-      this.scheduleEvent = null;
+      this.copyScheduleEvent = null;
       this.showCopyModal = false;
-
       this.$refs.copyform.reset();
-      this.selectedDuplicateWeeks = [];
     },
     handleOpenCopyModal(event) {
       this.selectedOpen = false;
       this.showCopyModal = true;
-      this.scheduleEvent = event;
+      this.copyScheduleEvent = event;
     },
     handleCloseConfirmModal() {
       this.deleteScheduleEventId = null;
@@ -361,12 +346,12 @@ export default {
       this.scheduleEvent = event;
     },
     handleDuplicateEvent() {
-      const scheduleEvent = this.scheduleEvent;
+      const copyScheduleEvent = this.copyScheduleEvent;
       const selectedDuplicateWeeks = this.selectedDuplicateWeeks;
 
       if (this.$refs.copyform.validate()) {
         const scheduleEvents = selectedDuplicateWeeks.map(week => ({
-          ...scheduleEvent,
+          ...copyScheduleEvent,
           week
         }));
         this.$store.dispatch("addDuplicateScheduleEvents", scheduleEvents);
@@ -378,7 +363,23 @@ export default {
       this.handleCloseConfirmModal();
     },
     handleDisableWeekItems(item) {
-      return this.scheduleEvent.week === item.value;
+      const duplicateScheduleEventWeeks = [];
+
+      const { content, name, start, end } = this.copyScheduleEvent;
+
+      this.scheduleEvents.forEach(event => {
+        if (
+          event.content === content &&
+          event.name === name &&
+          handleScheduleEventTime(event.start) ===
+            handleScheduleEventTime(start) &&
+          handleScheduleEventTime(event.end) === handleScheduleEventTime(end)
+        ) {
+          duplicateScheduleEventWeeks.push(event.week);
+        }
+      });
+
+      return duplicateScheduleEventWeeks.includes(item.value);
     },
     viewDay({ date }) {
       this.focus = date;
