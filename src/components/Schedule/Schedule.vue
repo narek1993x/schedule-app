@@ -43,7 +43,7 @@
         @click.stop="showCreateEditModal = true"
       >
         Add
-        <v-icon right dark>mdi-plus</v-icon>
+        <v-icon :size="18" right dark>mdi-plus</v-icon>
       </v-btn>
       <schedule-create-edit-modal
         :dark="darkMode"
@@ -89,27 +89,31 @@
         :activator="selectedElement"
         :offset-x="!isMobile"
       >
-        <v-card color="grey lighten-4" min-width="350px" flat>
+        <v-card
+          color="grey lighten-4"
+          :min-width="isMobile ? '250px' : '350px'"
+          flat
+        >
           <v-toolbar :color="selectedScheduleEvent.color" dark>
-            <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
-              <v-icon>mdi-pencil</v-icon>
+            <v-btn
+              :small="isMobile"
+              icon
+              @click="handleOpenScheduleModal(selectedScheduleEvent)"
+            >
+              <v-icon :size="22">mdi-pencil</v-icon>
             </v-btn>
             <v-toolbar-title
+              class="MenuToolbarTitle"
               v-html="selectedScheduleEvent.name"
             ></v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn
+              :small="isMobile"
               v-if="selectedScheduleEvent.permanent"
               icon
               @click="handleOpenCopyModal(selectedScheduleEvent)"
             >
-              <v-icon>mdi-content-duplicate</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              @click="handleOpenConfirmModal(selectedScheduleEvent.id)"
-            >
-              <v-icon>mdi-delete</v-icon>
+              <v-icon :size="22">mdi-content-duplicate</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -118,6 +122,14 @@
           <v-card-actions>
             <v-btn text color="secondary" @click="selectedOpen = false">
               Cancel
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+              :small="isMobile"
+              icon
+              @click="handleOpenConfirmModal(selectedScheduleEvent.id)"
+            >
+              <v-icon :size="22">mdi-delete</v-icon>
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -444,7 +456,8 @@ export default {
   }
 }
 @media (max-width: 767px) {
-  .ToolbarTitle {
+  .ToolbarTitle,
+  .MenuToolbarTitle {
     font-size: 16px;
   }
 
