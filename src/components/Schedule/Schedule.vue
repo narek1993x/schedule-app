@@ -260,6 +260,7 @@ export default {
     deleteScheduleEventId: null,
     scheduleEvent: null,
     copyScheduleEvent: null,
+    duplicateScheduleEventWeeks: [],
     copyformValid: true
   }),
   watch: {
@@ -321,11 +322,13 @@ export default {
       this.copyScheduleEvent = null;
       this.showCopyModal = false;
       this.$refs.copyform.reset();
+      this.duplicateScheduleEventWeeks = [];
     },
     handleOpenCopyModal(event) {
       this.selectedOpen = false;
       this.showCopyModal = true;
       this.copyScheduleEvent = event;
+      this.handleDuplicateScheduleEventWeeks();
     },
     handleCloseConfirmModal() {
       this.deleteScheduleEventId = null;
@@ -363,6 +366,9 @@ export default {
       this.handleCloseConfirmModal();
     },
     handleDisableWeekItems(item) {
+      return this.duplicateScheduleEventWeeks.includes(item.value);
+    },
+    handleDuplicateScheduleEventWeeks() {
       const duplicateScheduleEventWeeks = [];
 
       const { content, name, start, end } = this.copyScheduleEvent;
@@ -379,7 +385,7 @@ export default {
         }
       });
 
-      return duplicateScheduleEventWeeks.includes(item.value);
+      this.duplicateScheduleEventWeeks = duplicateScheduleEventWeeks;
     },
     viewDay({ date }) {
       this.focus = date;
