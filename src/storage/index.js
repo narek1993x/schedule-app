@@ -48,8 +48,13 @@ const store = {
 
 const nameMap = {
   USER_TOKEN: "1",
-  DARK_MODE: "2"
+  DARK_MODE: "2",
+  FIREBASE_DEVICE_TOKEN: "3"
 };
 
 export const UserToken = new Storage(store.storage, nameMap.USER_TOKEN);
 export const DarkMode = new Storage(store.storage, nameMap.DARK_MODE);
+export const FirebaseDeviceToken = new Storage(
+  store.storage,
+  nameMap.FIREBASE_DEVICE_TOKEN
+);

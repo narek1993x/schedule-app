@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { initializePushNotificationsService } from "./push-notifications";
+
 export default {
   computed: {
     error() {
@@ -97,6 +99,7 @@ export default {
   },
   created() {
     if (this.isUserLoggedIn) {
+      initializePushNotificationsService();
       this.$store.dispatch("fetchTodos");
       this.$store.dispatch("fetchSchedules");
     }

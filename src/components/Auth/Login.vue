@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import { initializePushNotificationsService } from "../../push-notifications";
+
 export default {
   computed: {
     loading() {
@@ -79,6 +81,7 @@ export default {
         this.$store
           .dispatch("authUser", user)
           .then(() => {
+            initializePushNotificationsService();
             this.$store.dispatch("fetchTodos");
             this.$store.dispatch("fetchSchedules");
             this.$router.push("/");
