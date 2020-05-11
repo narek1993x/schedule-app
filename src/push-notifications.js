@@ -57,7 +57,7 @@ export async function initializePushNotificationsService() {
         token: firebaseToken
       });
       FirebaseDeviceToken.set(firebaseToken);
-      console.log("sendTokenToServer: ", response);
+      console.info("sendTokenToServer: ", response);
     }
 
     console.info("push notification token: ", firebaseToken);
@@ -75,7 +75,7 @@ export async function initializePushNotificationsService() {
           refresh: true
         });
         FirebaseDeviceToken.set(firebaseToken);
-        console.log("Token refreshed: ", response);
+        console.info("Token refreshed: ", response);
       } catch (err) {
         console.info("Unable to retrieve refreshed token ", err);
       }
