@@ -2,7 +2,7 @@ import { firebaseApp, apps } from "./firebase";
 import { FirebaseDeviceToken, UserToken } from "./storage";
 import vapid from "../config/vapid.json";
 
-const pushServiceHost = "https://push-service-vuejs-todo.now.sh";
+const pushServiceHost = "https://push-service-vuejs-todo-duhh2ofcj.now.sh";
 
 function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
