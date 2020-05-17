@@ -8,6 +8,10 @@ function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
 }
 
+function getDeviceType() {
+  return ("userAgent" in navigator && navigator.userAgent) || "";
+}
+
 async function registerServiceWorker() {
   try {
     const registration = await navigator.serviceWorker.register(
@@ -54,7 +58,8 @@ export async function initializePushNotificationsService() {
       firebaseToken = await messaging.getToken();
       const response = await sendTokenToServer({
         userId: userToken.id,
-        token: firebaseToken
+        token: firebaseToken,
+        deviceType: getDeviceType()
       });
       FirebaseDeviceToken.set(firebaseToken);
       console.info("sendTokenToServer: ", response);

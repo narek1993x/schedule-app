@@ -1,5 +1,5 @@
 import * as firebase from "firebase";
-import { UserToken } from "../storage";
+import { UserToken, FirebaseDeviceToken } from "../storage";
 
 class User {
   constructor(id) {
@@ -53,6 +53,7 @@ export default {
     },
     removeUser({ commit }) {
       UserToken.remove();
+      FirebaseDeviceToken.remove();
       commit("removeUser");
     }
   },

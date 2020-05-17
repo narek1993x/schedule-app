@@ -7,7 +7,12 @@
             <v-toolbar-title>Login form</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form
+              ref="form"
+              id="registration-form"
+              v-model="valid"
+              lazy-validation
+            >
               <v-text-field
                 prepend-icon="mdi-account"
                 name="email"
@@ -39,6 +44,8 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
+              type="submit"
+              form="registration-form"
               color="primary"
               :disabled="!valid || loading"
               :loading="loading"
