@@ -8,6 +8,7 @@ yarn-error.log*
 .firebaserc
 
 firebase.json
+firebase.account.json
 vapid.json
 
 # Editor directories and files
