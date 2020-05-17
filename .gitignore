@@ -9,7 +9,7 @@ yarn-error.log*
 
 firebase.json
 firebase.account.json
-vapid.json
+config.json
 
 # Editor directories and files
 .idea

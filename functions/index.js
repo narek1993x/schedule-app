@@ -23,6 +23,11 @@ app.post("/save-subscription", async (req, res) => {
   res.json({ message: "subscription saved success" });
 });
 
+app.post("/remove-subscription", async (req, res) => {
+  await subscription.removeUserSubscription(req.body);
+  res.json({ message: "subscription removed success" });
+});
+
 timer.notificationJob.start();
 
 exports.app = functions.https.onRequest(app);

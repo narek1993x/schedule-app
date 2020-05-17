@@ -1,5 +1,6 @@
 import * as firebase from "firebase";
 import { UserToken, FirebaseDeviceToken } from "../storage";
+import { removeTokenFromServer } from "../services/api-requests";
 
 class User {
   constructor(id) {
@@ -52,6 +53,9 @@ export default {
       }
     },
     removeUser({ commit }) {
+      const token = UserToken.get();
+      removeTokenFromServer(token);
+
       UserToken.remove();
       FirebaseDeviceToken.remove();
       commit("removeUser");

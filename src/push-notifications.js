@@ -1,8 +1,7 @@
 import { firebaseApp, apps } from "./firebase";
 import { FirebaseDeviceToken, UserToken } from "./storage";
-import vapid from "../config/vapid.json";
-
-const pushServiceHost = "https://vuejs-todo-list-297d2.web.app";
+import { sendTokenToServer } from "./services/api-requests";
+import config from "../config/config.json";
 
 function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
@@ -23,21 +22,6 @@ async function registerServiceWorker() {
   }
 }
 
-async function sendTokenToServer(subscription) {
-  try {
-    const response = await fetch(`${pushServiceHost}/save-subscription`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(subscription)
-    });
-    return response.json();
-  } catch (error) {
-    throw error;
-  }
-}
-
 export async function initializePushNotificationsService() {
   try {
     const userToken = UserToken.get();
@@ -46,7 +30,7 @@ export async function initializePushNotificationsService() {
 
     const messaging = firebaseApp.messaging();
     await messaging.requestPermission();
-    messaging.usePublicVapidKey(vapid.vapidPublicKey);
+    messaging.usePublicVapidKey(config.vapidPublicKey);
 
     if (!apps.length) {
       await registerServiceWorker();
