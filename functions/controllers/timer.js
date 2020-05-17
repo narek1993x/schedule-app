@@ -4,6 +4,8 @@ const scheduleEvent = require("./schedule-event");
 const subscription = require("./subscription");
 const messaging = require("./messaging");
 
+moment.tz.setDefault("Asia/Yerevan");
+
 function filterByTime(time, week) {
   const [hours, minutes] = time.split(":");
   const year = moment().format("YYYY");
@@ -79,9 +81,15 @@ async function handleNotificationsTimer() {
   }
 }
 
-const notificationJob = new CronJob("0 */5 * * * *", () => {
-  handleNotificationsTimer();
-});
+const notificationJob = new CronJob(
+  "0 */5 * * * *",
+  () => {
+    handleNotificationsTimer();
+  },
+  null,
+  false,
+  "Asia/Yerevan"
+);
 
 module.exports = {
   notificationJob
