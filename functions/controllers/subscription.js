@@ -46,13 +46,11 @@ async function getSubscriptionByUserId(userId) {
   }
 }
 
-async function addUserSubscription({ token, ...data }) {
+async function addUserSubscription({ token, deviceInfo, ...data }) {
   try {
     const subscription = await getSubscriptionByUserId(data.userId);
-    const { os, browser } = _get(data, "deviceInfo", {
-      os: { name: "default" },
-      browser: { name: "default" }
-    });
+    const os = _get(deviceInfo, "os", { name: "default" });
+    const browser = _get(deviceInfo, "browser", { name: "default" });
 
     if (subscription === null) {
       await subscriptionsRef.child(data.userId).push({
@@ -79,14 +77,12 @@ async function addUserSubscription({ token, ...data }) {
   }
 }
 
-async function updateUserSubscription({ token, ...data }) {
+async function updateUserSubscription({ token, deviceInfo, ...data }) {
   try {
     const subscription = await getSubscriptionByUserId(data.userId);
-    const { os, browser } = _get(data, "deviceInfo", {
-      os: { name: "default" },
-      browser: { name: "default" }
-    });
     const deviceTokens = _get(subscription, "deviceTokens", {});
+    const os = _get(deviceInfo, "os", { name: "default" });
+    const browser = _get(deviceInfo, "browser", { name: "default" });
 
     return await subscriptionsRef
       .child(data.userId)
@@ -102,14 +98,12 @@ async function updateUserSubscription({ token, ...data }) {
   }
 }
 
-async function removeUserSubscription(data) {
+async function removeUserSubscription({ deviceInfo, userId }) {
   try {
-    const subscription = await getSubscriptionByUserId(data.userId);
+    const subscription = await getSubscriptionByUserId(userId);
     const deviceTokens = _get(subscription, "deviceTokens", {});
-    const { os, browser } = _get(data, "deviceInfo", {
-      os: { name: "default" },
-      browser: { name: "default" }
-    });
+    const os = _get(deviceInfo, "os", { name: "default" });
+    const browser = _get(deviceInfo, "browser", { name: "default" });
 
     if (_keys(deviceTokens).length > 1) {
       const newDeviceTokens = _pick(
@@ -118,7 +112,7 @@ async function removeUserSubscription(data) {
       );
 
       return await subscriptionsRef
-        .child(data.userId)
+        .child(userId)
         .child(subscription.id)
         .update({
           deviceTokens: newDeviceTokens
@@ -126,7 +120,7 @@ async function removeUserSubscription(data) {
     }
 
     return await subscriptionsRef
-      .child(data.userId)
+      .child(userId)
       .child(subscription.id)
       .remove();
   } catch (error) {
