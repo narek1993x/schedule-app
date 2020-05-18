@@ -21,7 +21,8 @@ messaging.setBackgroundMessageHandler(function(payload) {
 
   const title = payload.data.name;
   const options = {
-    body: payload.data.content
+    body: payload.data.content,
+    icon: "./img/icons/android-chrome-96x96.png"
   };
 
   return self.registration.showNotification(title, options);
