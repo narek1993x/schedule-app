@@ -33,21 +33,6 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-function createNotificationMessage(schedules, subscriptions) {
-  return schedules.map(schedule => {
-    const { token } = subscriptions.find(
-      sub => sub.userId === schedule.ownerId
-    );
-    return {
-      data: {
-        name: schedule.name,
-        content: schedule.content
-      },
-      token
-    };
-  });
-}
-
 async function handleNotificationsTimer() {
   const subscriptions = await subscription.getSubscriptions();
   const schedules = await scheduleEvent.getScheduleList();
@@ -69,7 +54,7 @@ async function handleNotificationsTimer() {
       (a, b) => filterByTime(a.start, a.week) - filterByTime(b.start, b.week)
     );
 
-  const notificationMessages = createNotificationMessage(
+  const notificationMessages = messaging.createMessages(
     filteredByTime,
     subscriptions
   );
