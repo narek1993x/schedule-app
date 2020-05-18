@@ -7,7 +7,13 @@
             <v-toolbar-title>Login form</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <v-form ref="form" id="login-form" v-model="valid" validation>
+            <v-form
+              @submit.prevent
+              ref="form"
+              id="login-form"
+              v-model="valid"
+              validation
+            >
               <v-text-field
                 prepend-icon="mdi-account"
                 name="email"

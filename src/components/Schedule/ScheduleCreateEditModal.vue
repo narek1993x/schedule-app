@@ -14,7 +14,7 @@
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form @submit.prevent ref="form" v-model="valid" lazy-validation>
               <v-row>
                 <v-col cols="12">
                   <v-text-field

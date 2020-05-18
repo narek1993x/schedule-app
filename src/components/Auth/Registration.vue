@@ -8,6 +8,7 @@
           </v-toolbar>
           <v-card-text>
             <v-form
+              @submit.prevent
               ref="form"
               id="registration-form"
               v-model="valid"

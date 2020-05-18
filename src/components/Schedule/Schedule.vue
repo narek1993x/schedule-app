@@ -161,7 +161,12 @@
         <v-card>
           <v-card-title class="headline">Duplicate Event</v-card-title>
           <v-card-text>
-            <v-form ref="copyform" v-model="copyformValid" lazy-validation>
+            <v-form
+              @submit.prevent
+              ref="copyform"
+              v-model="copyformValid"
+              lazy-validation
+            >
               <v-select
                 multiple
                 chips
