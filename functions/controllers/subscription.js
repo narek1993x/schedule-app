@@ -1,3 +1,6 @@
+const _get = require("lodash/get");
+const _pick = require("lodash/pick");
+const _keys = require("lodash/keys");
 const rootRef = require("../firebase-admin").rootRef;
 const subscriptionsRef = rootRef.child("subscriptions");
 
@@ -43,18 +46,32 @@ async function getSubscriptionByUserId(userId) {
   }
 }
 
-async function addUserSubscription(data) {
+async function addUserSubscription({ token, ...data }) {
   try {
     const subscription = await getSubscriptionByUserId(data.userId);
+    const { os, browser } = _get(data, "deviceInfo", {
+      os: { name: "default" },
+      browser: { name: "default" }
+    });
 
     if (subscription === null) {
-      await subscriptionsRef.child(data.userId).push(data);
+      await subscriptionsRef.child(data.userId).push({
+        ...data,
+        deviceTokens: {
+          [`${os.name}-${browser.name}`]: token
+        }
+      });
     } else {
+      const deviceTokens = _get(subscription, "deviceTokens", {});
+
       await subscriptionsRef
         .child(data.userId)
         .child(subscription.id)
         .update({
-          token: data.token
+          deviceTokens: {
+            ...deviceTokens,
+            [`${os.name}-${browser.name}`]: token
+          }
         });
     }
   } catch (error) {
@@ -62,14 +79,23 @@ async function addUserSubscription(data) {
   }
 }
 
-async function updateUserSubscription(data) {
+async function updateUserSubscription({ token, ...data }) {
   try {
-    const { id } = await getSubscriptionByUserId(data.userId);
+    const subscription = await getSubscriptionByUserId(data.userId);
+    const { os, browser } = _get(data, "deviceInfo", {
+      os: { name: "default" },
+      browser: { name: "default" }
+    });
+    const deviceTokens = _get(subscription, "deviceTokens", {});
+
     return await subscriptionsRef
       .child(data.userId)
-      .child(id)
+      .child(subscription.id)
       .update({
-        token: data.token
+        deviceTokens: {
+          ...deviceTokens,
+          [`${os.name}-${browser.name}`]: token
+        }
       });
   } catch (error) {
     console.error("Error in updateUserSubscription :", error);
@@ -78,10 +104,30 @@ async function updateUserSubscription(data) {
 
 async function removeUserSubscription(data) {
   try {
-    const { id } = await getSubscriptionByUserId(data.userId);
+    const subscription = await getSubscriptionByUserId(data.userId);
+    const deviceTokens = _get(subscription, "deviceTokens", {});
+    const { os, browser } = _get(data, "deviceInfo", {
+      os: { name: "default" },
+      browser: { name: "default" }
+    });
+
+    if (_keys(deviceTokens).length > 1) {
+      const newDeviceTokens = _pick(
+        deviceTokens,
+        _keys(deviceTokens).filter(key => key !== `${os.name}-${browser.name}`)
+      );
+
+      return await subscriptionsRef
+        .child(data.userId)
+        .child(subscription.id)
+        .update({
+          deviceTokens: newDeviceTokens
+        });
+    }
+
     return await subscriptionsRef
       .child(data.userId)
-      .child(id)
+      .child(subscription.id)
       .remove();
   } catch (error) {
     console.error("Error in removeUserSubscription :", error);

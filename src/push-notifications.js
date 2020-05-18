@@ -1,14 +1,11 @@
 import { firebaseApp, apps } from "./firebase";
 import { FirebaseDeviceToken, UserToken } from "./storage";
+import { getDeviceInfo } from "./helpers/utils";
 import { sendTokenToServer } from "./services/api-requests";
 import config from "../config/config.json";
 
 function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
-}
-
-function getDeviceType() {
-  return ("userAgent" in navigator && navigator.userAgent) || "";
 }
 
 async function registerServiceWorker() {
@@ -43,7 +40,7 @@ export async function initializePushNotificationsService() {
       const response = await sendTokenToServer({
         userId: userToken.id,
         token: firebaseToken,
-        deviceType: getDeviceType()
+        deviceInfo: getDeviceInfo()
       });
       FirebaseDeviceToken.set(firebaseToken);
       console.info("sendTokenToServer: ", response);
@@ -61,6 +58,7 @@ export async function initializePushNotificationsService() {
         const response = await sendTokenToServer({
           userId: userToken.id,
           token: refreshedToken,
+          deviceInfo: getDeviceInfo(),
           refresh: true
         });
         FirebaseDeviceToken.set(firebaseToken);

@@ -175,7 +175,7 @@
 </template>
 
 <script>
-import { handleScheduleEventTime, isMobile } from "../../helpers/utlis";
+import { handleScheduleEventTime, isMobile } from "../../helpers/utils";
 
 export default {
   props: ["visible", "dark", "scheduleEvent", "onClose"],

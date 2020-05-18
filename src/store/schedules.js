@@ -1,5 +1,5 @@
 import { scheduleEventsRef } from "../firebase";
-import { setScheduleEventProps } from "../helpers/utlis";
+import { setScheduleEventProps } from "../helpers/utils";
 
 export default {
   state: {

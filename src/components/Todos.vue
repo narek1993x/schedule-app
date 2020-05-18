@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { isMobile } from "../helpers/utlis";
+import { isMobile } from "../helpers/utils";
 
 export default {
   computed: {

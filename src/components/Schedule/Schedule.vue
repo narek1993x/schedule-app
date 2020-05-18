@@ -203,7 +203,7 @@
 import moment from "moment";
 import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
 import Modal from "../Modal.vue";
-import { isMobile, handleScheduleEventTime } from "../../helpers/utlis";
+import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];

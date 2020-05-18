@@ -1,4 +1,5 @@
 import config from "../../config/config.json";
+import { getDeviceInfo } from "../helpers/utils";
 
 export async function removeTokenFromServer(token) {
   try {
@@ -7,7 +8,7 @@ export async function removeTokenFromServer(token) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ userId: token.id })
+      body: JSON.stringify({ userId: token.id, deviceInfo: getDeviceInfo() })
     });
     return response.json();
   } catch (error) {
