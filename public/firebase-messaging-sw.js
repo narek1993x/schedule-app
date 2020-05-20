@@ -22,7 +22,7 @@ messaging.setBackgroundMessageHandler(function(payload) {
   const title = payload.data.name;
   const options = {
     body: payload.data.content,
-    icon: "./img/icons/android-chrome-192x192.png", // Min 192x192 or larger
+    icon: "./img/icons/android-chrome-512x512.png",
     badge: "./img/icons/badge.png", // Min 72x72 or larger
     actions: [
       { action: "close", title: "Close", icon: "./img/icons/close.png" }
@@ -33,5 +33,6 @@ messaging.setBackgroundMessageHandler(function(payload) {
 });
 
 self.addEventListener("notificationclick", function(event) {
+  console.info("notificationclick: ", event);
   event.notification.close();
 });
