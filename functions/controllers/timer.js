@@ -37,25 +37,27 @@ async function handleNotificationsTimer() {
   const subscriptions = await subscription.getSubscriptions();
   const schedules = await scheduleEvent.getScheduleList();
 
-  const filteredByUserId = schedules.filter(schedule =>
-    subscriptions.some(subscription => subscription.userId === schedule.ownerId)
-  );
-
   const currentTime = filterByTime(moment().format("HH:mm"));
 
-  const filteredByTimeAndReminder = filteredByUserId
-    .filter(s => {
-      const startTime = filterByTime(s.start, s.week);
+  const filteredSchedules = schedules
+    .filter(schedule => {
+      const startTime = filterByTime(schedule.start, schedule.week);
       const timeLeft = startTime - currentTime;
-
-      return !!s.reminder && timeLeft <= 300 && timeLeft > 0;
+      return (
+        !!schedule.reminder &&
+        subscriptions.some(
+          subscription => subscription.userId === schedule.ownerId
+        ) &&
+        timeLeft <= 300 &&
+        timeLeft > 0
+      );
     })
     .sort(
       (a, b) => filterByTime(a.start, a.week) - filterByTime(b.start, b.week)
     );
 
   const notificationMessages = messaging.createMessages(
-    filteredByTimeAndReminder,
+    filteredSchedules,
     subscriptions
   );
 
