@@ -113,6 +113,13 @@
             >
               <v-icon :size="20">mdi-content-duplicate</v-icon>
             </v-btn>
+            <v-btn icon @click="handleReminderToggle(selectedScheduleEvent)">
+              <v-icon :size="20">
+                {{
+                  selectedScheduleEvent.reminder ? "mdi-bell" : "mdi-bell-off"
+                }}
+              </v-icon>
+            </v-btn>
             <v-btn icon @click="selectedOpen = false">
               <v-icon :size="20">mdi-close</v-icon>
             </v-btn>
@@ -394,6 +401,15 @@ export default {
       });
 
       this.duplicateScheduleEventWeeks = duplicateScheduleEventWeeks;
+    },
+    handleReminderToggle(scheduleEvent) {
+      const newScheduleEvent = {
+        ...scheduleEvent,
+        reminder: !scheduleEvent.reminder
+      };
+
+      this.selectedScheduleEvent = newScheduleEvent;
+      this.$store.dispatch("editScheduleEvent", newScheduleEvent);
     },
     viewDay({ date }) {
       this.focus = date;

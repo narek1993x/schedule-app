@@ -43,19 +43,19 @@ async function handleNotificationsTimer() {
 
   const currentTime = filterByTime(moment().format("HH:mm"));
 
-  const filteredByTime = filteredByUserId
+  const filteredByTimeAndReminder = filteredByUserId
     .filter(s => {
       const startTime = filterByTime(s.start, s.week);
       const timeLeft = startTime - currentTime;
 
-      return timeLeft <= 300 && timeLeft > 0;
+      return !!s.reminder && timeLeft <= 300 && timeLeft > 0;
     })
     .sort(
       (a, b) => filterByTime(a.start, a.week) - filterByTime(b.start, b.week)
     );
 
   const notificationMessages = messaging.createMessages(
-    filteredByTime,
+    filteredByTimeAndReminder,
     subscriptions
   );
 

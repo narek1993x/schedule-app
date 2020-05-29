@@ -280,6 +280,7 @@ export default {
           permanent: this.permanent,
           start: this.startTime,
           end: this.endTime,
+          reminder: this.scheduleEvent ? this.scheduleEvent.reminder : true,
           ...(this.permanent
             ? {
                 week: this.week
