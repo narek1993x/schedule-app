@@ -113,13 +113,29 @@
             >
               <v-icon :size="20">mdi-content-duplicate</v-icon>
             </v-btn>
-            <v-btn icon @click="handleReminderToggle(selectedScheduleEvent)">
-              <v-icon :size="20">
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  v-on="on"
+                  @click="handleReminderToggle(selectedScheduleEvent)"
+                >
+                  <v-icon :size="20">
+                    {{
+                      selectedScheduleEvent.reminder
+                        ? "mdi-bell"
+                        : "mdi-bell-off"
+                    }}
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>
                 {{
-                  selectedScheduleEvent.reminder ? "mdi-bell" : "mdi-bell-off"
+                  selectedScheduleEvent.reminder ? "Turned on" : "Turned off"
                 }}
-              </v-icon>
-            </v-btn>
+              </span>
+            </v-tooltip>
             <v-btn icon @click="selectedOpen = false">
               <v-icon :size="20">mdi-close</v-icon>
             </v-btn>
