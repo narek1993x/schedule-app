@@ -27,6 +27,61 @@ export const handleScheduleEventTime = date => {
   return date;
 };
 
+export const handleConvertTimeForInput = date => {
+  return moment(date).format("hh:mm A");
+};
+
+export const handleHourRange = (time, max) => {
+  let list = null;
+
+  if (!time) return list;
+
+  try {
+    const hour = time.split(":")[0];
+    const AMPM = time.match(/\s(.*)$/)[1];
+    const hourNum = parseInt(hour, 10);
+    const code = AMPM === "AM" ? "a" : "p";
+
+    list = new Set();
+
+    if (max) {
+      if (code === "p") {
+        [...new Array(12).keys()].forEach(i => list.add(`${i + 1}a`));
+      }
+
+      for (let i = 1; i <= hourNum; i++) {
+        list.add(`${i}${code}`);
+      }
+    } else {
+      if (code === "a") {
+        [...new Array(12).keys()].forEach(i => list.add(`${i + 1}p`));
+      }
+
+      for (let j = hourNum; j <= 12; j++) {
+        list.add(`${j}${code}`);
+      }
+    }
+  } catch (error) {
+    console.error("handleHourRange: ", error);
+  }
+
+  return [...list];
+};
+
+export const convertTo24 = time => {
+  let hours = Number(time.match(/^(\d+)/)[1]);
+  let minutes = Number(time.match(/:(\d+)/)[1]);
+  let AMPM = time.match(/\s(.*)$/)[1];
+  if (AMPM == "PM" && hours < 12) hours = hours + 12;
+  if (AMPM == "AM" && hours == 12) hours = hours - 12;
+  let sHours = hours.toString();
+  let sMinutes = minutes.toString();
+  if (hours < 10) sHours = "0" + sHours;
+  if (minutes < 10) sMinutes = "0" + sMinutes;
+
+  return `${sHours}:${sMinutes}`;
+};
+
 export const setScheduleEventProps = (event, { start, end }) => {
   return {
     ...event,

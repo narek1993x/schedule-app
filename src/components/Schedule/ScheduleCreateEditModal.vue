@@ -80,74 +80,26 @@
                   </v-row>
                 </v-col>
                 <v-col cols="12">
-                  <v-row class="d-flex">
-                    <v-col cols="12" sm="6">
-                      <v-menu
-                        ref="startTimer"
-                        v-model="startTimerMenu"
-                        :close-on-content-click="false"
-                        :nudge-right="30"
-                        :return-value.sync="startTime"
-                        transition="scale-transition"
-                        offset-y
-                        max-width="290px"
-                        min-width="280px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="startTime"
-                            :rules="startTimeRules"
-                            label="Start*"
-                            prepend-icon="mdi-timer"
-                            readonly
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-time-picker
-                          v-if="startTimerMenu"
-                          v-model="startTime"
-                          ampm-in-title
-                          header-color="#3c3c3c"
-                          scrollable
-                          full-width
-                          :max="endTime"
-                          @click:minute="$refs.startTimer.save(startTime)"
-                        ></v-time-picker>
-                      </v-menu>
+                  <v-row class="d-flex justify-space-between">
+                    <v-col class="d-flex" cols="12" sm="6">
+                      <v-icon :size="20">mdi-timer</v-icon>
+                      <vue-timepicker
+                        v-model="startTime"
+                        placeholder="Start*"
+                        format="hh:mm A"
+                        :hour-range="startHourRange"
+                        input-width="100%"
+                      ></vue-timepicker>
                     </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-menu
-                        ref="endTimer"
-                        v-model="endTimerMenu"
-                        :close-on-content-click="false"
-                        :nudge-right="30"
-                        :return-value.sync="endTime"
-                        transition="scale-transition"
-                        offset-y
-                        max-width="290px"
-                        min-width="280px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="endTime"
-                            :rules="endTimeRules"
-                            label="End*"
-                            prepend-icon="mdi-timer"
-                            readonly
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-time-picker
-                          v-if="endTimerMenu"
-                          v-model="endTime"
-                          scrollable
-                          header-color="#3c3c3c"
-                          full-width
-                          :min="startTime"
-                          ampm-in-title
-                          @click:minute="$refs.endTimer.save(endTime)"
-                        ></v-time-picker>
-                      </v-menu>
+                    <v-col class="d-flex" cols="12" sm="6">
+                      <v-icon :size="20">mdi-timer</v-icon>
+                      <vue-timepicker
+                        v-model="endTime"
+                        placeholder="End*"
+                        format="hh:mm A"
+                        :hour-range="endHourRange"
+                        input-width="100%"
+                      ></vue-timepicker>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -175,9 +127,17 @@
 </template>
 
 <script>
-import { handleScheduleEventTime, isMobile } from "../../helpers/utils";
+import VueTimepicker from "vue2-timepicker";
+import {
+  isMobile,
+  convertTo24,
+  handleConvertTimeForInput,
+  handleHourRange
+} from "../../helpers/utils";
+import "vue2-timepicker/dist/VueTimepicker.css";
 
 export default {
+  components: { "vue-timepicker": VueTimepicker },
   props: ["visible", "dark", "scheduleEvent", "onClose"],
   watch: {
     scheduleEvent: function(newScheduleEvent) {
@@ -194,8 +154,8 @@ export default {
 
         this.title = name;
         this.content = content;
-        this.startTime = handleScheduleEventTime(start);
-        this.endTime = handleScheduleEventTime(end);
+        this.startTime = handleConvertTimeForInput(start);
+        this.endTime = handleConvertTimeForInput(end);
 
         if (permanent) {
           this.permanent = permanent;
@@ -220,6 +180,12 @@ export default {
     },
     loading() {
       return this.$store.getters.loading;
+    },
+    startHourRange() {
+      return handleHourRange(this.endTime, true);
+    },
+    endHourRange() {
+      return handleHourRange(this.startTime);
     }
   },
   data: () => ({
@@ -278,8 +244,8 @@ export default {
           name: this.title,
           content: this.content,
           permanent: this.permanent,
-          start: this.startTime,
-          end: this.endTime,
+          start: convertTo24(this.startTime),
+          end: convertTo24(this.endTime),
           reminder: this.scheduleEvent ? this.scheduleEvent.reminder : true,
           ...(this.permanent
             ? {
@@ -303,6 +269,30 @@ export default {
 </script>
 
 <style lang="scss">
+.time-picker {
+  & .dropdown,
+  & .select-list {
+    height: 7em !important;
+  }
+
+  & .display-time {
+    border: none !important;
+    border-bottom: 1px solid #696969 !important;
+    transition: 0.3s;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      border-bottom: 1px solid #000 !important;
+      outline: none !important;
+    }
+  }
+
+  & .active {
+    background-color: #e535ab !important;
+  }
+}
+
 @media (max-width: 767px) {
   .ModalTitle {
     & .headline {
