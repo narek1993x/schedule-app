@@ -27,45 +27,34 @@ export const handleScheduleEventTime = date => {
   return date;
 };
 
-export const handleConvertTimeForInput = date => {
-  return moment(date).format("hh:mm A");
-};
-
-export const handleHourRange = (time, max) => {
-  let list = null;
+export const handleStartHourRange = time => {
+  let list = [];
 
   if (!time) return list;
 
-  try {
-    const hour = time.split(":")[0];
-    const AMPM = time.match(/\s(.*)$/)[1];
-    const hourNum = parseInt(hour, 10);
-    const code = AMPM === "AM" ? "a" : "p";
+  const hour = time.split(":")[0];
+  const hourNum = parseInt(hour, 10);
 
-    list = new Set();
-
-    if (max) {
-      if (code === "p") {
-        [...new Array(12).keys()].forEach(i => list.add(`${i + 1}a`));
-      }
-
-      for (let i = 1; i <= hourNum; i++) {
-        list.add(`${i}${code}`);
-      }
-    } else {
-      if (code === "a") {
-        [...new Array(12).keys()].forEach(i => list.add(`${i + 1}p`));
-      }
-
-      for (let j = hourNum; j <= 12; j++) {
-        list.add(`${j}${code}`);
-      }
-    }
-  } catch (error) {
-    console.error("handleHourRange: ", error);
+  for (let i = 0; i <= hourNum; i++) {
+    list.push(i);
   }
 
-  return [...list];
+  return list;
+};
+
+export const handleEndHourRange = time => {
+  let list = [];
+
+  if (!time) return list;
+
+  const hour = time.split(":")[0];
+  const hourNum = parseInt(hour, 10);
+
+  for (let i = hourNum; i < 24; i++) {
+    list.push(i);
+  }
+
+  return list;
 };
 
 export const convertTo24 = time => {

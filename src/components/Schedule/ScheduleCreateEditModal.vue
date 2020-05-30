@@ -86,7 +86,6 @@
                       <vue-timepicker
                         v-model="startTime"
                         placeholder="Start*"
-                        format="hh:mm A"
                         :hour-range="startHourRange"
                         input-width="100%"
                       ></vue-timepicker>
@@ -96,7 +95,6 @@
                       <vue-timepicker
                         v-model="endTime"
                         placeholder="End*"
-                        format="hh:mm A"
                         :hour-range="endHourRange"
                         input-width="100%"
                       ></vue-timepicker>
@@ -131,8 +129,9 @@ import VueTimepicker from "vue2-timepicker";
 import {
   isMobile,
   convertTo24,
-  handleConvertTimeForInput,
-  handleHourRange
+  handleScheduleEventTime,
+  handleStartHourRange,
+  handleEndHourRange
 } from "../../helpers/utils";
 import "vue2-timepicker/dist/VueTimepicker.css";
 
@@ -154,8 +153,8 @@ export default {
 
         this.title = name;
         this.content = content;
-        this.startTime = handleConvertTimeForInput(start);
-        this.endTime = handleConvertTimeForInput(end);
+        this.startTime = handleScheduleEventTime(start);
+        this.endTime = handleScheduleEventTime(end);
 
         if (permanent) {
           this.permanent = permanent;
@@ -182,10 +181,10 @@ export default {
       return this.$store.getters.loading;
     },
     startHourRange() {
-      return handleHourRange(this.endTime, true);
+      return handleStartHourRange(this.endTime);
     },
     endHourRange() {
-      return handleHourRange(this.startTime);
+      return handleEndHourRange(this.startTime);
     }
   },
   data: () => ({
@@ -244,8 +243,8 @@ export default {
           name: this.title,
           content: this.content,
           permanent: this.permanent,
-          start: convertTo24(this.startTime),
-          end: convertTo24(this.endTime),
+          start: this.startTime,
+          end: this.endTime,
           reminder: this.scheduleEvent ? this.scheduleEvent.reminder : true,
           ...(this.permanent
             ? {
