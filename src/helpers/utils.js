@@ -36,7 +36,7 @@ export const handleScheduleEventTime = date => {
 export const handleHourRange = (time, forStart) => {
   let list = [];
 
-  if (!time) return list;
+  if (!time) return null;
 
   const [hourNum] = splitTime(time);
 
@@ -58,7 +58,7 @@ export const handleHourRange = (time, forStart) => {
 export const handleMinuteRange = (startTime, endTime, forStart) => {
   let list = [];
 
-  if (!startTime || !endTime) return list;
+  if (!startTime || !endTime) return null;
 
   const [startHourNum, startMinuteNum] = splitTime(startTime);
   const [endHourNum, endMinuteNum] = splitTime(endTime);
@@ -69,7 +69,7 @@ export const handleMinuteRange = (startTime, endTime, forStart) => {
         list.push(i);
       }
     } else {
-      for (let i = startMinuteNum + 5; i < 55; i += 5) {
+      for (let i = startMinuteNum + 5; i < 60; i += 5) {
         list.push(i);
       }
     }

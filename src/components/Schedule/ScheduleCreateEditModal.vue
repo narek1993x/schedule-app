@@ -89,6 +89,9 @@
                         :hour-range="startHourRange"
                         :minute-range="startMinuteRange"
                         :minute-interval="5"
+                        @blur="timePickerValidationHandler"
+                        @change="timePickerValidationHandler"
+                        auto-scroll
                         input-width="100%"
                       ></vue-timepicker>
                     </v-col>
@@ -100,6 +103,9 @@
                         :hour-range="endHourRange"
                         :minute-range="endMinuteRange"
                         :minute-interval="5"
+                        @blur="timePickerValidationHandler"
+                        @change="timePickerValidationHandler"
+                        auto-scroll
                         input-width="100%"
                       ></vue-timepicker>
                     </v-col>
@@ -206,8 +212,6 @@ export default {
     date: "",
     dateFormatted: null,
     dateMenu: false,
-    startTimerMenu: false,
-    endTimerMenu: false,
     startTime: "",
     endTime: "",
     week: "",
@@ -236,8 +240,6 @@ export default {
       this.date = "";
       this.dateFormatted = null;
       this.dateMenu = false;
-      this.startTimerMenu = false;
-      this.endTimerMenu = false;
       this.startTime = "";
       this.endTime = "";
       this.week = "";
@@ -245,6 +247,9 @@ export default {
     closeHandler() {
       this.onClose();
       this.clear();
+    },
+    timePickerValidationHandler() {
+      this.valid = this.startTime && this.endTime;
     },
     saveHandler() {
       if (this.$refs.form.validate()) {
