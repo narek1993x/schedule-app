@@ -87,6 +87,8 @@
                         v-model="startTime"
                         placeholder="Start*"
                         :hour-range="startHourRange"
+                        :minute-range="startMinuteRange"
+                        :minute-interval="5"
                         input-width="100%"
                       ></vue-timepicker>
                     </v-col>
@@ -96,6 +98,8 @@
                         v-model="endTime"
                         placeholder="End*"
                         :hour-range="endHourRange"
+                        :minute-range="endMinuteRange"
+                        :minute-interval="5"
                         input-width="100%"
                       ></vue-timepicker>
                     </v-col>
@@ -128,10 +132,9 @@
 import VueTimepicker from "vue2-timepicker";
 import {
   isMobile,
-  convertTo24,
   handleScheduleEventTime,
-  handleStartHourRange,
-  handleEndHourRange
+  handleHourRange,
+  handleMinuteRange
 } from "../../helpers/utils";
 import "vue2-timepicker/dist/VueTimepicker.css";
 
@@ -181,10 +184,16 @@ export default {
       return this.$store.getters.loading;
     },
     startHourRange() {
-      return handleStartHourRange(this.endTime);
+      return handleHourRange(this.endTime, true);
     },
     endHourRange() {
-      return handleEndHourRange(this.startTime);
+      return handleHourRange(this.startTime);
+    },
+    startMinuteRange() {
+      return handleMinuteRange(this.startTime, this.endTime, true);
+    },
+    endMinuteRange() {
+      return handleMinuteRange(this.startTime, this.endTime);
     }
   },
   data: () => ({

@@ -19,6 +19,12 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
+const splitTime = t => {
+  const [hour, minute] = t.split(":");
+
+  return [parseInt(hour, 10), parseInt(minute, 10)];
+};
+
 export const handleScheduleEventTime = date => {
   if (date && date.length > 10) {
     return date.slice(10);
@@ -27,32 +33,49 @@ export const handleScheduleEventTime = date => {
   return date;
 };
 
-export const handleStartHourRange = time => {
+export const handleHourRange = (time, forStart) => {
   let list = [];
 
   if (!time) return list;
 
-  const hour = time.split(":")[0];
-  const hourNum = parseInt(hour, 10);
+  const [hourNum] = splitTime(time);
 
-  for (let i = 0; i <= hourNum; i++) {
-    list.push(i);
+  if (forStart) {
+    for (let i = 0; i <= hourNum; i++) {
+      list.push(i);
+    }
+  } else {
+    for (let i = hourNum; i < 24; i++) {
+      list.push(i);
+    }
   }
+
+  if (list.length === 0) return null;
 
   return list;
 };
 
-export const handleEndHourRange = time => {
+export const handleMinuteRange = (startTime, endTime, forStart) => {
   let list = [];
 
-  if (!time) return list;
+  if (!startTime || !endTime) return list;
 
-  const hour = time.split(":")[0];
-  const hourNum = parseInt(hour, 10);
+  const [startHourNum, startMinuteNum] = splitTime(startTime);
+  const [endHourNum, endMinuteNum] = splitTime(endTime);
 
-  for (let i = hourNum; i < 24; i++) {
-    list.push(i);
+  if (startHourNum === endHourNum) {
+    if (forStart) {
+      for (let i = 0; i < endMinuteNum; i += 5) {
+        list.push(i);
+      }
+    } else {
+      for (let i = startMinuteNum + 5; i < 55; i += 5) {
+        list.push(i);
+      }
+    }
   }
+
+  if (list.length === 0) return null;
 
   return list;
 };
