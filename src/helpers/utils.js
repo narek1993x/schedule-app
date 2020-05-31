@@ -65,11 +65,11 @@ export const handleMinuteRange = (startTime, endTime, forStart) => {
 
   if (startHourNum === endHourNum) {
     if (forStart) {
-      for (let i = 0; i < endMinuteNum; i += 5) {
+      for (let i = 0; i < endMinuteNum; i++) {
         list.push(i);
       }
     } else {
-      for (let i = startMinuteNum + 5; i < 60; i += 5) {
+      for (let i = startMinuteNum + 1; i < 60; i++) {
         list.push(i);
       }
     }

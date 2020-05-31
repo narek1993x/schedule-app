@@ -88,9 +88,9 @@
                         placeholder="Start*"
                         :hour-range="startHourRange"
                         :minute-range="startMinuteRange"
-                        :minute-interval="5"
-                        @blur="timePickerValidationHandler"
+                        input-class="VueTimePicker"
                         @change="timePickerValidationHandler"
+                        @error="timePickerErrorHandler"
                         auto-scroll
                         input-width="100%"
                       ></vue-timepicker>
@@ -102,9 +102,9 @@
                         placeholder="End*"
                         :hour-range="endHourRange"
                         :minute-range="endMinuteRange"
-                        :minute-interval="5"
-                        @blur="timePickerValidationHandler"
+                        input-class="VueTimePicker"
                         @change="timePickerValidationHandler"
+                        @error="timePickerErrorHandler"
                         auto-scroll
                         input-width="100%"
                       ></vue-timepicker>
@@ -251,6 +251,9 @@ export default {
     timePickerValidationHandler() {
       this.valid = this.startTime && this.endTime;
     },
+    timePickerErrorHandler(eventData) {
+      this.valid = eventData.length === 0;
+    },
     saveHandler() {
       if (this.$refs.form.validate()) {
         const schedule = {
@@ -288,7 +291,7 @@ export default {
     height: 7em !important;
   }
 
-  & .display-time {
+  & .VueTimePicker {
     border: none !important;
     border-bottom: 1px solid #696969 !important;
     transition: 0.3s;
@@ -298,6 +301,10 @@ export default {
     &:focus {
       border-bottom: 1px solid #000 !important;
       outline: none !important;
+    }
+
+    &.invalid {
+      border-color: #c03 !important;
     }
   }
 
