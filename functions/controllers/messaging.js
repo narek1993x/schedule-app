@@ -8,7 +8,7 @@ function createMessages(schedules, subscriptions) {
     Object.keys(subscription.deviceTokens).forEach(deviceToken => {
       messages.push({
         data: {
-          name: schedule.name,
+          name: `${schedule.name} at ${schedule.start}`,
           content: schedule.content
         },
         token: subscription.deviceTokens[deviceToken]
