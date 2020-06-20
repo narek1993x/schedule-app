@@ -22,7 +22,7 @@
 
       <v-toolbar-title>
         <router-link to="/" tag="span" class="pointer">
-          My Todo List
+          Schedule App
         </router-link>
       </v-toolbar-title>
 
@@ -35,7 +35,6 @@
         </v-btn>
       </v-toolbar-items>
     </v-app-bar>
-
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -69,16 +68,17 @@ export default {
     links() {
       if (this.isUserLoggedIn) {
         return [
-          { title: "Todos", icon: "mdi-format-list-checks", url: "/" },
           {
             title: "Schedule",
             icon: "mdi-calendar-outline",
-            url: "/schedule"
+            url: "/"
           },
+          { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
           { title: "Loguot", icon: "mdi-logout-variant", url: "/logout" }
         ];
       }
       return [
+        { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
         { title: "Login", icon: "mdi-lock", url: "/login" },
         { title: "Registration", icon: "mdi-face", url: "/registration" }
       ];

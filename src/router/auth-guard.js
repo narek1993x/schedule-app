@@ -5,7 +5,7 @@ export default function(to, from, next) {
     if (store.getters.isUserLoggedIn) {
       next();
     } else {
-      next("/");
+      next("/todos");
     }
   }, 0);
 }

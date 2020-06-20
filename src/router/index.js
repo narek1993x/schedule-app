@@ -10,12 +10,12 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/todos",
     name: "todos",
     component: Todos
   },
   {
-    path: "/schedule",
+    path: "/",
     name: "schedule",
     // route level code-splitting
     // this generates a separate chunk (schedule.[hash].js) for this route
