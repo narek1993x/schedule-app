@@ -46,6 +46,7 @@
         <v-icon :size="18" right dark>mdi-plus</v-icon>
       </v-btn>
       <schedule-create-edit-modal
+        v-if="showCreateEditModal"
         :dark="darkMode"
         :onClose="handleCloseScheduleModal"
         :visible="showCreateEditModal"

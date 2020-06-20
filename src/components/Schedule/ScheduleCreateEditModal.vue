@@ -3,7 +3,7 @@
     <v-dialog
       :dark="dark"
       :fullscreen="isMobile"
-      v-model="dialog"
+      v-model="visible"
       max-width="800px"
     >
       <v-card>
@@ -64,7 +64,7 @@
                             v-model="date"
                             :rules="dateRules"
                             label="Date*"
-                            hint="Event data"
+                            hint="Event date"
                             persistent-hint
                             prepend-icon="mdi-calendar-outline"
                             v-on="on"
@@ -117,7 +117,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">
+          <v-btn color="blue darken-1" text @click="closeHandler">
             Close
           </v-btn>
           <v-btn
@@ -147,39 +147,34 @@ import "vue2-timepicker/dist/VueTimepicker.css";
 export default {
   components: { "vue-timepicker": VueTimepicker },
   props: ["visible", "dark", "scheduleEvent", "onClose"],
+  beforeMount() {
+    if (this.scheduleEvent) {
+      const {
+        name,
+        content,
+        permanent,
+        week,
+        start,
+        end,
+        date
+      } = this.scheduleEvent;
+
+      this.title = name;
+      this.content = content;
+      this.startTime = handleScheduleEventTime(start);
+      this.endTime = handleScheduleEventTime(end);
+
+      if (permanent) {
+        this.permanent = permanent;
+        this.week = week;
+      } else {
+        this.date = date;
+      }
+    }
+  },
   watch: {
-    scheduleEvent: function(newScheduleEvent) {
-      if (newScheduleEvent) {
-        const {
-          name,
-          content,
-          permanent,
-          week,
-          start,
-          end,
-          date
-        } = newScheduleEvent;
-
-        this.title = name;
-        this.content = content;
-        this.startTime = handleScheduleEventTime(start);
-        this.endTime = handleScheduleEventTime(end);
-
-        if (permanent) {
-          this.permanent = permanent;
-          this.week = week;
-        } else {
-          this.date = date;
-        }
-      }
-    },
     visible: function(newVisible) {
-      if (newVisible) {
-        this.dialog = newVisible;
-      }
-    },
-    dialog: function(newDialog) {
-      if (!newDialog) this.closeHandler();
+      if (!newVisible) this.closeHandler();
     }
   },
   computed: {
@@ -204,7 +199,6 @@ export default {
   },
   data: () => ({
     isMobile: isMobile(),
-    dialog: false,
     valid: true,
     permanent: false,
     title: "",
@@ -233,7 +227,6 @@ export default {
   methods: {
     clear() {
       this.$refs.form.reset();
-      this.dialog = false;
       this.permanent = false;
       this.title = "";
       this.content = "";
@@ -245,8 +238,8 @@ export default {
       this.week = "";
     },
     closeHandler() {
-      this.onClose();
       this.clear();
+      this.onClose();
     },
     timePickerValidationHandler() {
       this.valid = this.startTime && this.endTime;
