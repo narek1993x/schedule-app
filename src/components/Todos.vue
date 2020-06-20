@@ -27,7 +27,7 @@
 
       <app-loading :loading="loading"></app-loading>
 
-      <v-flex xs12 sm6 sm3 style="max-height: 600px; overflow: auto">
+      <v-flex xs12 sm6 sm3 class="List">
         <v-list three-line nav>
           <v-list-item
             @click="todoToggle(todo)"
@@ -127,6 +127,34 @@ export default {
 </script>
 
 <style lang="scss">
+.AddTodoInput,
+.Filters {
+  position: fixed;
+  max-width: 600px !important;
+  width: 100%;
+  z-index: 1;
+  background-color: #fff;
+}
+
+.AddTodoInput {
+  top: 64px;
+}
+
+.Filters {
+  top: 134px;
+}
+
+.List {
+  margin-top: 120px;
+  max-height: 600px;
+  overflow: auto;
+
+  & .v-list {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+}
+
 .completed {
   text-decoration: line-through;
   color: grey;
