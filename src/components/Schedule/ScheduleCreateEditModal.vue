@@ -1,137 +1,135 @@
 <template>
-  <v-row justify="start" class="ml-2">
-    <v-dialog
-      :dark="dark"
-      :fullscreen="isMobile"
-      v-model="visible"
-      max-width="800px"
-    >
-      <v-card>
-        <v-card-title class="ModalTitle">
-          <span class="headline">
-            {{ scheduleEvent ? "Edit" : "Create" }} schedule event
-          </span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-form @submit.prevent ref="form" v-model="valid" lazy-validation>
-              <v-row>
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="title"
-                    label="Title*"
-                    hint="title of event"
-                    :rules="titleRules"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-textarea
-                    v-model="content"
-                    name="input-7-4"
-                    label="Content"
-                    value
-                    hint="content of event"
-                  ></v-textarea>
-                </v-col>
-                <v-col cols="12">
-                  <v-row class="d-flex justify-space-between">
-                    <v-col cols="12" sm="3">
-                      <v-switch
-                        v-model="permanent"
-                        :label="`${permanent ? 'Permanent' : 'One time'}`"
-                      ></v-switch>
-                    </v-col>
-                    <v-col v-if="permanent" cols="12" sm="6">
-                      <v-select
-                        v-model="week"
-                        :items="weeks"
-                        :rules="weekRules"
-                        label="Week*"
-                      ></v-select>
-                    </v-col>
-                    <v-col v-else cols="12" sm="6">
-                      <v-menu
-                        v-model="dateMenu"
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        max-width="290px"
-                        min-width="290px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="date"
-                            :rules="dateRules"
-                            label="Date*"
-                            hint="Event date"
-                            persistent-hint
-                            prepend-icon="mdi-calendar-outline"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
+  <v-dialog
+    :dark="dark"
+    :fullscreen="isMobile"
+    v-model="visible"
+    max-width="800px"
+  >
+    <v-card>
+      <v-card-title class="ModalTitle">
+        <span class="headline">
+          {{ scheduleEvent ? "Edit" : "Create" }} schedule event
+        </span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-form @submit.prevent ref="form" v-model="valid" lazy-validation>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="title"
+                  label="Title*"
+                  hint="title of event"
+                  :rules="titleRules"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="content"
+                  name="input-7-4"
+                  label="Content"
+                  value
+                  hint="content of event"
+                ></v-textarea>
+              </v-col>
+              <v-col cols="12">
+                <v-row class="d-flex justify-space-between">
+                  <v-col cols="12" sm="3">
+                    <v-switch
+                      v-model="permanent"
+                      :label="`${permanent ? 'Permanent' : 'One time'}`"
+                    ></v-switch>
+                  </v-col>
+                  <v-col v-if="permanent" cols="12" sm="6">
+                    <v-select
+                      v-model="week"
+                      :items="weeks"
+                      :rules="weekRules"
+                      label="Week*"
+                    ></v-select>
+                  </v-col>
+                  <v-col v-else cols="12" sm="6">
+                    <v-menu
+                      v-model="dateMenu"
+                      :close-on-content-click="false"
+                      transition="scale-transition"
+                      offset-y
+                      max-width="290px"
+                      min-width="290px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
                           v-model="date"
-                          no-title
-                          @input="dateMenu = false"
-                        ></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>
-                </v-col>
-                <v-col cols="12">
-                  <v-row class="d-flex justify-space-between">
-                    <v-col class="d-flex" cols="12" sm="6">
-                      <v-icon :size="20">mdi-timer</v-icon>
-                      <vue-timepicker
-                        v-model="startTime"
-                        placeholder="Start*"
-                        :hour-range="startHourRange"
-                        :minute-range="startMinuteRange"
-                        input-class="VueTimePicker"
-                        @change="timePickerValidationHandler"
-                        @error="timePickerErrorHandler"
-                        auto-scroll
-                        input-width="100%"
-                      ></vue-timepicker>
-                    </v-col>
-                    <v-col class="d-flex" cols="12" sm="6">
-                      <v-icon :size="20">mdi-timer</v-icon>
-                      <vue-timepicker
-                        v-model="endTime"
-                        placeholder="End*"
-                        :hour-range="endHourRange"
-                        :minute-range="endMinuteRange"
-                        input-class="VueTimePicker"
-                        @change="timePickerValidationHandler"
-                        @error="timePickerErrorHandler"
-                        auto-scroll
-                        input-width="100%"
-                      ></vue-timepicker>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </v-form>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="closeHandler">
-            Close
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            :disabled="!valid || loading"
-            @click="saveHandler"
-          >
-            {{ scheduleEvent ? "Update" : "Save" }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-row>
+                          :rules="dateRules"
+                          label="Date*"
+                          hint="Event date"
+                          persistent-hint
+                          prepend-icon="mdi-calendar-outline"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        v-model="date"
+                        no-title
+                        @input="dateMenu = false"
+                      ></v-date-picker>
+                    </v-menu>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12">
+                <v-row class="d-flex justify-space-between">
+                  <v-col class="d-flex" cols="12" sm="6">
+                    <v-icon :size="20">mdi-timer</v-icon>
+                    <vue-timepicker
+                      v-model="startTime"
+                      placeholder="Start*"
+                      :hour-range="startHourRange"
+                      :minute-range="startMinuteRange"
+                      input-class="VueTimePicker"
+                      @change="timePickerValidationHandler"
+                      @error="timePickerErrorHandler"
+                      auto-scroll
+                      input-width="100%"
+                    ></vue-timepicker>
+                  </v-col>
+                  <v-col class="d-flex" cols="12" sm="6">
+                    <v-icon :size="20">mdi-timer</v-icon>
+                    <vue-timepicker
+                      v-model="endTime"
+                      placeholder="End*"
+                      :hour-range="endHourRange"
+                      :minute-range="endMinuteRange"
+                      input-class="VueTimePicker"
+                      @change="timePickerValidationHandler"
+                      @error="timePickerErrorHandler"
+                      auto-scroll
+                      input-width="100%"
+                    ></vue-timepicker>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue darken-1" text @click="closeHandler">
+          Close
+        </v-btn>
+        <v-btn
+          color="blue darken-1"
+          text
+          :disabled="!valid || loading"
+          @click="saveHandler"
+        >
+          {{ scheduleEvent ? "Update" : "Save" }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>

@@ -4,19 +4,17 @@
       tile
       height="54"
       color="grey lighten-3"
-      class="d-flex align-center"
+      class="d-flex justify-space-between align-center"
     >
       <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-toolbar-title class="ToolbarTitle">{{ title }}</v-toolbar-title>
+      <v-btn outlined class="mr-2" color="grey darken-2" @click="setToday">
+        Today
+      </v-btn>
+
+      <v-toolbar-title class="ToolbarTitle mr-2">{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-switch
-        v-if="!isMobile"
-        v-model="dark"
-        class="mr-2"
-        :label="`${dark ? 'Dark' : 'Light'} Mode`"
-      ></v-switch>
       <v-select
         v-if="!isMobile"
         v-model="type"
@@ -24,8 +22,8 @@
         dense
         outlined
         hide-details
-        class="ma-2"
         label="type"
+        class="TypeSelect mr-2"
       ></v-select>
       <v-select
         v-if="!isMobile"
@@ -35,8 +33,15 @@
         outlined
         hide-details
         label="weekdays"
-        class="ma-2"
+        class="WeekdaysSelect mr-2"
       ></v-select>
+      <v-spacer></v-spacer>
+      <v-switch
+        v-if="!isMobile"
+        v-model="dark"
+        class="mr-2"
+        :label="`${dark ? 'Dark' : 'Light'} Mode`"
+      ></v-switch>
       <v-btn
         color="primary"
         :small="isMobile"
@@ -52,7 +57,6 @@
         :visible="showCreateEditModal"
         :scheduleEvent="scheduleEvent"
       ></schedule-create-edit-modal>
-      <v-spacer></v-spacer>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
@@ -65,7 +69,6 @@
         v-model="focus"
         :type="type"
         :max-days="maxDays"
-        :now="today"
         :dark="darkMode"
         :weekdays="weekdays"
         :short-months="shortMonths"
@@ -83,7 +86,15 @@
         @click:more="viewDay"
         @click:date="viewDay"
         @change="updateRange"
-      ></v-calendar>
+      >
+        <template #day-body="{ date, week }">
+          <div
+            class="v-current-time"
+            :class="{ first: date === week[0].date }"
+            :style="{ top: nowY }"
+          ></div>
+        </template>
+      </v-calendar>
       <v-menu
         v-model="selectedOpen"
         :close-on-content-click="false"
@@ -224,7 +235,6 @@
 </template>
 
 <script>
-import moment from "moment";
 import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
 import Modal from "../Modal.vue";
 import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
@@ -237,8 +247,8 @@ export default {
   data: () => ({
     dark,
     isMobile: isMobile(),
-    focus: moment().format("YYYY-MM-DD"),
-    today: moment().format("YYYY-MM-DD hh:mm:ss"),
+    ready: false,
+    focus: "",
     selectedScheduleEvent: {},
     selectedElement: null,
     selectedOpen: false,
@@ -338,6 +348,12 @@ export default {
       }
       return "";
     },
+    cal() {
+      return this.ready ? this.$refs.calendar : null;
+    },
+    nowY() {
+      return this.cal ? this.cal.timeToY(this.cal.times.now) + "px" : "-10px";
+    },
     monthFormatter() {
       return this.$refs.calendar.getFormatter({
         timeZone: "UTC",
@@ -345,9 +361,10 @@ export default {
       });
     }
   },
-  components: {
-    "schedule-create-edit-modal": ScheduleCreateEditModal,
-    modal: Modal
+  mounted() {
+    this.ready = true;
+    this.scrollToTime();
+    this.updateTime();
   },
   methods: {
     handleCloseCopyModal() {
@@ -428,6 +445,23 @@ export default {
       this.selectedScheduleEvent = newScheduleEvent;
       this.$store.dispatch("editScheduleEvent", newScheduleEvent);
     },
+    setToday() {
+      this.focus = "";
+    },
+    getCurrentTime() {
+      return this.cal
+        ? this.cal.times.now.hour * 60 + this.cal.times.now.minute
+        : 0;
+    },
+    scrollToTime() {
+      const time = this.getCurrentTime();
+      const first = Math.max(0, time - (time % 30) - 30);
+
+      this.cal.scrollToTime(first);
+    },
+    updateTime() {
+      setInterval(() => this.cal.updateTimes(), 60 * 1000);
+    },
     viewDay({ date }) {
       this.focus = date;
       this.type = "day";
@@ -468,11 +502,20 @@ export default {
         ? "th"
         : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
     }
+  },
+  components: {
+    "schedule-create-edit-modal": ScheduleCreateEditModal,
+    modal: Modal
   }
 };
 </script>
 
 <style lang="scss">
+.TypeSelect,
+.WeekdaysSelect {
+  max-width: 200px !important;
+}
+
 .Container {
   padding: 0px !important;
 }
@@ -484,6 +527,27 @@ export default {
     top: -3px !important;
   }
 }
+
+.v-current-time {
+  height: 2px;
+  background-color: #ea4335;
+  position: absolute;
+  left: -1px;
+  right: 0;
+  pointer-events: none;
+
+  &.first::before {
+    content: "";
+    position: absolute;
+    background-color: #ea4335;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: -5px;
+    margin-left: -6.5px;
+  }
+}
+
 @media (max-width: 767px) {
   .ToolbarTitle {
     font-size: 16px;
