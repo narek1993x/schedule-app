@@ -106,10 +106,12 @@
         @click:date="viewDay"
         @change="updateRange"
       >
-        <template #day-body="{ date, week }">
+        <template #day-body="{ date }">
           <div
             class="v-current-time"
-            :class="{ first: date === week[0].date }"
+            :class="{
+              hide: date !== new Date().toISOString().substr(0, 10)
+            }"
             :style="{ top: nowY }"
           ></div>
         </template>
@@ -562,7 +564,11 @@ export default {
   right: 0;
   pointer-events: none;
 
-  &.first::before {
+  &.hide {
+    display: none;
+  }
+
+  &::before {
     content: "";
     position: absolute;
     background-color: #ea4335;
