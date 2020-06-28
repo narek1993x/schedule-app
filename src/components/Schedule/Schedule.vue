@@ -13,7 +13,26 @@
         Today
       </v-btn>
 
-      <v-toolbar-title class="ToolbarTitle mr-2">{{ title }}</v-toolbar-title>
+      <v-menu
+        v-model="calendarOpen"
+        :close-on-content-click="false"
+        :offset-x="!isMobile"
+      >
+        <v-toolbar-title
+          slot="activator"
+          class="ToolbarTitle mr-2"
+          @click="calendarOpen = true"
+        >
+          {{ title }}
+        </v-toolbar-title>
+        <v-date-picker
+          v-model="focus"
+          reactive
+          show-current
+          :full-width="isMobile"
+          type="date"
+        ></v-date-picker>
+      </v-menu>
       <v-spacer></v-spacer>
       <v-select
         v-if="!isMobile"
@@ -248,10 +267,11 @@ export default {
     dark,
     isMobile: isMobile(),
     ready: false,
-    focus: "",
+    focus: new Date().toISOString().substr(0, 10),
     selectedScheduleEvent: {},
     selectedElement: null,
     selectedOpen: false,
+    calendarOpen: false,
     start: null,
     end: null,
     type: isMobile() ? "day" : "week",
@@ -519,9 +539,15 @@ export default {
 .Container {
   padding: 0px !important;
 }
+
 .CalendarSheet {
   height: calc(100vh - 118px) !important;
 }
+
+.ToolbarTitle {
+  cursor: pointer;
+}
+
 .v-calendar-daily__interval:first-child {
   & .v-calendar-daily__interval-text {
     top: -3px !important;
