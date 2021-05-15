@@ -32,9 +32,7 @@ export default {
     },
   },
   actions: {
-    async authUser({ commit }, { email, password, isSignup = false }) {
-      const method = isSignup ? "createUserWithEmailAndPassword" : "signInWithEmailAndPassword";
-
+    async authUser({ commit }, { email, password, method }) {
       commit("clearError");
       commit("setLoading", true);
       try {

@@ -19,26 +19,27 @@ async function registerServiceWorker() {
 export async function initializePushNotificationsService() {
   try {
     const user = User.get();
+    let firebaseToken = FirebaseDeviceToken.get();
 
     if (!isPushNotificationSupported() || !user) return;
 
     const messaging = firebaseApp.messaging();
-    await messaging.requestPermission();
-    messaging.usePublicVapidKey(process.env.VUE_APP_FIREBASE_VAPID_PUBLIC_KEY);
 
     if (!apps.length) {
       await registerServiceWorker();
     }
 
-    let firebaseToken = FirebaseDeviceToken.get();
-
     if (!firebaseToken) {
+      await messaging.requestPermission();
+      messaging.usePublicVapidKey(process.env.VUE_APP_FIREBASE_VAPID_PUBLIC_KEY);
+
       firebaseToken = await messaging.getToken();
       const response = await sendTokenToServer({
         userId: user.id,
         token: firebaseToken,
         deviceInfo: getDeviceInfo(),
       });
+
       FirebaseDeviceToken.set(firebaseToken);
       console.info("sendTokenToServer: ", response);
     }
@@ -52,12 +53,14 @@ export async function initializePushNotificationsService() {
     messaging.onTokenRefresh(async () => {
       try {
         const refreshedToken = await messaging.getToken();
+
         const response = await sendTokenToServer({
           userId: user.id,
           token: refreshedToken,
           deviceInfo: getDeviceInfo(),
           refresh: true,
         });
+
         FirebaseDeviceToken.set(firebaseToken);
         console.info("Token refreshed: ", response);
       } catch (err) {

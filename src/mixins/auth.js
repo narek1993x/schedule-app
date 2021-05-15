@@ -1,5 +1,12 @@
 import { initializePushNotificationsService } from "../push-notifications";
 
+const authMethods = {
+  github: "GithubAuthProvider",
+  google: "GoogleAuthProvider",
+  signIn: "signInWithEmailAndPassword",
+  signUp: "createUserWithEmailAndPassword",
+};
+
 export const authMixin = {
   computed: {
     isUserLoggedIn() {
@@ -11,14 +18,15 @@ export const authMixin = {
     },
   },
   methods: {
-    signInWithEmailPassword(user) {
+    signInWithEmailPassword(user, isSignUp = false) {
+      user.method = isSignUp ? authMethods.signUp : authMethods.signIn;
       this.$store.dispatch("authUser", user).then(this.handleSignInCallback);
     },
     signInWithGitHub() {
-      this.$store.dispatch("signInWithProvider", "GithubAuthProvider").then(this.handleSignInCallback);
+      this.$store.dispatch("signInWithProvider", authMethods.github).then(this.handleSignInCallback);
     },
     signInWithGoogle() {
-      this.$store.dispatch("signInWithProvider", "GoogleAuthProvider").then(this.handleSignInCallback);
+      this.$store.dispatch("signInWithProvider", authMethods.google).then(this.handleSignInCallback);
     },
     signOut() {
       this.$store.dispatch("signOut").then(() => {

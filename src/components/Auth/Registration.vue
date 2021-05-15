@@ -93,11 +93,13 @@ export default {
   methods: {
     onSubmit() {
       if (this.$refs.form.validate()) {
-        this.signInWithEmailPassword({
-          email: this.email,
-          password: this.password,
-          isSignup: true,
-        });
+        this.signInWithEmailPassword(
+          {
+            email: this.email,
+            password: this.password,
+          },
+          true,
+        );
       }
     },
   },
