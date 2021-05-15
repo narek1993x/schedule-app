@@ -12,7 +12,7 @@ const routes = [
   {
     path: "/todos",
     name: "todos",
-    component: Todos
+    component: Todos,
   },
   {
     path: "/",
@@ -20,37 +20,34 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (schedule.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(
-        /* webpackChunkName: "schedule" */ "../components/Schedule/Schedule"
-      ),
-    beforeEnter: AuthGuard
+    component: () => import(/* webpackChunkName: "schedule" */ "../components/Schedule/Schedule"),
+    beforeEnter: AuthGuard,
   },
   {
     path: "/login",
     name: "login",
-    component: Login
+    component: Login,
   },
   {
     path: "/logout",
     name: "logout",
-    component: Logout
+    component: Logout,
   },
   {
     path: "/registration",
     name: "reg",
-    component: Registration
+    component: Registration,
   },
   {
     path: "*",
-    redirect: "/"
-  }
+    redirect: "/",
+  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
 export default router;

@@ -1,9 +1,8 @@
-import config from "../../config/config.json";
 import { getDeviceInfo } from "../helpers/utils";
 
 export async function removeTokenFromServer(userId) {
   try {
-    const response = await fetch(`${config.host}/remove-subscription`, {
+    const response = await fetch(`${process.env.VUE_APP_FIREBASE_VAPID_HOST}/remove-subscription`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -18,7 +17,7 @@ export async function removeTokenFromServer(userId) {
 
 export async function sendTokenToServer(subscription) {
   try {
-    const response = await fetch(`${config.host}/save-subscription`, {
+    const response = await fetch(`${process.env.VUE_APP_FIREBASE_VAPID_HOST}/save-subscription`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

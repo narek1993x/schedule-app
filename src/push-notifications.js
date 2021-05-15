@@ -2,7 +2,6 @@ import { firebaseApp, apps } from "./firebase";
 import { FirebaseDeviceToken, User } from "./storage";
 import { getDeviceInfo } from "./helpers/utils";
 import { sendTokenToServer } from "./services/api-requests";
-import config from "../config/config.json";
 
 function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
@@ -25,7 +24,7 @@ export async function initializePushNotificationsService() {
 
     const messaging = firebaseApp.messaging();
     await messaging.requestPermission();
-    messaging.usePublicVapidKey(config.vapidPublicKey);
+    messaging.usePublicVapidKey(process.env.VUE_APP_FIREBASE_VAPID_PUBLIC_KEY);
 
     if (!apps.length) {
       await registerServiceWorker();

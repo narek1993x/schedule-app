@@ -11,6 +11,8 @@ firebase.json
 firebase.account.json
 config.json
 
+.env
+
 # Editor directories and files
 .idea
 .firebase
