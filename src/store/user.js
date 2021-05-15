@@ -66,6 +66,8 @@ export default {
     },
     retrieveUser({ commit }) {
       return firebase.auth().onIdTokenChanged((rawUser) => {
+        if (!rawUser) return;
+
         const retrievedUser = handleUser(rawUser);
         commit("setUser", retrievedUser);
       });
