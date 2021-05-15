@@ -6,10 +6,11 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build && node ./scripts/swEnvBuild.js"
   },
   "dependencies": {
     "core-js": "^3.4.4",
+    "dotenv": "^9.0.2",
     "firebase": "^7.8.0",
     "moment": "^2.24.0",
     "register-service-worker": "^1.6.2",
