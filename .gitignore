@@ -13,6 +13,8 @@ config.json
 
 .env
 
+swenv.js
+
 # Editor directories and files
 .idea
 .firebase
