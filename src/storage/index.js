@@ -10,7 +10,7 @@ class Storage {
     const expiredMilliseconds = +new Date(+expiredSeconds + Date.now());
     const storageObj = {
       value,
-      expired: expiredMilliseconds
+      expired: expiredMilliseconds,
     };
     this.type.setItem(name, JSON.stringify(storageObj));
 
@@ -43,18 +43,15 @@ class Storage {
 }
 
 const store = {
-  storage: window.localStorage
+  storage: window.localStorage,
 };
 
 const nameMap = {
-  USER_TOKEN: "1",
+  USER: "1",
   DARK_MODE: "2",
-  FIREBASE_DEVICE_TOKEN: "3"
+  FIREBASE_DEVICE_TOKEN: "3",
 };
 
-export const UserToken = new Storage(store.storage, nameMap.USER_TOKEN);
+export const User = new Storage(store.storage, nameMap.USER);
 export const DarkMode = new Storage(store.storage, nameMap.DARK_MODE);
-export const FirebaseDeviceToken = new Storage(
-  store.storage,
-  nameMap.FIREBASE_DEVICE_TOKEN
-);
+export const FirebaseDeviceToken = new Storage(store.storage, nameMap.FIREBASE_DEVICE_TOKEN);

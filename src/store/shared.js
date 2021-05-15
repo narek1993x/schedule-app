@@ -1,9 +1,16 @@
 export default {
   state: {
     loading: false,
-    error: null
+    error: null,
+    loadedData: {
+      todos: false,
+      schedules: false,
+    },
   },
   mutations: {
+    setDataIsLoaded(state, payload) {
+      state.loadedData[payload] = true;
+    },
     setLoading(state, payload) {
       state.loading = payload;
     },
@@ -12,18 +19,7 @@ export default {
     },
     clearError(state) {
       state.error = null;
-    }
-  },
-  actions: {
-    setLoading({ commit }, payload) {
-      commit("setLoading", payload);
     },
-    setError({ commit }, payload) {
-      commit("setError", payload);
-    },
-    clearError({ commit }) {
-      commit("clearError");
-    }
   },
   getters: {
     loading(state) {
@@ -31,6 +27,9 @@ export default {
     },
     error(state) {
       return state.error;
-    }
-  }
+    },
+    loadedData(state) {
+      return state.loadedData;
+    },
+  },
 };

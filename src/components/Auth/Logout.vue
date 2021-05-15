@@ -3,10 +3,12 @@
 </template>
 
 <script>
+import { authMixin } from "../../mixins/auth";
+
 export default {
-  beforeCreate() {
-    this.$store.dispatch("removeUser");
-    this.$router.push("/");
-  }
+  mixins: [authMixin],
+  created() {
+    this.signOut();
+  },
 };
 </script>

@@ -4,50 +4,46 @@ import { setScheduleEventProps } from "../helpers/utils";
 export default {
   state: {
     scheduleEvents: [],
-    startEndDates: {}
+    startEndDates: {},
   },
   mutations: {
     setStartEndDates: (state, payload) => {
       state.startEndDates = payload;
-      state.scheduleEvents = state.scheduleEvents.map(event => ({
-        ...setScheduleEventProps(event, payload)
+      state.scheduleEvents = state.scheduleEvents.map((event) => ({
+        ...setScheduleEventProps(event, payload),
       }));
     },
     setScheduleEvents: (state, payload) => {
-      state.scheduleEvents = payload.map(event => ({
-        ...setScheduleEventProps(event, state.startEndDates)
+      state.scheduleEvents = payload.map((event) => ({
+        ...setScheduleEventProps(event, state.startEndDates),
       }));
     },
     addScheduleEvent: (state, payload) => {
       const newScheduleEvent = {
-        ...setScheduleEventProps(payload, state.startEndDates)
+        ...setScheduleEventProps(payload, state.startEndDates),
       };
 
       state.scheduleEvents = [...state.scheduleEvents, newScheduleEvent];
     },
     editScheduleEvent: (state, payload) => {
-      const scheduleIndex = state.scheduleEvents.findIndex(
-        s => s.id === payload.id
-      );
+      const scheduleIndex = state.scheduleEvents.findIndex((s) => s.id === payload.id);
 
       state.scheduleEvents = [
         ...state.scheduleEvents.slice(0, scheduleIndex),
         {
           ...state.scheduleEvents[scheduleIndex],
-          ...setScheduleEventProps(payload, state.startEndDates)
+          ...setScheduleEventProps(payload, state.startEndDates),
         },
-        ...state.scheduleEvents.slice(scheduleIndex + 1)
+        ...state.scheduleEvents.slice(scheduleIndex + 1),
       ];
     },
     removeScheduleEvent: (state, scheduleId) => {
-      const scheduleIndex = state.scheduleEvents.findIndex(
-        s => s.id === scheduleId
-      );
+      const scheduleIndex = state.scheduleEvents.findIndex((s) => s.id === scheduleId);
       state.scheduleEvents = [
         ...state.scheduleEvents.slice(0, scheduleIndex),
-        ...state.scheduleEvents.slice(scheduleIndex + 1)
+        ...state.scheduleEvents.slice(scheduleIndex + 1),
       ];
-    }
+    },
   },
   actions: {
     async fetchSchedules({ commit, getters }) {
@@ -55,20 +51,19 @@ export default {
       commit("setLoading", true);
 
       try {
-        const fbVal = await scheduleEventsRef
-          .child(getters.user.id)
-          .once("value");
+        const fbVal = await scheduleEventsRef.child(getters.user.id).once("value");
         const scheduleEvents = fbVal.val();
 
         const resultScheduleEvents = [];
         for (let key in scheduleEvents) {
           resultScheduleEvents.push({
             ...scheduleEvents[key],
-            id: key
+            id: key,
           });
         }
 
         commit("setLoading", false);
+        commit("setDataIsLoaded", "schedules");
         commit("setScheduleEvents", resultScheduleEvents);
       } catch (error) {
         commit("setLoading", false);
@@ -82,15 +77,13 @@ export default {
 
       try {
         const newScheduleEvents = await Promise.all(
-          scheduleEvents.map(scheduleEvent =>
-            scheduleEventsRef.child(getters.user.id).push(scheduleEvent)
-          )
+          scheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.id).push(scheduleEvent)),
         );
 
         scheduleEvents.forEach((scheduleEvent, index) => {
           commit("addScheduleEvent", {
             ...scheduleEvent,
-            id: newScheduleEvents[index].key
+            id: newScheduleEvents[index].key,
           });
         });
 
@@ -106,13 +99,11 @@ export default {
       commit("setLoading", true);
 
       try {
-        const scheduleEvent = await scheduleEventsRef
-          .child(getters.user.id)
-          .push(newScheduleEvent);
+        const scheduleEvent = await scheduleEventsRef.child(getters.user.id).push(newScheduleEvent);
 
         commit("addScheduleEvent", {
           ...newScheduleEvent,
-          id: scheduleEvent.key
+          id: scheduleEvent.key,
         });
 
         commit("setLoading", false);
@@ -159,10 +150,10 @@ export default {
         commit("setError", error.message);
         throw error;
       }
-    }
+    },
   },
   getters: {
-    scheduleEvents: state => state.scheduleEvents,
-    startEndDates: start => start.startEndDates
-  }
+    scheduleEvents: (state) => state.scheduleEvents,
+    startEndDates: (start) => start.startEndDates,
+  },
 };

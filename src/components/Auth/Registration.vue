@@ -4,16 +4,10 @@
       <v-flex xs12 sm8 md4>
         <v-card class="elevation-12">
           <v-toolbar dark color="primary">
-            <v-toolbar-title>Login form</v-toolbar-title>
+            <v-toolbar-title>Registration form</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <v-form
-              @submit.prevent
-              ref="form"
-              id="registration-form"
-              v-model="valid"
-              lazy-validation
-            >
+            <v-form @submit.prevent ref="form" id="registration-form" v-model="valid" validation>
               <v-text-field
                 prepend-icon="mdi-account"
                 name="email"
@@ -43,6 +37,14 @@
             </v-form>
           </v-card-text>
           <v-card-actions>
+            <v-btn class="mr-1" dark @click="signInWithGitHub">
+              <v-icon left medium>mdi-github</v-icon>
+              Continue with Gitub
+            </v-btn>
+            <v-btn @click="signInWithGoogle" color="info">
+              <v-icon left medium>mdi-google</v-icon>
+              Continue with Google
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn
               type="submit"
@@ -52,7 +54,7 @@
               :loading="loading"
               @click="onSubmit"
             >
-              Create Account
+              Sign up
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -62,11 +64,14 @@
 </template>
 
 <script>
+import { authMixin } from "../../mixins/auth";
+
 export default {
+  mixins: [authMixin],
   computed: {
     loading() {
       return this.$store.getters.loading;
-    }
+    },
   },
   data() {
     return {
@@ -74,37 +79,28 @@ export default {
       email: "",
       password: "",
       confirmPassword: "",
-      emailRules: [
-        v => !!v || "E-mail is required",
-        v => /.+@.+/.test(v) || "E-mail must be valid"
-      ],
+      emailRules: [(v) => !!v || "E-mail is required", (v) => /.+@.+/.test(v) || "E-mail must be valid"],
       passwordRules: [
-        v => !!v || "Password is required",
-        v =>
-          (v && v.length >= 6) ||
-          "Password must be equal or more than 6 characters"
+        (v) => !!v || "Password is required",
+        (v) => (v && v.length >= 6) || "Password must be equal or more than 6 characters",
       ],
       confirmPasswordRules: [
-        v => !!v || "Confirm password is required",
-        v => v === this.password || "Confirm password must be mutch"
-      ]
+        (v) => !!v || "Confirm password is required",
+        (v) => v === this.password || "Confirm password must be mutch",
+      ],
     };
   },
   methods: {
     onSubmit() {
       if (this.$refs.form.validate()) {
-        const user = {
+        this.signInWithEmailPassword({
           email: this.email,
           password: this.password,
-          isSignup: true
-        };
-        this.$store
-          .dispatch("authUser", user)
-          .then(() => this.$router.push("/"))
-          .catch(() => {});
+          isSignup: true,
+        });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

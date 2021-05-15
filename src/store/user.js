@@ -1,16 +1,27 @@
-import * as firebase from "firebase";
-import { UserToken, FirebaseDeviceToken } from "../storage";
+import firebase from "../firebase";
+import { User, FirebaseDeviceToken } from "../storage";
 import { removeTokenFromServer } from "../services/api-requests";
 
-class User {
-  constructor(id) {
-    this.id = id;
-  }
+function formatUser(user) {
+  // const token = await user.getIdToken();
+  return {
+    id: user.uid,
+    email: user.email,
+    name: user.displayName,
+    photoUrl: user.photoURL,
+  };
+}
+
+function handleUser(rawUser) {
+  const user = formatUser(rawUser);
+  User.set(user);
+
+  return user;
 }
 
 export default {
   state: {
-    user: null
+    user: User.get(),
   },
   mutations: {
     setUser(state, payload) {
@@ -18,24 +29,17 @@ export default {
     },
     removeUser(state) {
       state.user = null;
-    }
+    },
   },
   actions: {
     async authUser({ commit }, { email, password, isSignup = false }) {
-      const method = isSignup
-        ? "createUserWithEmailAndPassword"
-        : "signInWithEmailAndPassword";
-      // Set expiration date to one month
-      const expirationDate = 30 * 24 * 60 * 60;
+      const method = isSignup ? "createUserWithEmailAndPassword" : "signInWithEmailAndPassword";
 
       commit("clearError");
       commit("setLoading", true);
       try {
-        const {
-          user: { uid }
-        } = await firebase.auth()[method](email, password);
-        const user = new User(uid);
-        UserToken.set(user, expirationDate);
+        const response = await firebase.auth()[method](email, password);
+        const user = handleUser(response.user);
 
         commit("setUser", user);
         commit("setLoading", false);
@@ -45,21 +49,45 @@ export default {
         throw err;
       }
     },
-    authCheckState({ commit }) {
-      const token = UserToken.get();
+    async signInWithProvider({ commit }, provider) {
+      commit("clearError");
+      commit("setLoading", true);
+      try {
+        const response = await firebase.auth().signInWithPopup(new firebase.auth[provider]());
+        const user = handleUser(response.user);
 
-      if (token) {
-        commit("setUser", token);
+        commit("setUser", user);
+        commit("setLoading", false);
+      } catch (err) {
+        commit("setLoading", false);
+        commit("setError", err.message);
+        throw err;
       }
     },
-    removeUser({ commit }) {
-      const token = UserToken.get();
-      removeTokenFromServer(token);
+    retrieveUser({ commit }) {
+      return firebase.auth().onIdTokenChanged((rawUser) => {
+        const retrievedUser = handleUser(rawUser);
+        commit("setUser", retrievedUser);
+      });
+    },
+    async signOut({ commit }) {
+      try {
+        await firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            const { id } = User.get();
+            removeTokenFromServer(id);
 
-      UserToken.remove();
-      FirebaseDeviceToken.remove();
-      commit("removeUser");
-    }
+            User.remove();
+            FirebaseDeviceToken.remove();
+            commit("removeUser");
+          });
+      } catch (error) {
+        commit("setError", err.message);
+        throw err;
+      }
+    },
   },
   getters: {
     user(state) {
@@ -67,6 +95,6 @@ export default {
     },
     isUserLoggedIn(state) {
       return state.user !== null;
-    }
-  }
+    },
+  },
 };

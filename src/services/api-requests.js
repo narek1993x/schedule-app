@@ -1,14 +1,14 @@
 import config from "../../config/config.json";
 import { getDeviceInfo } from "../helpers/utils";
 
-export async function removeTokenFromServer(token) {
+export async function removeTokenFromServer(userId) {
   try {
     const response = await fetch(`${config.host}/remove-subscription`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userId: token.id, deviceInfo: getDeviceInfo() })
+      body: JSON.stringify({ userId, deviceInfo: getDeviceInfo() }),
     });
     return response.json();
   } catch (error) {
@@ -21,9 +21,9 @@ export async function sendTokenToServer(subscription) {
     const response = await fetch(`${config.host}/save-subscription`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(subscription)
+      body: JSON.stringify(subscription),
     });
     return response.json();
   } catch (error) {

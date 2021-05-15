@@ -15,10 +15,7 @@
     </v-navigation-drawer>
 
     <v-app-bar app dark color="primary">
-      <v-app-bar-nav-icon
-        @click="drawer = !drawer"
-        class="hidden-md-and-up"
-      ></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = !drawer" class="hidden-md-and-up"></v-app-bar-nav-icon>
 
       <v-toolbar-title>
         <router-link to="/" tag="span" class="pointer">
@@ -40,13 +37,7 @@
     </v-content>
 
     <template v-if="error">
-      <v-snackbar
-        :multi-line="true"
-        :timeout="5000"
-        color="error"
-        @input="closeError"
-        :value="true"
-      >
+      <v-snackbar :multi-line="true" :timeout="5000" color="error" @input="closeError" :value="true">
         {{ error }}
         <v-btn dark text @click.native="closeError">Close</v-btn>
       </v-snackbar>
@@ -55,15 +46,13 @@
 </template>
 
 <script>
-import { initializePushNotificationsService } from "./push-notifications";
+import { authMixin } from "./mixins/auth";
 
 export default {
+  mixins: [authMixin],
   computed: {
     error() {
       return this.$store.getters.error;
-    },
-    isUserLoggedIn() {
-      return this.$store.getters.isUserLoggedIn;
     },
     links() {
       if (this.isUserLoggedIn) {
@@ -71,39 +60,29 @@ export default {
           {
             title: "Schedule",
             icon: "mdi-calendar-outline",
-            url: "/"
+            url: "/",
           },
           { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
-          { title: "Loguot", icon: "mdi-logout-variant", url: "/logout" }
+          { title: "Loguot", icon: "mdi-logout-variant", url: "/logout" },
         ];
       }
       return [
         { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
         { title: "Login", icon: "mdi-lock", url: "/login" },
-        { title: "Registration", icon: "mdi-face", url: "/registration" }
+        { title: "Registration", icon: "mdi-face", url: "/registration" },
       ];
-    }
+    },
   },
   data() {
     return {
-      drawer: false
+      drawer: false,
     };
   },
   methods: {
     closeError() {
       this.$store.dispatch("clearError");
-    }
+    },
   },
-  beforeCreate() {
-    this.$store.dispatch("authCheckState");
-  },
-  created() {
-    if (this.isUserLoggedIn) {
-      initializePushNotificationsService();
-      this.$store.dispatch("fetchTodos");
-      this.$store.dispatch("fetchSchedules");
-    }
-  }
 };
 </script>
 

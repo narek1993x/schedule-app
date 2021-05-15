@@ -1,5 +1,5 @@
 import { firebaseApp, apps } from "./firebase";
-import { FirebaseDeviceToken, UserToken } from "./storage";
+import { FirebaseDeviceToken, User } from "./storage";
 import { getDeviceInfo } from "./helpers/utils";
 import { sendTokenToServer } from "./services/api-requests";
 import config from "../config/config.json";
@@ -10,9 +10,7 @@ function isPushNotificationSupported() {
 
 async function registerServiceWorker() {
   try {
-    const registration = await navigator.serviceWorker.register(
-      "/firebase-messaging-sw.js"
-    );
+    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
     return firebaseApp.messaging().useServiceWorker(registration);
   } catch (e) {
     throw new Error(e);
@@ -21,9 +19,9 @@ async function registerServiceWorker() {
 
 export async function initializePushNotificationsService() {
   try {
-    const userToken = UserToken.get();
+    const user = User.get();
 
-    if (!isPushNotificationSupported() || !userToken) return;
+    if (!isPushNotificationSupported() || !user) return;
 
     const messaging = firebaseApp.messaging();
     await messaging.requestPermission();
@@ -38,9 +36,9 @@ export async function initializePushNotificationsService() {
     if (!firebaseToken) {
       firebaseToken = await messaging.getToken();
       const response = await sendTokenToServer({
-        userId: userToken.id,
+        userId: user.id,
         token: firebaseToken,
-        deviceInfo: getDeviceInfo()
+        deviceInfo: getDeviceInfo(),
       });
       FirebaseDeviceToken.set(firebaseToken);
       console.info("sendTokenToServer: ", response);
@@ -56,10 +54,10 @@ export async function initializePushNotificationsService() {
       try {
         const refreshedToken = await messaging.getToken();
         const response = await sendTokenToServer({
-          userId: userToken.id,
+          userId: user.id,
           token: refreshedToken,
           deviceInfo: getDeviceInfo(),
-          refresh: true
+          refresh: true,
         });
         FirebaseDeviceToken.set(firebaseToken);
         console.info("Token refreshed: ", response);
