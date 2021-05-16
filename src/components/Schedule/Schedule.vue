@@ -22,13 +22,13 @@
         Add
         <v-icon :size="18" right dark>mdi-plus</v-icon>
       </v-btn>
-      <schedule-create-edit-modal
+      <event-modal
         v-if="showCreateEditModal"
         :dark="dark"
         :onClose="handleCloseScheduleModal"
         :visible="showCreateEditModal"
         :scheduleEvent="scheduleEvent"
-      ></schedule-create-edit-modal>
+      ></event-modal>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
+import EventModal from "./EventModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
 import Modal from "../Modal.vue";
 import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
@@ -172,7 +172,7 @@ const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   components: {
-    "schedule-create-edit-modal": ScheduleCreateEditModal,
+    "event-modal": EventModal,
     "schedule-settings": ScheduleSettings,
     modal: Modal,
   },

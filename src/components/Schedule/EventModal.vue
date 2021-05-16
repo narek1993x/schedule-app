@@ -2,7 +2,7 @@
   <v-dialog :dark="dark" :fullscreen="isMobile" v-model="visible" max-width="800px">
     <v-card>
       <v-card-title class="ModalTitle">
-        <span class="headline"> {{ scheduleEvent ? "Edit" : "Create" }} schedule event </span>
+        <span class="headline"> {{ scheduleEvent ? "Edit" : "Create" }} event</span>
       </v-card-title>
       <v-card-text>
         <v-container>
