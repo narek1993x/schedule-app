@@ -1,15 +1,8 @@
 <template>
-  <v-dialog
-    :dark="dark"
-    :fullscreen="isMobile"
-    v-model="visible"
-    max-width="800px"
-  >
+  <v-dialog :dark="dark" :fullscreen="isMobile" v-model="visible" max-width="800px">
     <v-card>
       <v-card-title class="ModalTitle">
-        <span class="headline">
-          {{ scheduleEvent ? "Edit" : "Create" }} schedule event
-        </span>
+        <span class="headline"> {{ scheduleEvent ? "Edit" : "Create" }} schedule event </span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -38,16 +31,12 @@
                   <v-col cols="12" sm="3">
                     <v-switch
                       v-model="permanent"
+                      color="secondary"
                       :label="`${permanent ? 'Permanent' : 'One time'}`"
                     ></v-switch>
                   </v-col>
                   <v-col v-if="permanent" cols="12" sm="6">
-                    <v-select
-                      v-model="week"
-                      :items="weeks"
-                      :rules="weekRules"
-                      label="Week*"
-                    ></v-select>
+                    <v-select v-model="week" :items="weeks" :rules="weekRules" label="Week*"></v-select>
                   </v-col>
                   <v-col v-else cols="12" sm="6">
                     <v-menu
@@ -69,44 +58,80 @@
                           v-on="on"
                         ></v-text-field>
                       </template>
-                      <v-date-picker
-                        v-model="date"
-                        no-title
-                        @input="dateMenu = false"
-                      ></v-date-picker>
+                      <v-date-picker v-model="date" no-title @input="dateMenu = false"></v-date-picker>
                     </v-menu>
                   </v-col>
                 </v-row>
               </v-col>
               <v-col cols="12">
-                <v-row class="d-flex justify-space-between">
-                  <v-col class="d-flex" cols="12" sm="6">
-                    <v-icon :size="20">mdi-timer</v-icon>
-                    <vue-timepicker
-                      v-model="startTime"
-                      placeholder="Start*"
-                      :hour-range="startHourRange"
-                      :minute-range="startMinuteRange"
-                      input-class="VueTimePicker"
-                      @change="timePickerValidationHandler"
-                      @error="timePickerErrorHandler"
-                      auto-scroll
-                      input-width="100%"
-                    ></vue-timepicker>
+                <v-row class="d-flex">
+                  <v-col cols="12" sm="6">
+                    <v-menu
+                      ref="startTimer"
+                      v-model="startTimerMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="30"
+                      :return-value.sync="startTime"
+                      transition="scale-transition"
+                      offset-y
+                      max-width="290px"
+                      min-width="280px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="startTime"
+                          :rules="startTimeRules"
+                          label="Start*"
+                          prepend-icon="mdi-timer"
+                          readonly
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-time-picker
+                        v-if="startTimerMenu"
+                        v-model="startTime"
+                        ampm-in-title
+                        header-color="#3c3c3c"
+                        scrollable
+                        full-width
+                        :max="endTime"
+                        @click:minute="$refs.startTimer.save(startTime)"
+                      ></v-time-picker>
+                    </v-menu>
                   </v-col>
-                  <v-col class="d-flex" cols="12" sm="6">
-                    <v-icon :size="20">mdi-timer</v-icon>
-                    <vue-timepicker
-                      v-model="endTime"
-                      placeholder="End*"
-                      :hour-range="endHourRange"
-                      :minute-range="endMinuteRange"
-                      input-class="VueTimePicker"
-                      @change="timePickerValidationHandler"
-                      @error="timePickerErrorHandler"
-                      auto-scroll
-                      input-width="100%"
-                    ></vue-timepicker>
+                  <v-col cols="12" sm="6">
+                    <v-menu
+                      ref="endTimer"
+                      v-model="endTimerMenu"
+                      :close-on-content-click="false"
+                      :nudge-right="30"
+                      :return-value.sync="endTime"
+                      transition="scale-transition"
+                      offset-y
+                      max-width="290px"
+                      min-width="280px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="endTime"
+                          :rules="endTimeRules"
+                          label="End*"
+                          prepend-icon="mdi-timer"
+                          readonly
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-time-picker
+                        v-if="endTimerMenu"
+                        v-model="endTime"
+                        scrollable
+                        header-color="#3c3c3c"
+                        full-width
+                        :min="startTime"
+                        ampm-in-title
+                        @click:minute="$refs.endTimer.save(endTime)"
+                      ></v-time-picker>
+                    </v-menu>
                   </v-col>
                 </v-row>
               </v-col>
@@ -119,12 +144,7 @@
         <v-btn color="blue darken-1" text @click="closeHandler">
           Close
         </v-btn>
-        <v-btn
-          color="blue darken-1"
-          text
-          :disabled="!valid || loading"
-          @click="saveHandler"
-        >
+        <v-btn color="blue darken-1" text :disabled="!valid || loading" @click="saveHandler">
           {{ scheduleEvent ? "Update" : "Save" }}
         </v-btn>
       </v-card-actions>
@@ -133,29 +153,13 @@
 </template>
 
 <script>
-import VueTimepicker from "vue2-timepicker";
-import {
-  isMobile,
-  handleScheduleEventTime,
-  handleHourRange,
-  handleMinuteRange
-} from "../../helpers/utils";
-import "vue2-timepicker/dist/VueTimepicker.css";
+import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
 
 export default {
-  components: { "vue-timepicker": VueTimepicker },
   props: ["visible", "dark", "scheduleEvent", "onClose"],
   beforeMount() {
     if (this.scheduleEvent) {
-      const {
-        name,
-        content,
-        permanent,
-        week,
-        start,
-        end,
-        date
-      } = this.scheduleEvent;
+      const { name, content, permanent, week, start, end, date } = this.scheduleEvent;
 
       this.title = name;
       this.content = content;
@@ -173,7 +177,7 @@ export default {
   watch: {
     visible: function(newVisible) {
       if (!newVisible) this.closeHandler();
-    }
+    },
   },
   computed: {
     user() {
@@ -182,18 +186,6 @@ export default {
     loading() {
       return this.$store.getters.loading;
     },
-    startHourRange() {
-      return handleHourRange(this.endTime, true);
-    },
-    endHourRange() {
-      return handleHourRange(this.startTime);
-    },
-    startMinuteRange() {
-      return handleMinuteRange(this.startTime, this.endTime, true);
-    },
-    endMinuteRange() {
-      return handleMinuteRange(this.startTime, this.endTime);
-    }
   },
   data: () => ({
     isMobile: isMobile(),
@@ -204,6 +196,8 @@ export default {
     date: "",
     dateFormatted: null,
     dateMenu: false,
+    startTimerMenu: false,
+    endTimerMenu: false,
     startTime: "",
     endTime: "",
     week: "",
@@ -214,13 +208,13 @@ export default {
       { text: "Thursday", value: "thursday" },
       { text: "Friday", value: "friday" },
       { text: "Saturday", value: "saturday" },
-      { text: "Sunday", value: "sunday" }
+      { text: "Sunday", value: "sunday" },
     ],
-    titleRules: [v => !!v || "Title is required"],
-    dateRules: [v => !!v || "Date is required"],
-    startTimeRules: [v => !!v || "Start time is required"],
-    endTimeRules: [v => !!v || "End time is required"],
-    weekRules: [v => !!v || "Week is required"]
+    titleRules: [(v) => !!v || "Title is required"],
+    dateRules: [(v) => !!v || "Date is required"],
+    startTimeRules: [(v) => !!v || "Start time is required"],
+    endTimeRules: [(v) => !!v || "End time is required"],
+    weekRules: [(v) => !!v || "Week is required"],
   }),
   methods: {
     clear() {
@@ -256,22 +250,20 @@ export default {
           reminder: this.scheduleEvent ? this.scheduleEvent.reminder : true,
           ...(this.permanent
             ? {
-                week: this.week
+                week: this.week,
               }
             : { date: this.date }),
           ...(this.user ? { ownerId: this.user.id } : {}),
-          ...(this.scheduleEvent ? { id: this.scheduleEvent.id } : {})
+          ...(this.scheduleEvent ? { id: this.scheduleEvent.id } : {}),
         };
 
-        const dispatchAction = this.scheduleEvent
-          ? "editScheduleEvent"
-          : "addScheduleEvent";
+        const dispatchAction = this.scheduleEvent ? "editScheduleEvent" : "addScheduleEvent";
 
         this.$store.dispatch(dispatchAction, schedule);
         this.closeHandler();
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

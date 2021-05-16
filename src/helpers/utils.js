@@ -1,97 +1,22 @@
 import moment from "moment";
 
-const colors = [
-  "blue",
-  "indigo",
-  "deep-purple",
-  "cyan",
-  "green",
-  "orange",
-  "grey darken-1"
-];
+const colors = ["blue", "indigo", "deep-purple", "cyan", "green", "orange", "grey darken-1"];
 
 const rnd = (a, b) => {
   return Math.floor((b - a + 1) * Math.random()) + a;
 };
 
-const capitalize = s => {
+const capitalize = (s) => {
   if (typeof s !== "string") return "";
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-const splitTime = t => {
-  const [hour, minute] = t.split(":");
-
-  return [parseInt(hour, 10), parseInt(minute, 10)];
-};
-
-export const handleScheduleEventTime = date => {
+export const handleScheduleEventTime = (date) => {
   if (date && date.length > 10) {
     return date.slice(10);
   }
 
   return date;
-};
-
-export const handleHourRange = (time, forStart) => {
-  let list = [];
-
-  if (!time) return null;
-
-  const [hourNum] = splitTime(time);
-
-  if (forStart) {
-    for (let i = 0; i <= hourNum; i++) {
-      list.push(i);
-    }
-  } else {
-    for (let i = hourNum; i < 24; i++) {
-      list.push(i);
-    }
-  }
-
-  if (list.length === 0) return null;
-
-  return list;
-};
-
-export const handleMinuteRange = (startTime, endTime, forStart) => {
-  let list = [];
-
-  if (!startTime || !endTime) return null;
-
-  const [startHourNum, startMinuteNum] = splitTime(startTime);
-  const [endHourNum, endMinuteNum] = splitTime(endTime);
-
-  if (startHourNum === endHourNum) {
-    if (forStart) {
-      for (let i = 0; i < endMinuteNum; i++) {
-        list.push(i);
-      }
-    } else {
-      for (let i = startMinuteNum + 1; i < 60; i++) {
-        list.push(i);
-      }
-    }
-  }
-
-  if (list.length === 0) return null;
-
-  return list;
-};
-
-export const convertTo24 = time => {
-  let hours = Number(time.match(/^(\d+)/)[1]);
-  let minutes = Number(time.match(/:(\d+)/)[1]);
-  let AMPM = time.match(/\s(.*)$/)[1];
-  if (AMPM == "PM" && hours < 12) hours = hours + 12;
-  if (AMPM == "AM" && hours == 12) hours = hours - 12;
-  let sHours = hours.toString();
-  let sMinutes = minutes.toString();
-  if (hours < 10) sHours = "0" + sHours;
-  if (minutes < 10) sMinutes = "0" + sMinutes;
-
-  return `${sHours}:${sMinutes}`;
 };
 
 export const setScheduleEventProps = (event, { start, end }) => {
@@ -105,16 +30,12 @@ export const setScheduleEventProps = (event, { start, end }) => {
             .format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
           end: `${moment(event.week === "sunday" ? end : start)
             .day(capitalize(event.week))
-            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`
+            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`,
         }
       : {
-          start: `${moment(event.date).format(
-            "YYYY-M-DD"
-          )} ${handleScheduleEventTime(event.start)}`,
-          end: `${moment(event.date).format(
-            "YYYY-M-DD"
-          )} ${handleScheduleEventTime(event.end)}`
-        })
+          start: `${moment(event.date).format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
+          end: `${moment(event.date).format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`,
+        }),
   };
 };
 
@@ -136,13 +57,7 @@ export function getDeviceInfo() {
 
   const module = {
     options: [],
-    header: [
-      navigator.platform,
-      navigator.userAgent,
-      navigator.appVersion,
-      navigator.vendor,
-      window.opera
-    ],
+    header: [navigator.platform, navigator.userAgent, navigator.appVersion, navigator.vendor, window.opera],
     dataos: [
       { name: "Windows Phone", value: "Windows Phone", version: "OS" },
       { name: "Windows", value: "Win", version: "NT" },
@@ -154,7 +69,7 @@ export function getDeviceInfo() {
       { name: "BlackBerry", value: "BlackBerry", version: "/" },
       { name: "Macintosh", value: "Mac", version: "OS X" },
       { name: "Linux", value: "Linux", version: "rv" },
-      { name: "Palm", value: "Palm", version: "PalmOS" }
+      { name: "Palm", value: "Palm", version: "PalmOS" },
     ],
     databrowser: [
       { name: "Chrome", value: "Chrome", version: "Chrome" },
@@ -163,7 +78,7 @@ export function getDeviceInfo() {
       { name: "Internet Explorer", value: "MSIE", version: "MSIE" },
       { name: "Opera", value: "Opera", version: "Opera" },
       { name: "BlackBerry", value: "CLDC", version: "CLDC" },
-      { name: "Mozilla", value: "Mozilla", version: "Mozilla" }
+      { name: "Mozilla", value: "Mozilla", version: "Mozilla" },
     ],
     init: function() {
       const agent = this.header.join(" "),
@@ -207,12 +122,12 @@ export function getDeviceInfo() {
           }
           return {
             name: data[i].name,
-            version: parseFloat(version)
+            version: parseFloat(version),
           };
         }
       }
       return { name: "unknown", version: 0 };
-    }
+    },
   };
 
   return module.init();
