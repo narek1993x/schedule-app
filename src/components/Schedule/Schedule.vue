@@ -1,77 +1,30 @@
 <template>
   <v-container fluid class="Container">
-    <v-sheet
-      tile
-      height="54"
-      color="grey lighten-3"
-      class="d-flex justify-space-between align-center"
-    >
+    <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
       <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-btn outlined class="mr-2" color="grey darken-2" @click="setToday">
-        Today
-      </v-btn>
-
-      <v-menu
-        v-model="calendarOpen"
-        :close-on-content-click="false"
-        :offset-x="!isMobile"
-      >
-        <v-toolbar-title
-          slot="activator"
-          class="ToolbarTitle mr-2"
-          @click="calendarOpen = true"
-        >
+      <schedule-settings
+        :dark="dark"
+        :type="type"
+        :weekdays="weekdays"
+        :onSettingsChange="handleSettingsChange"
+      ></schedule-settings>
+      <v-spacer></v-spacer>
+      <v-menu v-model="calendarOpen" :close-on-content-click="false" :offset-x="!isMobile">
+        <v-toolbar-title slot="activator" class="ToolbarTitle mr-2" @click="calendarOpen = true">
           {{ title }}
         </v-toolbar-title>
-        <v-date-picker
-          v-model="focus"
-          reactive
-          show-current
-          :full-width="isMobile"
-          type="date"
-        ></v-date-picker>
+        <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
       </v-menu>
       <v-spacer></v-spacer>
-      <v-select
-        v-if="!isMobile"
-        v-model="type"
-        :items="typeOptions"
-        dense
-        outlined
-        hide-details
-        label="type"
-        class="TypeSelect mr-2"
-      ></v-select>
-      <v-select
-        v-if="!isMobile"
-        v-model="weekdays"
-        :items="weekdaysOptions"
-        dense
-        outlined
-        hide-details
-        label="weekdays"
-        class="WeekdaysSelect mr-2"
-      ></v-select>
-      <v-spacer></v-spacer>
-      <v-switch
-        v-if="!isMobile"
-        v-model="dark"
-        class="mr-2"
-        :label="`${dark ? 'Dark' : 'Light'} Mode`"
-      ></v-switch>
-      <v-btn
-        color="primary"
-        :small="isMobile"
-        @click.stop="showCreateEditModal = true"
-      >
+      <v-btn color="primary" :small="isMobile" @click.stop="showCreateEditModal = true">
         Add
         <v-icon :size="18" right dark>mdi-plus</v-icon>
       </v-btn>
       <schedule-create-edit-modal
         v-if="showCreateEditModal"
-        :dark="darkMode"
+        :dark="dark"
         :onClose="handleCloseScheduleModal"
         :visible="showCreateEditModal"
         :scheduleEvent="scheduleEvent"
@@ -87,8 +40,8 @@
         color="secondary"
         v-model="focus"
         :type="type"
-        :max-days="maxDays"
-        :dark="darkMode"
+        :max-days="7"
+        :dark="dark"
         :weekdays="weekdays"
         :short-months="shortMonths"
         :short-weekdays="shortWeekdays"
@@ -110,18 +63,13 @@
           <div
             class="v-current-time"
             :class="{
-              hide: date !== new Date().toISOString().substr(0, 10)
+              hide: date !== new Date().toISOString().substr(0, 10),
             }"
             :style="{ top: nowY }"
           ></div>
         </template>
       </v-calendar>
-      <v-menu
-        v-model="selectedOpen"
-        :close-on-content-click="false"
-        :activator="selectedElement"
-        :offset-x="!isMobile"
-      >
+      <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" :offset-x="!isMobile">
         <v-card
           color="grey lighten-4"
           :width="isMobile ? '320px' : '448px'"
@@ -133,40 +81,23 @@
             <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
               <v-icon :size="20">mdi-pencil</v-icon>
             </v-btn>
-            <v-btn
-              icon
-              @click="handleOpenConfirmModal(selectedScheduleEvent.id)"
-            >
+            <v-btn icon @click="handleOpenConfirmModal(selectedScheduleEvent.id)">
               <v-icon :size="20">mdi-delete</v-icon>
             </v-btn>
-            <v-btn
-              v-if="selectedScheduleEvent.permanent"
-              icon
-              @click="handleOpenCopyModal(selectedScheduleEvent)"
-            >
+            <v-btn v-if="selectedScheduleEvent.permanent" icon @click="handleOpenCopyModal(selectedScheduleEvent)">
               <v-icon :size="20">mdi-content-duplicate</v-icon>
             </v-btn>
 
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  v-on="on"
-                  @click="handleReminderToggle(selectedScheduleEvent)"
-                >
+                <v-btn icon v-on="on" @click="handleReminderToggle(selectedScheduleEvent)">
                   <v-icon :size="20">
-                    {{
-                      selectedScheduleEvent.reminder
-                        ? "mdi-bell"
-                        : "mdi-bell-off"
-                    }}
+                    {{ selectedScheduleEvent.reminder ? "mdi-bell" : "mdi-bell-off" }}
                   </v-icon>
                 </v-btn>
               </template>
               <span>
-                {{
-                  selectedScheduleEvent.reminder ? "Turned on" : "Turned off"
-                }}
+                {{ selectedScheduleEvent.reminder ? "Turned on" : "Turned off" }}
               </span>
             </v-tooltip>
             <v-btn icon @click="selectedOpen = false">
@@ -181,12 +112,7 @@
           </v-card-text>
         </v-card>
       </v-menu>
-      <modal
-        :width="400"
-        :dark="darkMode"
-        :visible="showConfirmModal"
-        :onClose="handleCloseConfirmModal"
-      >
+      <modal :width="400" :dark="dark" :visible="showConfirmModal" :onClose="handleCloseConfirmModal">
         <v-card>
           <v-card-title class="headline">Delete Event</v-card-title>
           <v-card-text>
@@ -197,32 +123,17 @@
             <v-btn color="blue darken-1" text @click="handleCloseConfirmModal">
               Cancel
             </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              :disabled="loading"
-              @click="handleDeleteEvent"
-            >
+            <v-btn color="blue darken-1" text :disabled="loading" @click="handleDeleteEvent">
               Confirm
             </v-btn>
           </v-card-actions>
         </v-card>
       </modal>
-      <modal
-        :width="500"
-        :dark="darkMode"
-        :visible="showCopyModal"
-        :onClose="handleCloseCopyModal"
-      >
+      <modal :width="500" :dark="dark" :visible="showCopyModal" :onClose="handleCloseCopyModal">
         <v-card>
           <v-card-title class="headline">Duplicate Event</v-card-title>
           <v-card-text>
-            <v-form
-              @submit.prevent
-              ref="copyform"
-              v-model="copyformValid"
-              lazy-validation
-            >
+            <v-form @submit.prevent ref="copyform" v-model="copyformValid" lazy-validation>
               <v-select
                 multiple
                 chips
@@ -240,12 +151,7 @@
             <v-btn color="blue darken-1" text @click="handleCloseCopyModal">
               Cancel
             </v-btn>
-            <v-btn
-              color="blue darken-1"
-              text
-              :disabled="!copyformValid || loading"
-              @click="handleDuplicateEvent"
-            >
+            <v-btn color="blue darken-1" text :disabled="!copyformValid || loading" @click="handleDuplicateEvent">
               Duplicate
             </v-btn>
           </v-card-actions>
@@ -257,16 +163,23 @@
 
 <script>
 import ScheduleCreateEditModal from "./ScheduleCreateEditModal.vue";
+import ScheduleSettings from "./ScheduleSettings";
 import Modal from "../Modal.vue";
 import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
-const dark = !!DarkMode.get();
 
 export default {
+  components: {
+    "schedule-create-edit-modal": ScheduleCreateEditModal,
+    "schedule-settings": ScheduleSettings,
+    modal: Modal,
+  },
   data: () => ({
-    dark,
+    dark: !!DarkMode.get(),
+    type: isMobile() ? "day" : "week",
+    weekdays: weekdaysDefault,
     isMobile: isMobile(),
     ready: false,
     focus: new Date().toISOString().substr(0, 10),
@@ -276,21 +189,7 @@ export default {
     calendarOpen: false,
     start: null,
     end: null,
-    type: isMobile() ? "day" : "week",
-    typeOptions: [
-      { text: "Day", value: "day" },
-      { text: "4 Day", value: "4day" },
-      { text: "Week", value: "week" },
-      { text: "Month", value: "month" }
-    ],
     mode: "column",
-    weekdays: weekdaysDefault,
-    weekdaysOptions: [
-      { text: "Sunday - Saturday", value: [0, 1, 2, 3, 4, 5, 6] },
-      { text: "Mon, Wed, Fri", value: [1, 3, 5] },
-      { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
-      { text: "Mon - Sun", value: weekdaysDefault }
-    ],
     selectedDuplicateWeeks: [],
     duplicateWeeks: [
       { text: "Monday", value: "monday" },
@@ -299,21 +198,14 @@ export default {
       { text: "Thursday", value: "thursday" },
       { text: "Friday", value: "friday" },
       { text: "Saturday", value: "saturday" },
-      { text: "Sunday", value: "sunday" }
+      { text: "Sunday", value: "sunday" },
     ],
-    weekRules: [v => !!v.length || "Weeks are required"],
-    maxDays: 7,
-    maxDaysOptions: [
-      { text: "7 days", value: 7 },
-      { text: "5 days", value: 5 },
-      { text: "4 days", value: 4 },
-      { text: "3 days", value: 3 }
-    ],
+    weekRules: [(v) => !!v.length || "Weeks are required"],
     styleInterval: "default",
     styleIntervalOptions: [
       { text: "Default", value: "default" },
       { text: "Workday", value: "workday" },
-      { text: "Past", value: "past" }
+      { text: "Past", value: "past" },
     ],
     shortIntervals: true,
     shortMonths: false,
@@ -325,17 +217,14 @@ export default {
     scheduleEvent: null,
     copyScheduleEvent: null,
     duplicateScheduleEventWeeks: [],
-    copyformValid: true
+    copyformValid: true,
   }),
   watch: {
     dark: function(newDark) {
       DarkMode.set(newDark);
-    }
+    },
   },
   computed: {
-    darkMode() {
-      return this.dark;
-    },
     loading() {
       return this.$store.getters.loading;
     },
@@ -379,9 +268,9 @@ export default {
     monthFormatter() {
       return this.$refs.calendar.getFormatter({
         timeZone: "UTC",
-        month: "long"
+        month: "long",
       });
-    }
+    },
   },
   mounted() {
     this.ready = true;
@@ -389,6 +278,9 @@ export default {
     this.updateTime();
   },
   methods: {
+    handleSettingsChange(value, key) {
+      this[key] = value;
+    },
     handleCloseCopyModal() {
       this.copyScheduleEvent = null;
       this.showCopyModal = false;
@@ -424,9 +316,9 @@ export default {
       const selectedDuplicateWeeks = this.selectedDuplicateWeeks;
 
       if (this.$refs.copyform.validate()) {
-        const scheduleEvents = selectedDuplicateWeeks.map(week => ({
+        const scheduleEvents = selectedDuplicateWeeks.map((week) => ({
           ...copyScheduleEvent,
-          week
+          week,
         }));
         this.$store.dispatch("addDuplicateScheduleEvents", scheduleEvents);
         this.handleCloseCopyModal();
@@ -444,12 +336,11 @@ export default {
 
       const { content, name, start, end } = this.copyScheduleEvent;
 
-      this.scheduleEvents.forEach(event => {
+      this.scheduleEvents.forEach((event) => {
         if (
           event.content === content &&
           event.name === name &&
-          handleScheduleEventTime(event.start) ===
-            handleScheduleEventTime(start) &&
+          handleScheduleEventTime(event.start) === handleScheduleEventTime(start) &&
           handleScheduleEventTime(event.end) === handleScheduleEventTime(end)
         ) {
           duplicateScheduleEventWeeks.push(event.week);
@@ -461,19 +352,14 @@ export default {
     handleReminderToggle(scheduleEvent) {
       const newScheduleEvent = {
         ...scheduleEvent,
-        reminder: !scheduleEvent.reminder
+        reminder: !scheduleEvent.reminder,
       };
 
       this.selectedScheduleEvent = newScheduleEvent;
       this.$store.dispatch("editScheduleEvent", newScheduleEvent);
     },
-    setToday() {
-      this.focus = "";
-    },
     getCurrentTime() {
-      return this.cal
-        ? this.cal.times.now.hour * 60 + this.cal.times.now.minute
-        : 0;
+      return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0;
     },
     scrollToTime() {
       const time = this.getCurrentTime();
@@ -516,19 +402,13 @@ export default {
 
       this.$store.commit("setStartEndDates", {
         start: start.date,
-        end: end.date
+        end: end.date,
       });
     },
     nth(d) {
-      return d > 3 && d < 21
-        ? "th"
-        : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
-    }
+      return d > 3 && d < 21 ? "th" : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
+    },
   },
-  components: {
-    "schedule-create-edit-modal": ScheduleCreateEditModal,
-    modal: Modal
-  }
 };
 </script>
 
