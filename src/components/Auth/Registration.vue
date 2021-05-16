@@ -5,8 +5,12 @@
         <v-card class="elevation-12">
           <v-toolbar dark color="primary">
             <v-toolbar-title>Registration form</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn v-if="isShowForm" class="ma-2" small outlined @click="handleShowForm">
+              <v-icon left> mdi-arrow-left </v-icon>Back
+            </v-btn>
           </v-toolbar>
-          <v-card-text>
+          <v-card-text v-if="isShowForm">
             <v-form @submit.prevent ref="form" id="registration-form" v-model="valid" validation>
               <v-text-field
                 prepend-icon="mdi-account"
@@ -36,15 +40,7 @@
               ></v-text-field>
             </v-form>
           </v-card-text>
-          <v-card-actions>
-            <v-btn class="mr-1" dark @click="signInWithGitHub">
-              <v-icon left medium>mdi-github</v-icon>
-              Continue with Gitub
-            </v-btn>
-            <v-btn @click="signInWithGoogle" color="info">
-              <v-icon left medium>mdi-google</v-icon>
-              Continue with Google
-            </v-btn>
+          <v-card-actions v-if="isShowForm">
             <v-spacer></v-spacer>
             <v-btn
               type="submit"
@@ -57,6 +53,12 @@
               Sign up
             </v-btn>
           </v-card-actions>
+          <auth-actions
+            v-else
+            :onEmail="handleShowForm"
+            :onGithub="signInWithGitHub"
+            :onGoogle="signInWithGoogle"
+          ></auth-actions>
         </v-card>
       </v-flex>
     </v-layout>
@@ -65,9 +67,11 @@
 
 <script>
 import { authMixin } from "../../mixins/auth";
+import AuthActions from "./AuthActions";
 
 export default {
   mixins: [authMixin],
+  components: { "auth-actions": AuthActions },
   computed: {
     loading() {
       return this.$store.getters.loading;
@@ -75,6 +79,7 @@ export default {
   },
   data() {
     return {
+      isShowForm: false,
       valid: false,
       email: "",
       password: "",
@@ -91,6 +96,9 @@ export default {
     };
   },
   methods: {
+    handleShowForm() {
+      this.isShowForm = !this.isShowForm;
+    },
     onSubmit() {
       if (this.$refs.form.validate()) {
         this.signInWithEmailPassword(
