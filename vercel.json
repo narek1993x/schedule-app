@@ -1,5 +1,4 @@
 {
-  "redirects": [{ "source": "/swenv.js", "destination": "/" }],
   "headers": [
     {
       "source": "/service-worker.js",
