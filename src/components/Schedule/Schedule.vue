@@ -12,9 +12,11 @@
       ></schedule-settings>
       <v-spacer></v-spacer>
       <v-menu v-model="calendarOpen" :close-on-content-click="false" :offset-x="!isMobile">
-        <v-toolbar-title slot="activator" class="ToolbarTitle mr-2" @click="calendarOpen = true">
-          {{ title }}
-        </v-toolbar-title>
+        <template v-slot:activator="{ on, attrs }">
+          <v-toolbar-title v-on="on" v-bind="attrs" class="ToolbarTitle mr-2">
+            {{ title }}
+          </v-toolbar-title>
+        </template>
         <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
       </v-menu>
       <v-spacer></v-spacer>
