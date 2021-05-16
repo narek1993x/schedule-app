@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
+    <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" :nudge-top="-9" offset-y>
       <template v-slot:activator="{ on, attrs }">
         <v-btn icon v-bind="attrs" v-on="on">
           <v-icon>mdi-cog</v-icon>
