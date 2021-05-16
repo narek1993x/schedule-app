@@ -47,6 +47,7 @@
           </v-card-actions>
           <auth-actions
             v-else
+            :loading="loading"
             :onEmail="handleShowForm"
             :onGithub="signInWithGitHub"
             :onGoogle="signInWithGoogle"
