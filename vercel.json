@@ -1,5 +1,5 @@
 {
-  "routes": [{ "src": "/swenv.js", "status": 404 }],
+  "redirects": [{ "source": "/swenv.js", "destination": "/" }],
   "headers": [
     {
       "source": "/service-worker.js",
