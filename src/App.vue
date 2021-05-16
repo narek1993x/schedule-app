@@ -31,6 +31,12 @@
           {{ link.title }}
         </v-btn>
       </v-toolbar-items>
+      <v-avatar v-if="user" color="secondary">
+        <img v-if="user.photoUrl" :src="user.photoUrl" />
+        <v-icon v-else dark>
+          mdi-account-circle
+        </v-icon>
+      </v-avatar>
     </v-app-bar>
     <v-content>
       <router-view></router-view>

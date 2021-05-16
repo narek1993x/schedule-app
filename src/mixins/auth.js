@@ -9,6 +9,9 @@ const authMethods = {
 
 export const authMixin = {
   computed: {
+    user() {
+      return this.$store.getters.user;
+    },
     isUserLoggedIn() {
       return this.$store.getters.isUserLoggedIn;
     },
