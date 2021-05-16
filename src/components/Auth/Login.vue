@@ -6,7 +6,7 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title>Login form</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn v-if="isShowForm" class="ma-2" small outlined @click="handleShowForm">
+            <v-btn v-if="isShowForm" small outlined @click="handleShowForm">
               <v-icon left> mdi-arrow-left </v-icon>Back
             </v-btn>
           </v-toolbar>
@@ -34,6 +34,7 @@
           <v-card-actions v-if="isShowForm">
             <v-spacer></v-spacer>
             <v-btn
+              class="mr-2"
               type="submit"
               form="login-form"
               color="primary"
