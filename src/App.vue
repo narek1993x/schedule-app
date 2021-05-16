@@ -25,18 +25,13 @@
 
       <v-spacer></v-spacer>
 
-      <v-toolbar-items class="hidden-sm-and-down">
+      <v-toolbar-items class="hidden-sm-and-down mr-2">
         <v-btn text v-for="link of links" :key="link.title" :to="link.url">
           <v-icon size="24" left>{{ link.icon }}</v-icon>
           {{ link.title }}
         </v-btn>
       </v-toolbar-items>
-      <v-avatar v-if="user" color="secondary">
-        <img v-if="user.photoUrl" :src="user.photoUrl" />
-        <v-icon v-else dark>
-          mdi-account-circle
-        </v-icon>
-      </v-avatar>
+      <avatar v-if="user" :user="user"></avatar>
     </v-app-bar>
     <v-content>
       <router-view></router-view>
@@ -53,9 +48,13 @@
 
 <script>
 import { authMixin } from "./mixins/auth";
+import Avatar from "./components/Avatar";
 
 export default {
   mixins: [authMixin],
+  components: {
+    avatar: Avatar,
+  },
   computed: {
     error() {
       return this.$store.getters.error;
@@ -69,7 +68,6 @@ export default {
             url: "/",
           },
           { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
-          { title: "Loguot", icon: "mdi-logout-variant", url: "/logout" },
         ];
       }
       return [
