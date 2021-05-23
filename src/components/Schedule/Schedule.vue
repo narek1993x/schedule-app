@@ -339,7 +339,7 @@ export default {
           selectedWeekDays.push({
             week: event.week || getWeekDayFromDate(event.date),
             id: event.id,
-            reminder: event.reminder,
+            reminder: event.reminder || false,
           });
         }
       });
