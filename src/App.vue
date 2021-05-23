@@ -33,9 +33,9 @@
       </v-toolbar-items>
       <avatar v-if="user" :user="user"></avatar>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <router-view></router-view>
-    </v-content>
+    </v-main>
 
     <template v-if="error">
       <v-snackbar :multi-line="true" :timeout="5000" color="error" @input="closeError" :value="true">

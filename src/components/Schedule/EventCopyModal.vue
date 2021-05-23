@@ -5,7 +5,6 @@
       <v-card-text>
         <v-form @submit.prevent ref="copyform" v-model="formValid">
           <week-select
-            v-if="showModal"
             :defaultDisabled="defaultDisabled"
             :onSelect="weekSelectHandler"
             label="Select week days to duplicate event*"

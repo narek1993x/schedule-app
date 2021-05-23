@@ -115,7 +115,13 @@
           </v-card-text>
         </v-card>
       </v-menu>
-      <modal :width="400" :dark="dark" :visible="showConfirmModal" :onClose="handleCloseConfirmModal">
+      <modal
+        v-if="showConfirmModal"
+        :width="400"
+        :dark="dark"
+        :visible="showConfirmModal"
+        :onClose="handleCloseConfirmModal"
+      >
         <v-card>
           <v-card-title class="headline">Delete Event</v-card-title>
           <v-card-text>
@@ -133,6 +139,7 @@
         </v-card>
       </modal>
       <event-copy-modal
+        v-if="showCopyModal"
         :dark="dark"
         :showModal="showCopyModal"
         :defaultSelected="selectedWeekDays"
