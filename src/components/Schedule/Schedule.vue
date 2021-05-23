@@ -103,7 +103,7 @@
                 {{ selectedScheduleEvent.reminder ? "Turned on" : "Turned off" }}
               </span>
             </v-tooltip>
-            <v-btn icon @click="selectedOpen = false">
+            <v-btn icon @click="closeEvent">
               <v-icon :size="20">mdi-close</v-icon>
             </v-btn>
           </v-toolbar>
@@ -132,40 +132,23 @@
           </v-card-actions>
         </v-card>
       </modal>
-      <modal :width="500" :dark="dark" :visible="showCopyModal" :onClose="handleCloseCopyModal">
-        <v-card>
-          <v-card-title class="headline">Duplicate Event</v-card-title>
-          <v-card-text>
-            <v-form @submit.prevent ref="copyform" v-model="copyformValid" lazy-validation>
-              <week-select
-                v-if="showCopyModal"
-                :defaultDisabled="defaultSelectedWeekDays"
-                :onSelect="weekSelectHandler"
-                label="Select week days to duplicate event*"
-              ></week-select>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="handleCloseCopyModal">
-              Cancel
-            </v-btn>
-            <v-btn color="blue darken-1" text :disabled="!copyformValid || loading" @click="handleDuplicateEvent">
-              Duplicate
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </modal>
+      <event-copy-modal
+        :dark="dark"
+        :showModal="showCopyModal"
+        :defaultSelected="selectedWeekDays"
+        :onClose="handleCloseCopyModal"
+        :onDuplicate="handleDuplicateEvent"
+      ></event-copy-modal>
     </v-sheet>
   </v-container>
 </template>
 
 <script>
 import EventModal from "./EventModal.vue";
+import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
-import WeekSelect from "../WeekSelect";
 import Modal from "../Modal.vue";
-import { isMobile, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
+import { isMobile, nth, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
@@ -173,8 +156,8 @@ const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 export default {
   components: {
     "event-modal": EventModal,
+    "event-copy-modal": EventCopyModal,
     "schedule-settings": ScheduleSettings,
-    "week-select": WeekSelect,
     modal: Modal,
   },
   data: () => ({
@@ -191,7 +174,6 @@ export default {
     start: null,
     end: null,
     mode: "column",
-    selectedDuplicateWeekDays: [],
     selectedWeekDays: [],
     shortIntervals: true,
     shortMonths: false,
@@ -201,8 +183,6 @@ export default {
     showCopyModal: false,
     deleteScheduleEventId: null,
     scheduleEvent: null,
-    copyScheduleEvent: null,
-    copyformValid: true,
   }),
   watch: {
     dark: function(newDark) {
@@ -233,8 +213,8 @@ export default {
       const endYear = end.year;
       const suffixYear = startYear === endYear ? "" : endYear;
 
-      const startDay = start.day + this.nth(start.day);
-      const endDay = end.day + this.nth(end.day);
+      const startDay = start.day + nth(start.day);
+      const endDay = end.day + nth(end.day);
 
       switch (this.type) {
         case "month":
@@ -266,33 +246,28 @@ export default {
     this.updateTime();
   },
   methods: {
-    weekSelectHandler(value) {
-      this.selectedDuplicateWeekDays = value;
-    },
     handleSettingsChange(value, key) {
       this[key] = value;
     },
     handleCloseCopyModal() {
-      this.copyScheduleEvent = null;
       this.showCopyModal = false;
-      this.$refs.copyform.reset();
-      this.selectedDuplicateWeekDays = [];
+      this.scheduleEvent = null;
       this.selectedWeekDays = [];
     },
     handleOpenCopyModal(event) {
-      this.selectedOpen = false;
       this.showCopyModal = true;
-      this.copyScheduleEvent = event;
+      this.scheduleEvent = event;
       this.handleSelectWeekDays();
+      this.closeEvent();
     },
     handleCloseConfirmModal() {
       this.deleteScheduleEventId = null;
       this.showConfirmModal = false;
     },
     handleOpenConfirmModal(eventId) {
-      this.selectedOpen = false;
       this.showConfirmModal = true;
       this.deleteScheduleEventId = eventId;
+      this.closeEvent();
     },
     handleCloseScheduleModal() {
       this.showEventModal = false;
@@ -300,25 +275,23 @@ export default {
       this.selectedWeekDays = [];
     },
     handleOpenScheduleModal(event) {
-      this.selectedOpen = false;
       this.showEventModal = true;
       this.scheduleEvent = event;
       this.handleSelectWeekDays();
+      this.closeEvent();
     },
-    handleDuplicateEvent() {
-      const copyScheduleEvent = this.copyScheduleEvent;
-      const selectedDuplicateWeekDays = this.selectedDuplicateWeekDays;
+    handleDuplicateEvent(selected) {
+      const scheduleEvent = this.scheduleEvent;
 
-      if (this.$refs.copyform.validate()) {
-        const scheduleEvents = selectedDuplicateWeekDays.map((week) => ({
-          ...copyScheduleEvent,
-          start: handleScheduleEventTime(copyScheduleEvent.start),
-          end: handleScheduleEventTime(copyScheduleEvent.end),
-          week,
-        }));
-        this.$store.dispatch("addScheduleEvents", scheduleEvents);
-        this.handleCloseCopyModal();
-      }
+      const scheduleEvents = selected.map((week) => ({
+        ...scheduleEvent,
+        start: handleScheduleEventTime(scheduleEvent.start),
+        end: handleScheduleEventTime(scheduleEvent.end),
+        week,
+      }));
+
+      this.$store.dispatch("addScheduleEvents", scheduleEvents);
+      this.handleCloseCopyModal();
     },
     handleDeleteEvent() {
       this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
@@ -327,7 +300,7 @@ export default {
     handleSelectWeekDays() {
       const selectedWeekDays = [];
 
-      const { content, name, start, end } = this.copyScheduleEvent || this.scheduleEvent;
+      const { content, name, start, end } = this.scheduleEvent;
 
       this.scheduleEvents.forEach((event) => {
         if (
@@ -377,6 +350,9 @@ export default {
     showIntervalLabel(interval) {
       return interval.minute === 0;
     },
+    closeEvent() {
+      this.selectedOpen = false;
+    },
     showEvent({ nativeEvent, event }) {
       const open = () => {
         this.selectedScheduleEvent = event;
@@ -385,7 +361,7 @@ export default {
       };
 
       if (this.selectedOpen) {
-        this.selectedOpen = false;
+        this.closeEvent();
         setTimeout(open, 10);
       } else {
         open();
@@ -401,9 +377,6 @@ export default {
         start: start.date,
         end: end.date,
       });
-    },
-    nth(d) {
-      return d > 3 && d < 21 ? "th" : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
     },
   },
 };
