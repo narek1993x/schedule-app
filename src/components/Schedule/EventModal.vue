@@ -36,7 +36,11 @@
                     ></v-switch>
                   </v-col>
                   <v-col v-if="permanent" cols="12" sm="6">
-                    <v-select v-model="week" :items="weeks" :rules="weekRules" label="Week*"></v-select>
+                    <week-select
+                      :defaultSelected="defaultSelectedWeekDays"
+                      :onSelect="weekSelectHandler"
+                      label="Week days*"
+                    ></week-select>
                   </v-col>
                   <v-col v-else cols="12" sm="6">
                     <v-menu
@@ -153,10 +157,14 @@
 </template>
 
 <script>
+import WeekSelect from "../WeekSelect";
 import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
 
 export default {
-  props: ["visible", "dark", "scheduleEvent", "onClose"],
+  components: {
+    "week-select": WeekSelect,
+  },
+  props: ["visible", "dark", "scheduleEvent", "onClose", "selectedWeekDays"],
   beforeMount() {
     if (this.scheduleEvent) {
       const { name, content, permanent, week, start, end, date } = this.scheduleEvent;
@@ -180,6 +188,9 @@ export default {
     },
   },
   computed: {
+    defaultSelectedWeekDays() {
+      return this.selectedWeekDays.map((d) => d.week);
+    },
     user() {
       return this.$store.getters.user;
     },
@@ -187,35 +198,27 @@ export default {
       return this.$store.getters.loading;
     },
   },
-  data: () => ({
-    isMobile: isMobile(),
-    valid: true,
-    permanent: false,
-    title: "",
-    content: "",
-    date: "",
-    dateFormatted: null,
-    dateMenu: false,
-    startTimerMenu: false,
-    endTimerMenu: false,
-    startTime: "",
-    endTime: "",
-    week: "",
-    weeks: [
-      { text: "Monday", value: "monday" },
-      { text: "Tuesday", value: "tuesday" },
-      { text: "Wednesday", value: "wednesday" },
-      { text: "Thursday", value: "thursday" },
-      { text: "Friday", value: "friday" },
-      { text: "Saturday", value: "saturday" },
-      { text: "Sunday", value: "sunday" },
-    ],
-    titleRules: [(v) => !!v || "Title is required"],
-    dateRules: [(v) => !!v || "Date is required"],
-    startTimeRules: [(v) => !!v || "Start time is required"],
-    endTimeRules: [(v) => !!v || "End time is required"],
-    weekRules: [(v) => !!v || "Week is required"],
-  }),
+  data: (instance) => {
+    return {
+      isMobile: isMobile(),
+      valid: true,
+      permanent: false,
+      title: "",
+      content: "",
+      date: "",
+      dateFormatted: null,
+      dateMenu: false,
+      startTimerMenu: false,
+      endTimerMenu: false,
+      startTime: "",
+      endTime: "",
+      newSelectedWeekDays: instance.selectedWeekDays.map((d) => d.week),
+      titleRules: [(v) => !!v || "Title is required"],
+      dateRules: [(v) => !!v || "Date is required"],
+      startTimeRules: [(v) => !!v || "Start time is required"],
+      endTimeRules: [(v) => !!v || "End time is required"],
+    };
+  },
   methods: {
     clear() {
       this.$refs.form.reset();
@@ -239,6 +242,9 @@ export default {
     timePickerErrorHandler(eventData) {
       this.valid = eventData.length === 0;
     },
+    weekSelectHandler(value) {
+      this.newSelectedWeekDays = value;
+    },
     saveHandler() {
       if (this.$refs.form.validate()) {
         const schedule = {
@@ -247,19 +253,32 @@ export default {
           permanent: this.permanent,
           start: this.startTime,
           end: this.endTime,
-          reminder: this.scheduleEvent ? this.scheduleEvent.reminder : true,
-          ...(this.permanent
-            ? {
-                week: this.week,
-              }
-            : { date: this.date }),
-          ...(this.user ? { ownerId: this.user.id } : {}),
-          ...(this.scheduleEvent ? { id: this.scheduleEvent.id } : {}),
+          reminder: true,
+          ownerId: this.user.id,
         };
 
-        const dispatchAction = this.scheduleEvent ? "editScheduleEvent" : "addScheduleEvent";
+        const scheduleEvents = [];
 
-        this.$store.dispatch(dispatchAction, schedule);
+        if (this.permanent) {
+          this.newSelectedWeekDays.forEach((weekDay) => {
+            const weekData = this.selectedWeekDays.find((d) => d.week === weekDay);
+            scheduleEvents.push({
+              ...schedule,
+              week: weekDay,
+              ...(weekData && weekData),
+            });
+          });
+        } else {
+          scheduleEvents.push({
+            ...schedule,
+            ...(this.scheduleEvent && { id: this.scheduleEvent.id }),
+            week: null,
+            date: this.date,
+          });
+        }
+
+        const dispatchAction = !!this.scheduleEvent ? "editScheduleEvents" : "addScheduleEvents";
+        this.$store.dispatch(dispatchAction, scheduleEvents);
         this.closeHandler();
       }
     },

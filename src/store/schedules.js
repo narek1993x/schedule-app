@@ -71,7 +71,7 @@ export default {
         throw error;
       }
     },
-    async addDuplicateScheduleEvents({ commit, getters }, scheduleEvents) {
+    async addScheduleEvents({ commit, getters }, scheduleEvents) {
       commit("clearError");
       commit("setLoading", true);
 
@@ -94,38 +94,41 @@ export default {
         throw error;
       }
     },
-    async addScheduleEvent({ commit, getters }, newScheduleEvent) {
+    async editScheduleEvents({ commit, getters }, scheduleEvents) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const scheduleEvent = await scheduleEventsRef.child(getters.user.id).push(newScheduleEvent);
+        const newScheduleEvents = scheduleEvents.filter((e) => !e.id);
+        const oldScheduleEvents = scheduleEvents.filter((e) => e.id);
 
-        commit("addScheduleEvent", {
-          ...newScheduleEvent,
-          id: scheduleEvent.key,
-        });
+        if (newScheduleEvents.length) {
+          const newEventsResolvedEvents = await Promise.all(
+            newScheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.id).push(scheduleEvent)),
+          );
 
-        commit("setLoading", false);
-      } catch (error) {
-        commit("setLoading", false);
-        commit("setError", error.message);
-        throw error;
-      }
-    },
-    async editScheduleEvent({ commit, getters }, newScheduleEvent) {
-      if (newScheduleEvent && !newScheduleEvent.id) return;
+          newScheduleEvents.forEach((scheduleEvent, index) => {
+            commit("addScheduleEvent", {
+              ...scheduleEvent,
+              id: newEventsResolvedEvents[index].key,
+            });
+          });
+        }
 
-      commit("clearError");
-      commit("setLoading", true);
+        if (oldScheduleEvents.length) {
+          await Promise.all(
+            oldScheduleEvents.map((scheduleEvent) =>
+              scheduleEventsRef
+                .child(getters.user.id)
+                .child(scheduleEvent.id)
+                .update(scheduleEvent),
+            ),
+          );
 
-      try {
-        await scheduleEventsRef
-          .child(getters.user.id)
-          .child(newScheduleEvent.id)
-          .update(newScheduleEvent);
-
-        commit("editScheduleEvent", newScheduleEvent);
+          oldScheduleEvents.forEach((scheduleEvent) => {
+            commit("editScheduleEvent", scheduleEvent);
+          });
+        }
 
         commit("setLoading", false);
       } catch (error) {

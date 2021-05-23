@@ -20,15 +20,16 @@
         <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
       </v-menu>
       <v-spacer></v-spacer>
-      <v-btn color="primary" :small="isMobile" @click.stop="showCreateEditModal = true">
+      <v-btn color="primary" :small="isMobile" @click.stop="showEventModal = true">
         Add
         <v-icon :size="18" right dark>mdi-plus</v-icon>
       </v-btn>
       <event-modal
-        v-if="showCreateEditModal"
+        v-if="showEventModal"
         :dark="dark"
         :onClose="handleCloseScheduleModal"
-        :visible="showCreateEditModal"
+        :visible="showEventModal"
+        :selectedWeekDays="selectedWeekDays"
         :scheduleEvent="scheduleEvent"
       ></event-modal>
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
@@ -136,16 +137,12 @@
           <v-card-title class="headline">Duplicate Event</v-card-title>
           <v-card-text>
             <v-form @submit.prevent ref="copyform" v-model="copyformValid" lazy-validation>
-              <v-select
-                multiple
-                chips
-                clearable
-                :item-disabled="handleDisableWeekItems"
-                v-model="selectedDuplicateWeeks"
-                :items="duplicateWeeks"
-                :rules="weekRules"
-                label="Select weeks to duplicate event*"
-              ></v-select>
+              <week-select
+                v-if="showCopyModal"
+                :defaultDisabled="defaultSelectedWeekDays"
+                :onSelect="weekSelectHandler"
+                label="Select week days to duplicate event*"
+              ></week-select>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -166,8 +163,9 @@
 <script>
 import EventModal from "./EventModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
+import WeekSelect from "../WeekSelect";
 import Modal from "../Modal.vue";
-import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
+import { isMobile, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
@@ -176,6 +174,7 @@ export default {
   components: {
     "event-modal": EventModal,
     "schedule-settings": ScheduleSettings,
+    "week-select": WeekSelect,
     modal: Modal,
   },
   data: () => ({
@@ -192,33 +191,17 @@ export default {
     start: null,
     end: null,
     mode: "column",
-    selectedDuplicateWeeks: [],
-    duplicateWeeks: [
-      { text: "Monday", value: "monday" },
-      { text: "Tuesday", value: "tuesday" },
-      { text: "Wednesday", value: "wednesday" },
-      { text: "Thursday", value: "thursday" },
-      { text: "Friday", value: "friday" },
-      { text: "Saturday", value: "saturday" },
-      { text: "Sunday", value: "sunday" },
-    ],
-    weekRules: [(v) => !!v.length || "Weeks are required"],
-    styleInterval: "default",
-    styleIntervalOptions: [
-      { text: "Default", value: "default" },
-      { text: "Workday", value: "workday" },
-      { text: "Past", value: "past" },
-    ],
+    selectedDuplicateWeekDays: [],
+    selectedWeekDays: [],
     shortIntervals: true,
     shortMonths: false,
     shortWeekdays: false,
-    showCreateEditModal: false,
+    showEventModal: false,
     showConfirmModal: false,
     showCopyModal: false,
     deleteScheduleEventId: null,
     scheduleEvent: null,
     copyScheduleEvent: null,
-    duplicateScheduleEventWeeks: [],
     copyformValid: true,
   }),
   watch: {
@@ -227,6 +210,9 @@ export default {
     },
   },
   computed: {
+    defaultSelectedWeekDays() {
+      return this.selectedWeekDays.map((d) => d.week);
+    },
     loading() {
       return this.$store.getters.loading;
     },
@@ -280,6 +266,9 @@ export default {
     this.updateTime();
   },
   methods: {
+    weekSelectHandler(value) {
+      this.selectedDuplicateWeekDays = value;
+    },
     handleSettingsChange(value, key) {
       this[key] = value;
     },
@@ -287,13 +276,14 @@ export default {
       this.copyScheduleEvent = null;
       this.showCopyModal = false;
       this.$refs.copyform.reset();
-      this.duplicateScheduleEventWeeks = [];
+      this.selectedDuplicateWeekDays = [];
+      this.selectedWeekDays = [];
     },
     handleOpenCopyModal(event) {
       this.selectedOpen = false;
       this.showCopyModal = true;
       this.copyScheduleEvent = event;
-      this.handleDuplicateScheduleEventWeeks();
+      this.handleSelectWeekDays();
     },
     handleCloseConfirmModal() {
       this.deleteScheduleEventId = null;
@@ -305,24 +295,28 @@ export default {
       this.deleteScheduleEventId = eventId;
     },
     handleCloseScheduleModal() {
-      this.showCreateEditModal = false;
+      this.showEventModal = false;
       this.scheduleEvent = null;
+      this.selectedWeekDays = [];
     },
     handleOpenScheduleModal(event) {
       this.selectedOpen = false;
-      this.showCreateEditModal = true;
+      this.showEventModal = true;
       this.scheduleEvent = event;
+      this.handleSelectWeekDays();
     },
     handleDuplicateEvent() {
       const copyScheduleEvent = this.copyScheduleEvent;
-      const selectedDuplicateWeeks = this.selectedDuplicateWeeks;
+      const selectedDuplicateWeekDays = this.selectedDuplicateWeekDays;
 
       if (this.$refs.copyform.validate()) {
-        const scheduleEvents = selectedDuplicateWeeks.map((week) => ({
+        const scheduleEvents = selectedDuplicateWeekDays.map((week) => ({
           ...copyScheduleEvent,
+          start: handleScheduleEventTime(copyScheduleEvent.start),
+          end: handleScheduleEventTime(copyScheduleEvent.end),
           week,
         }));
-        this.$store.dispatch("addDuplicateScheduleEvents", scheduleEvents);
+        this.$store.dispatch("addScheduleEvents", scheduleEvents);
         this.handleCloseCopyModal();
       }
     },
@@ -330,13 +324,10 @@ export default {
       this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
       this.handleCloseConfirmModal();
     },
-    handleDisableWeekItems(item) {
-      return this.duplicateScheduleEventWeeks.includes(item.value);
-    },
-    handleDuplicateScheduleEventWeeks() {
-      const duplicateScheduleEventWeeks = [];
+    handleSelectWeekDays() {
+      const selectedWeekDays = [];
 
-      const { content, name, start, end } = this.copyScheduleEvent;
+      const { content, name, start, end } = this.copyScheduleEvent || this.scheduleEvent;
 
       this.scheduleEvents.forEach((event) => {
         if (
@@ -345,11 +336,15 @@ export default {
           handleScheduleEventTime(event.start) === handleScheduleEventTime(start) &&
           handleScheduleEventTime(event.end) === handleScheduleEventTime(end)
         ) {
-          duplicateScheduleEventWeeks.push(event.week);
+          selectedWeekDays.push({
+            week: event.week || getWeekDayFromDate(event.date),
+            id: event.id,
+            reminder: event.reminder,
+          });
         }
       });
 
-      this.duplicateScheduleEventWeeks = duplicateScheduleEventWeeks;
+      this.selectedWeekDays = selectedWeekDays;
     },
     handleReminderToggle(scheduleEvent) {
       const newScheduleEvent = {
@@ -358,7 +353,7 @@ export default {
       };
 
       this.selectedScheduleEvent = newScheduleEvent;
-      this.$store.dispatch("editScheduleEvent", newScheduleEvent);
+      this.$store.dispatch("editScheduleEvents", [newScheduleEvent]);
     },
     getCurrentTime() {
       return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0;

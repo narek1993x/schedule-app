@@ -13,10 +13,15 @@ const capitalize = (s) => {
 
 export const handleScheduleEventTime = (date) => {
   if (date && date.length > 10) {
-    return date.slice(10);
+    return date.slice(10).trim();
   }
 
   return date;
+};
+
+export const getWeekDayFromDate = (date) => {
+  const newDate = moment(date).format("dddd");
+  return typeof newDate === "string" ? newDate.toLowerCase() : newDate;
 };
 
 export const setScheduleEventProps = (event, { start, end }) => {
