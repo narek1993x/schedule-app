@@ -16,6 +16,14 @@
             <v-list-item-title>Enable dark mode</v-list-item-title>
           </v-list-item>
 
+          <v-list-item v-if="isMobile">
+            <v-list-item-action>
+              <v-btn outlined class="mr-2" color="grey darken-2" @click="onSettingsChange('', 'focus')">
+                Today
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+
           <v-list-item>
             <v-list-item-action>
               <v-select
@@ -53,7 +61,7 @@
 
 <script>
 export default {
-  props: ["dark", "type", "weekdays", "onSettingsChange"],
+  props: ["isMobile", "dark", "type", "weekdays", "onSettingsChange"],
   data: (instance) => ({
     menu: false,
     typeOptions: [

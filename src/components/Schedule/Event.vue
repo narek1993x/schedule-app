@@ -64,10 +64,9 @@
 </template>
 
 <script>
-import { isMobile } from "../../helpers/utils";
-
 export default {
   props: [
+    "isMobile",
     "show",
     "event",
     "eventActivator",
@@ -77,11 +76,6 @@ export default {
     "onOpenCopyModal",
     "onReminderToggle",
   ],
-  data: () => {
-    return {
-      isMobile: isMobile(),
-    };
-  },
 };
 </script>
 

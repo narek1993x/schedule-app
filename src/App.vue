@@ -90,11 +90,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 html {
   overflow-y: auto !important;
 }
+
 .pointer {
   cursor: pointer;
+}
+
+.v-tooltip {
+  &__content {
+    text-transform: capitalize !important;
+  }
 }
 </style>

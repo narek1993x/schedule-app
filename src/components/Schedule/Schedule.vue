@@ -5,7 +5,7 @@
         <v-icon size="42">mdi-plus-circle-outline</v-icon>
       </v-btn>
 
-      <v-tooltip bottom>
+      <v-tooltip bottom v-if="!isMobile">
         <template v-slot:activator="{ on, attrs }">
           <v-btn
             small
@@ -53,6 +53,7 @@
       <v-spacer></v-spacer>
 
       <ScheduleSettings
+        :isMobile="isMobile"
         :dark="dark"
         :type="type"
         :weekdays="weekdays"
@@ -104,6 +105,7 @@
         </template>
       </v-calendar>
       <Event
+        :isMobile="isMobile"
         :show="selectedOpen"
         :event="selectedScheduleEvent"
         :eventActivator="selectedElement"
@@ -307,6 +309,7 @@ export default {
             week: event.week || getWeekDayFromDate(event.date),
             id: event.id,
             reminder: !!event.reminder,
+            ...(event.color && { color: event.color }),
           });
         }
       });

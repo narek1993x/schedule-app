@@ -1,11 +1,5 @@
 import moment from "moment";
 
-const colors = ["blue", "indigo", "deep-purple", "cyan", "green", "orange", "grey darken-1"];
-
-const rnd = (a, b) => {
-  return Math.floor((b - a + 1) * Math.random()) + a;
-};
-
 const capitalize = (s) => {
   if (typeof s !== "string") return "";
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -27,7 +21,6 @@ export const getWeekDayFromDate = (date) => {
 export const setScheduleEventProps = (event, { start, end }) => {
   return {
     ...event,
-    color: colors[rnd(0, colors.length - 1)],
     ...(event.permanent
       ? {
           start: `${moment(event.week === "sunday" ? end : start)

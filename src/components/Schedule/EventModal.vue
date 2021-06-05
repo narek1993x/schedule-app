@@ -9,6 +9,16 @@
           <v-form @submit.prevent ref="form" v-model="valid" lazy-validation>
             <v-row>
               <v-col cols="12">
+                <v-btn-toggle v-model="permanent" dense borderless :dark="dark">
+                  <v-btn :value="false">
+                    One time
+                  </v-btn>
+                  <v-btn :value="true">
+                    Permanent
+                  </v-btn>
+                </v-btn-toggle>
+              </v-col>
+              <v-col cols="12">
                 <v-text-field
                   v-model="title"
                   label="Title*"
@@ -17,6 +27,7 @@
                   required
                 ></v-text-field>
               </v-col>
+
               <v-col cols="12">
                 <v-textarea
                   v-model="content"
@@ -24,23 +35,20 @@
                   label="Content"
                   value
                   hint="content of event"
+                  rows="2"
                 ></v-textarea>
               </v-col>
               <v-col cols="12">
-                <v-row class="d-flex justify-space-between">
-                  <v-col cols="12" sm="3">
-                    <v-switch
-                      v-model="permanent"
-                      color="secondary"
-                      :label="`${permanent ? 'Permanent' : 'One time'}`"
-                    ></v-switch>
+                <v-row class="d-flex align-center">
+                  <v-col cols="12" sm="6">
+                    <ColorSelect :dark="dark" :defaultColor="color" :onSelect="colorSelectHandler"></ColorSelect>
                   </v-col>
                   <v-col v-if="permanent" cols="12" sm="6">
-                    <week-select
+                    <WeekSelect
                       :defaultSelected="defaultSelectedWeekDays"
                       :onSelect="weekSelectHandler"
                       label="Week days*"
-                    ></week-select>
+                    ></WeekSelect>
                   </v-col>
                   <v-col v-else cols="12" sm="6">
                     <v-menu
@@ -60,6 +68,7 @@
                           persistent-hint
                           prepend-icon="mdi-calendar-outline"
                           v-on="on"
+                          style="min-height: 76px"
                         ></v-text-field>
                       </template>
                       <v-date-picker v-model="date" no-title @input="dateMenu = false"></v-date-picker>
@@ -157,22 +166,25 @@
 </template>
 
 <script>
+import ColorSelect from "../ColorSelect";
 import WeekSelect from "../WeekSelect";
 import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
 
 export default {
   components: {
-    "week-select": WeekSelect,
+    ColorSelect,
+    WeekSelect,
   },
   props: ["visible", "dark", "scheduleEvent", "onClose", "selectedWeekDays"],
   beforeMount() {
     if (this.scheduleEvent) {
-      const { name, content, permanent, week, start, end, date } = this.scheduleEvent;
+      const { name, color, content, permanent, week, start, end, date } = this.scheduleEvent;
 
       this.title = name;
       this.content = content;
       this.startTime = handleScheduleEventTime(start);
       this.endTime = handleScheduleEventTime(end);
+      this.color = color || "blue";
 
       if (permanent) {
         this.permanent = permanent;
@@ -212,6 +224,7 @@ export default {
       endTimerMenu: false,
       startTime: "",
       endTime: "",
+      color: "",
       newSelectedWeekDays: instance.selectedWeekDays.map((d) => d.week),
       titleRules: [(v) => !!v || "Title is required"],
       dateRules: [(v) => !!v || "Date is required"],
@@ -236,14 +249,20 @@ export default {
       this.clear();
       this.onClose();
     },
-    timePickerValidationHandler() {
-      this.valid = this.startTime && this.endTime;
-    },
-    timePickerErrorHandler(eventData) {
-      this.valid = eventData.length === 0;
-    },
     weekSelectHandler(value) {
       this.newSelectedWeekDays = value;
+    },
+    colorSelectHandler(value) {
+      this.color = value;
+    },
+    handleEventColor(weekDay, selectedWeekDay, weekData) {
+      let color = this.color;
+
+      if (weekDay !== selectedWeekDay && weekData?.color) {
+        color = weekData.color;
+      }
+
+      return color;
     },
     saveHandler() {
       if (this.$refs.form.validate()) {
@@ -260,18 +279,22 @@ export default {
         const scheduleEvents = [];
 
         if (this.permanent) {
+          const selectedWeekDay = this.week;
+
           this.newSelectedWeekDays.forEach((weekDay) => {
             const weekData = this.selectedWeekDays.find((d) => d.week === weekDay);
             scheduleEvents.push({
               ...schedule,
-              week: weekDay,
               ...(weekData && weekData),
+              color: this.handleEventColor(weekDay, selectedWeekDay, weekData),
+              week: weekDay,
             });
           });
         } else {
           scheduleEvents.push({
             ...schedule,
             ...(this.scheduleEvent && { id: this.scheduleEvent.id }),
+            color: this.color,
             week: null,
             date: this.date,
           });
@@ -287,34 +310,6 @@ export default {
 </script>
 
 <style lang="scss">
-.time-picker {
-  & .dropdown,
-  & .select-list {
-    height: 7em !important;
-  }
-
-  & .VueTimePicker {
-    border: none !important;
-    border-bottom: 1px solid #696969 !important;
-    transition: 0.3s;
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-      border-bottom: 1px solid #000 !important;
-      outline: none !important;
-    }
-
-    &.invalid {
-      border-color: #c03 !important;
-    }
-  }
-
-  & .active {
-    background-color: #e535ab !important;
-  }
-}
-
 @media (max-width: 767px) {
   .ModalTitle {
     & .headline {

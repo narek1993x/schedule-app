@@ -4,11 +4,11 @@
       <v-card-title class="headline">Duplicate Event</v-card-title>
       <v-card-text>
         <v-form @submit.prevent ref="copyform" v-model="formValid">
-          <week-select
+          <WeekSelect
             :defaultDisabled="defaultDisabled"
             :onSelect="weekSelectHandler"
             label="Select week days to duplicate event*"
-          ></week-select>
+          ></WeekSelect>
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -29,7 +29,7 @@ import WeekSelect from "../WeekSelect";
 
 export default {
   components: {
-    "week-select": WeekSelect,
+    WeekSelect,
   },
   props: ["dark", "showModal", "defaultSelected", "onClose", "onDuplicate"],
   computed: {
