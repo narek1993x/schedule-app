@@ -255,15 +255,6 @@ export default {
     colorSelectHandler(value) {
       this.color = value;
     },
-    handleEventColor(weekDay, selectedWeekDay, weekData) {
-      let color = this.color;
-
-      if (weekDay !== selectedWeekDay && weekData?.color) {
-        color = weekData.color;
-      }
-
-      return color;
-    },
     saveHandler() {
       if (this.$refs.form.validate()) {
         const schedule = {
@@ -272,6 +263,7 @@ export default {
           permanent: this.permanent,
           start: this.startTime,
           end: this.endTime,
+          color: this.color,
           reminder: true,
           ownerId: this.user.id,
         };
@@ -286,7 +278,6 @@ export default {
             scheduleEvents.push({
               ...schedule,
               ...(weekData && weekData),
-              color: this.handleEventColor(weekDay, selectedWeekDay, weekData),
               week: weekDay,
             });
           });
@@ -294,7 +285,6 @@ export default {
           scheduleEvents.push({
             ...schedule,
             ...(this.scheduleEvent && { id: this.scheduleEvent.id }),
-            color: this.color,
             week: null,
             date: this.date,
           });

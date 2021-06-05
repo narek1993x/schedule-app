@@ -309,7 +309,6 @@ export default {
             week: event.week || getWeekDayFromDate(event.date),
             id: event.id,
             reminder: !!event.reminder,
-            ...(event.color && { color: event.color }),
           });
         }
       });
