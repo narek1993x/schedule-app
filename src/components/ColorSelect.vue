@@ -36,15 +36,17 @@ export default {
     return {
       color: instance.defaultColor || "blue",
       colors: [
-        "red darken-1",
+        "red darken-4",
         "orange",
-        "deep-orange",
-        "yellow darken-2",
+        "yellow darken-3",
         "green",
-        "blue",
-        "cyan",
-        "indigo",
+        "light-green darken-4",
         "deep-purple",
+        "indigo",
+        "blue",
+        "light-blue",
+        "cyan",
+        "teal",
         "grey darken-1",
       ],
     };
