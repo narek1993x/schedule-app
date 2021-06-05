@@ -1,22 +1,50 @@
 <template>
   <v-container fluid class="Container">
     <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
-      <v-btn class="ma-3" icon @click.stop="showEventModal = true">
+      <v-btn class="ml-3 mr-6" icon @click.stop="showEventModal = true">
         <v-icon size="42">mdi-plus-circle-outline</v-icon>
       </v-btn>
-      <v-btn small outlined class="mr-2" color="grey darken-2" @click="handleSettingsChange('', 'focus')">
-        Today
-      </v-btn>
-      <v-btn icon @click="$refs.calendar.prev()">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-      <v-btn icon class="mr-2" @click="$refs.calendar.next()">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            small
+            outlined
+            v-bind="attrs"
+            v-on="on"
+            class="mr-2"
+            color="grey darken-2"
+            @click="handleSettingsChange('', 'focus')"
+          >
+            Today
+          </v-btn>
+        </template>
+        <span>{{ todayText }}</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on" @click="$refs.calendar.prev()">
+            <v-icon>mdi-chevron-left</v-icon>
+          </v-btn>
+        </template>
+        <span>Previous {{ type }}</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on" class="mr-2" @click="$refs.calendar.next()">
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+        </template>
+        <span>Next {{ type }}</span>
+      </v-tooltip>
+
       <v-menu v-model="calendarOpen" :close-on-content-click="false" :offset-x="!isMobile">
         <template v-slot:activator="{ on, attrs }">
           <v-toolbar-title v-on="on" v-bind="attrs" class="ToolbarTitle mr-2">
             {{ title }}
+            <v-icon>mdi-menu-down</v-icon>
           </v-toolbar-title>
         </template>
         <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
@@ -105,6 +133,7 @@
 </template>
 
 <script>
+import moment from "moment";
 import Event from "./Event.vue";
 import EventModal from "./EventModal.vue";
 import EventDeleteModal from "./EventDeleteModal.vue";
@@ -153,6 +182,9 @@ export default {
     },
   },
   computed: {
+    todayText() {
+      return moment().format("dddd, MMM D");
+    },
     defaultSelectedWeekDays() {
       return this.selectedWeekDays.map((d) => d.week);
     },
@@ -359,7 +391,16 @@ export default {
 }
 
 .ToolbarTitle {
+  display: flex;
   cursor: pointer;
+
+  &:hover {
+    color: #616161;
+
+    .v-icon {
+      opacity: 0.7;
+    }
+  }
 }
 
 .v-calendar-daily__interval:first-child {
