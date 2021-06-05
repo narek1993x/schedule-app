@@ -11,10 +11,6 @@ const capitalize = (s) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export const nth = (d) => {
-  return d > 3 && d < 21 ? "th" : ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][d % 10];
-};
-
 export const handleScheduleEventTime = (date) => {
   if (date && date.length > 10) {
     return date.slice(10).trim();

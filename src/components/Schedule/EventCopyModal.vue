@@ -1,5 +1,5 @@
 <template>
-  <modal :width="500" :dark="dark" :visible="showModal" :onClose="handleClose">
+  <Modal :width="500" :dark="dark" :visible="showModal" :onClose="handleClose">
     <v-card>
       <v-card-title class="headline">Duplicate Event</v-card-title>
       <v-card-text>
@@ -21,17 +21,15 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </modal>
+  </Modal>
 </template>
 
 <script>
 import WeekSelect from "../WeekSelect";
-import Modal from "../Modal.vue";
 
 export default {
   components: {
     "week-select": WeekSelect,
-    modal: Modal,
   },
   props: ["dark", "showModal", "defaultSelected", "onClose", "onDuplicate"],
   computed: {

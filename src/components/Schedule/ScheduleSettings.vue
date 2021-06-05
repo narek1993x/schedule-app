@@ -2,21 +2,13 @@
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" :nudge-top="-9" offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn icon v-bind="attrs" v-on="on">
-          <v-icon>mdi-cog</v-icon>
+        <v-btn class="ma-3" icon v-bind="attrs" v-on="on">
+          <v-icon size="36">mdi-cog</v-icon>
         </v-btn>
       </template>
 
       <v-card>
         <v-list>
-          <v-list-item>
-            <v-list-item-action>
-              <v-btn outlined class="mr-2" color="grey darken-2" @click="onSettingsChange('', 'focus')">
-                Show Today
-              </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-
           <v-list-item>
             <v-list-item-action>
               <v-switch :input-value="dark" @change="onSettingsChange($event, 'dark')" color="secondary"></v-switch>

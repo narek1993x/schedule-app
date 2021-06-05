@@ -1,16 +1,19 @@
 <template>
   <v-container fluid class="Container">
     <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
-      <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
+      <v-btn class="ma-3" icon @click.stop="showEventModal = true">
+        <v-icon size="42">mdi-plus-circle-outline</v-icon>
+      </v-btn>
+      <v-btn small outlined class="mr-2" color="grey darken-2" @click="handleSettingsChange('', 'focus')">
+        Today
+      </v-btn>
+      <v-btn icon @click="$refs.calendar.prev()">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <schedule-settings
-        :dark="dark"
-        :type="type"
-        :weekdays="weekdays"
-        :onSettingsChange="handleSettingsChange"
-      ></schedule-settings>
-      <v-spacer></v-spacer>
+      <v-btn icon class="mr-2" @click="$refs.calendar.next()">
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
+
       <v-menu v-model="calendarOpen" :close-on-content-click="false" :offset-x="!isMobile">
         <template v-slot:activator="{ on, attrs }">
           <v-toolbar-title v-on="on" v-bind="attrs" class="ToolbarTitle mr-2">
@@ -20,23 +23,23 @@
         <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
       </v-menu>
       <v-spacer></v-spacer>
-      <v-btn color="primary" :small="isMobile" @click.stop="showEventModal = true">
-        Add
-        <v-icon :size="18" right dark>mdi-plus</v-icon>
-      </v-btn>
-      <event-modal
+
+      <ScheduleSettings
+        :dark="dark"
+        :type="type"
+        :weekdays="weekdays"
+        :onSettingsChange="handleSettingsChange"
+      ></ScheduleSettings>
+      <EventModal
         v-if="showEventModal"
         :dark="dark"
         :onClose="handleCloseScheduleModal"
         :visible="showEventModal"
         :selectedWeekDays="selectedWeekDays"
         :scheduleEvent="scheduleEvent"
-      ></event-modal>
-      <v-btn icon class="ma-2" @click="$refs.calendar.next()">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
+      ></EventModal>
     </v-sheet>
-    <app-loading :loading="loading"></app-loading>
+    <Loading :loading="loading"></Loading>
     <v-sheet class="CalendarSheet">
       <v-calendar
         ref="calendar"
@@ -115,7 +118,7 @@
           </v-card-text>
         </v-card>
       </v-menu>
-      <modal
+      <Modal
         v-if="showConfirmModal"
         :width="400"
         :dark="dark"
@@ -137,15 +140,15 @@
             </v-btn>
           </v-card-actions>
         </v-card>
-      </modal>
-      <event-copy-modal
+      </Modal>
+      <EventCopyModal
         v-if="showCopyModal"
         :dark="dark"
         :showModal="showCopyModal"
         :defaultSelected="selectedWeekDays"
         :onClose="handleCloseCopyModal"
         :onDuplicate="handleDuplicateEvent"
-      ></event-copy-modal>
+      ></EventCopyModal>
     </v-sheet>
   </v-container>
 </template>
@@ -154,7 +157,6 @@
 import EventModal from "./EventModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
-import Modal from "../Modal.vue";
 import { isMobile, nth, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
@@ -162,10 +164,9 @@ const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   components: {
-    "event-modal": EventModal,
-    "event-copy-modal": EventCopyModal,
-    "schedule-settings": ScheduleSettings,
-    modal: Modal,
+    EventModal,
+    EventCopyModal,
+    ScheduleSettings,
   },
   data: () => ({
     dark: !!DarkMode.get(),
@@ -218,17 +219,16 @@ export default {
 
       const startYear = start.year;
       const endYear = end.year;
-      const suffixYear = startYear === endYear ? "" : endYear;
 
-      const startDay = start.day + nth(start.day);
-      const endDay = end.day + nth(end.day);
+      const startDay = start.day;
+      const endDay = end.day;
 
       switch (this.type) {
         case "month":
           return `${startMonth} ${startYear}`;
         case "week":
         case "4day":
-          return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`;
+          return `${startMonth} ${startDay} - ${suffixMonth} ${endDay} ${endYear}`;
         case "day":
           return `${startMonth} ${startDay} ${startYear}`;
       }
@@ -243,7 +243,7 @@ export default {
     monthFormatter() {
       return this.$refs.calendar.getFormatter({
         timeZone: "UTC",
-        month: "long",
+        month: "short",
       });
     },
   },

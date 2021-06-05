@@ -18,8 +18,8 @@
       <v-app-bar-nav-icon @click="drawer = !drawer" class="hidden-md-and-up"></v-app-bar-nav-icon>
 
       <v-toolbar-title>
-        <router-link to="/" tag="span" class="pointer">
-          Schedule App
+        <router-link to="/" custom v-slot="{ navigate }" class="pointer">
+          <span @click="navigate" role="link">Schedule App</span>
         </router-link>
       </v-toolbar-title>
 
@@ -31,7 +31,7 @@
           {{ link.title }}
         </v-btn>
       </v-toolbar-items>
-      <avatar v-if="user" :user="user"></avatar>
+      <MenuAvatar v-if="user" :user="user"></MenuAvatar>
     </v-app-bar>
     <v-main>
       <router-view></router-view>
@@ -48,12 +48,12 @@
 
 <script>
 import { authMixin } from "./mixins/auth";
-import Avatar from "./components/Avatar";
+import MenuAvatar from "./components/MenuAvatar";
 
 export default {
   mixins: [authMixin],
   components: {
-    avatar: Avatar,
+    MenuAvatar,
   },
   computed: {
     error() {
