@@ -3,32 +3,56 @@
     <v-card color="grey lighten-4" :width="isMobile ? '320px' : '448px'" :height="isMobile ? '326px' : '457px'" flat>
       <v-toolbar :color="event.color" dark>
         <v-spacer />
-        <v-btn icon @click="onOpenEventeModal(event)">
-          <v-icon :size="20">mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn icon @click="onOpenDeleteModal(event.id)">
-          <v-icon :size="20">mdi-delete</v-icon>
-        </v-btn>
-        <v-btn v-if="event.permanent" icon @click="onOpenCopyModal(event)">
-          <v-icon :size="20">mdi-content-duplicate</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" @click="onOpenEventeModal(event)">
+              <v-icon :size="20">mdi-pencil</v-icon>
+            </v-btn>
+          </template>
+          <span>Edit event</span>
+        </v-tooltip>
 
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on" @click="onReminderToggle(event)">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" @click="onOpenDeleteModal(event.id)">
+              <v-icon :size="20">mdi-delete</v-icon>
+            </v-btn>
+          </template>
+          <span>Delete event</span>
+        </v-tooltip>
+
+        <v-tooltip v-if="event.permanent" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" @click="onOpenCopyModal(event)">
+              <v-icon :size="20">mdi-content-duplicate</v-icon>
+            </v-btn>
+          </template>
+          <span>Duplicate event</span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" @click="onReminderToggle(event)">
               <v-icon :size="20">
                 {{ event.reminder ? "mdi-bell" : "mdi-bell-off" }}
               </v-icon>
             </v-btn>
           </template>
           <span>
-            {{ event.reminder ? "Turned on" : "Turned off" }}
+            {{ event.reminder ? "Reminder is on" : "Reminder is off" }}
           </span>
         </v-tooltip>
-        <v-btn icon @click="onClose">
-          <v-icon :size="20">mdi-close</v-icon>
-        </v-btn>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" @click="onClose">
+              <v-icon :size="20">mdi-close</v-icon>
+            </v-btn>
+          </template>
+          <span>Close</span>
+        </v-tooltip>
       </v-toolbar>
+
       <v-card-text>
         <div class="headline text--primary pb-5">
           {{ event.name }}
