@@ -13,7 +13,6 @@
       <v-btn icon class="mr-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
-
       <v-menu v-model="calendarOpen" :close-on-content-click="false" :offset-x="!isMobile">
         <template v-slot:activator="{ on, attrs }">
           <v-toolbar-title v-on="on" v-bind="attrs" class="ToolbarTitle mr-2">
@@ -22,6 +21,7 @@
         </template>
         <v-date-picker v-model="focus" reactive show-current :full-width="isMobile" type="date"></v-date-picker>
       </v-menu>
+
       <v-spacer></v-spacer>
 
       <ScheduleSettings
@@ -85,29 +85,13 @@
         :onOpenCopyModal="handleOpenCopyModal"
         :onReminderToggle="handleReminderToggle"
       ></Event>
-      <Modal
-        v-if="showConfirmModal"
-        :width="400"
+      <EventDeleteModal
         :dark="dark"
-        :visible="showConfirmModal"
+        :loading="loading"
+        :showModal="showConfirmModal"
         :onClose="handleCloseDeleteModal"
-      >
-        <v-card>
-          <v-card-title class="headline">Delete Event</v-card-title>
-          <v-card-text>
-            Are you sure you want to permanently delete this event?
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="handleCloseDeleteModal">
-              Cancel
-            </v-btn>
-            <v-btn color="blue darken-1" text :disabled="loading" @click="handleDeleteEvent">
-              Confirm
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </Modal>
+        :onDelete="handleDeleteEvent"
+      ></EventDeleteModal>
       <EventCopyModal
         v-if="showCopyModal"
         :dark="dark"
@@ -123,6 +107,7 @@
 <script>
 import Event from "./Event.vue";
 import EventModal from "./EventModal.vue";
+import EventDeleteModal from "./EventDeleteModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
 import { isMobile, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
@@ -134,6 +119,7 @@ export default {
   components: {
     Event,
     EventModal,
+    EventDeleteModal,
     EventCopyModal,
     ScheduleSettings,
   },
