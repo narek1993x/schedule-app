@@ -8,16 +8,16 @@
     :menu-props="{ contentClass: 'color-select-content' }"
   >
     <template v-slot:selection="{ item }">
-      <div class="color-item" :class="item"></div>
+      <div class="color-item" :class="item.value"></div>
     </template>
 
     <template v-slot:item="{ item, attrs, on }">
       <v-list-item v-on="on" v-bind="attrs">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <div v-on="on" v-bind="attrs" class="color-item" :class="item"></div>
+            <div v-on="on" v-bind="attrs" class="color-item" :class="item.value"></div>
           </template>
-          <span>{{ item }}</span>
+          <span>{{ item.text }}</span>
         </v-tooltip>
       </v-list-item>
     </template></v-select
@@ -36,18 +36,17 @@ export default {
     return {
       color: instance.defaultColor || "blue",
       colors: [
-        "red darken-4",
-        "orange",
-        "yellow darken-3",
-        "green",
-        "light-green darken-4",
-        "deep-purple",
-        "indigo",
-        "blue",
-        "light-blue",
-        "cyan",
-        "teal",
-        "grey darken-1",
+        { value: "red darken-2", text: "Tomato" },
+        { value: "red lighten-2", text: "Flamingo" },
+        { value: "deep-orange darken-1", text: "Tangerine" },
+        { value: "yellow darken-2", text: "Banana" },
+        { value: "green darken-2", text: "Sage" },
+        { value: "green darken-4", text: "Basil" },
+        { value: "indigo lighten-2", text: "Peacock" },
+        { value: "blue", text: "Blueberry" },
+        { value: "indigo", text: "Lavender" },
+        { value: "purple darken-1", text: "Grape" },
+        { value: "grey darken-2", text: "Graphite" },
       ],
     };
   },

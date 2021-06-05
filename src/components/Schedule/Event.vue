@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-model="show" :close-on-content-click="false" :activator="eventActivator" :offset-x="!isMobile">
+  <v-menu v-if="show" :value="show" :close-on-content-click="false" :activator="eventActivator" :offset-x="!isMobile">
     <v-card color="grey lighten-4" :width="isMobile ? '320px' : '448px'" :height="isMobile ? '326px' : '457px'" flat>
       <v-toolbar :color="event.color" dark>
         <v-spacer />
