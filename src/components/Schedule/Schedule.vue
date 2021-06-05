@@ -33,7 +33,7 @@
       <EventModal
         v-if="showEventModal"
         :dark="dark"
-        :onClose="handleCloseScheduleModal"
+        :onClose="handleCloseEventModal"
         :visible="showEventModal"
         :selectedWeekDays="selectedWeekDays"
         :scheduleEvent="scheduleEvent"
@@ -75,55 +75,22 @@
           ></div>
         </template>
       </v-calendar>
-      <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" :offset-x="!isMobile">
-        <v-card
-          color="grey lighten-4"
-          :width="isMobile ? '320px' : '448px'"
-          :height="isMobile ? '326px' : '457px'"
-          flat
-        >
-          <v-toolbar :color="selectedScheduleEvent.color" dark>
-            <v-spacer />
-            <v-btn icon @click="handleOpenScheduleModal(selectedScheduleEvent)">
-              <v-icon :size="20">mdi-pencil</v-icon>
-            </v-btn>
-            <v-btn icon @click="handleOpenConfirmModal(selectedScheduleEvent.id)">
-              <v-icon :size="20">mdi-delete</v-icon>
-            </v-btn>
-            <v-btn v-if="selectedScheduleEvent.permanent" icon @click="handleOpenCopyModal(selectedScheduleEvent)">
-              <v-icon :size="20">mdi-content-duplicate</v-icon>
-            </v-btn>
-
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click="handleReminderToggle(selectedScheduleEvent)">
-                  <v-icon :size="20">
-                    {{ selectedScheduleEvent.reminder ? "mdi-bell" : "mdi-bell-off" }}
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>
-                {{ selectedScheduleEvent.reminder ? "Turned on" : "Turned off" }}
-              </span>
-            </v-tooltip>
-            <v-btn icon @click="closeEvent">
-              <v-icon :size="20">mdi-close</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-card-text>
-            <div class="headline text--primary pb-5">
-              {{ selectedScheduleEvent.name }}
-            </div>
-            <div class="text--primary">{{ selectedScheduleEvent.content }}</div>
-          </v-card-text>
-        </v-card>
-      </v-menu>
+      <Event
+        :show="selectedOpen"
+        :event="selectedScheduleEvent"
+        :eventActivator="selectedElement"
+        :onClose="closeEvent"
+        :onOpenEventeModal="handleOpenEventeModal"
+        :onOpenDeleteModal="handleOpenDeleteModal"
+        :onOpenCopyModal="handleOpenCopyModal"
+        :onReminderToggle="handleReminderToggle"
+      ></Event>
       <Modal
         v-if="showConfirmModal"
         :width="400"
         :dark="dark"
         :visible="showConfirmModal"
-        :onClose="handleCloseConfirmModal"
+        :onClose="handleCloseDeleteModal"
       >
         <v-card>
           <v-card-title class="headline">Delete Event</v-card-title>
@@ -132,7 +99,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="handleCloseConfirmModal">
+            <v-btn color="blue darken-1" text @click="handleCloseDeleteModal">
               Cancel
             </v-btn>
             <v-btn color="blue darken-1" text :disabled="loading" @click="handleDeleteEvent">
@@ -154,16 +121,18 @@
 </template>
 
 <script>
+import Event from "./Event.vue";
 import EventModal from "./EventModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
-import { isMobile, nth, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
+import { isMobile, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
 export default {
   components: {
+    Event,
     EventModal,
     EventCopyModal,
     ScheduleSettings,
@@ -267,21 +236,21 @@ export default {
       this.handleSelectWeekDays();
       this.closeEvent();
     },
-    handleCloseConfirmModal() {
+    handleCloseDeleteModal() {
       this.deleteScheduleEventId = null;
       this.showConfirmModal = false;
     },
-    handleOpenConfirmModal(eventId) {
+    handleOpenDeleteModal(eventId) {
       this.showConfirmModal = true;
       this.deleteScheduleEventId = eventId;
       this.closeEvent();
     },
-    handleCloseScheduleModal() {
+    handleCloseEventModal() {
       this.showEventModal = false;
       this.scheduleEvent = null;
       this.selectedWeekDays = [];
     },
-    handleOpenScheduleModal(event) {
+    handleOpenEventeModal(event) {
       this.showEventModal = true;
       this.scheduleEvent = event;
       this.handleSelectWeekDays();
@@ -302,7 +271,7 @@ export default {
     },
     handleDeleteEvent() {
       this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
-      this.handleCloseConfirmModal();
+      this.handleCloseDeleteModal();
     },
     handleSelectWeekDays() {
       const selectedWeekDays = [];
