@@ -312,6 +312,10 @@ export default {
       }
     }
 
+    .v-btn.v-btn--active.v-btn--has-bg {
+      @extend %btnToggleColors;
+    }
+
     .v-btn.v-btn--active.v-btn--disabled.v-btn--has-bg {
       @extend %btnToggleColors;
     }
