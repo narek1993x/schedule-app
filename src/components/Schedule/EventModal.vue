@@ -9,16 +9,6 @@
           <v-form @submit.prevent ref="form" v-model="valid" lazy-validation>
             <v-row>
               <v-col cols="12">
-                <v-btn-toggle v-model="permanent" dense borderless :dark="dark">
-                  <v-btn :value="false">
-                    One time
-                  </v-btn>
-                  <v-btn :value="true">
-                    Permanent
-                  </v-btn>
-                </v-btn-toggle>
-              </v-col>
-              <v-col cols="12">
                 <v-text-field
                   v-model="title"
                   label="Title*"
@@ -40,8 +30,18 @@
               </v-col>
               <v-col cols="12">
                 <v-row class="d-flex align-center">
-                  <v-col cols="12" sm="6">
+                  <v-col cols="4" sm="2">
                     <ColorSelect :dark="dark" :defaultColor="color" :onSelect="colorSelectHandler"></ColorSelect>
+                  </v-col>
+                  <v-col cols="8" sm="4">
+                    <v-btn-toggle v-model="permanent" dense :dark="dark">
+                      <v-btn :value="false">
+                        One time
+                      </v-btn>
+                      <v-btn :value="true">
+                        Permanent
+                      </v-btn>
+                    </v-btn-toggle>
                   </v-col>
                   <v-col v-if="permanent" cols="12" sm="6">
                     <WeekSelect
