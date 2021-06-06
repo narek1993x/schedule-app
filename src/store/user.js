@@ -1,7 +1,7 @@
 import firebase from "../libs/firebase";
 import { createUser } from "../libs/db";
 import { User, FirebaseDeviceToken } from "../storage";
-import { removeTokenFromServer } from "../services/api-requests";
+import { removeTokenFromServer } from "../libs/subscription";
 
 function formatUser(user) {
   // const token = await user.getIdToken();

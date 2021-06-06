@@ -1,7 +1,7 @@
 import { firebaseApp, apps } from "./libs/db";
 import { FirebaseDeviceToken, User } from "./storage";
 import { getDeviceInfo } from "./helpers/utils";
-import { sendTokenToServer } from "./services/api-requests";
+import { sendTokenToServer } from "./libs/subscription";
 
 function isPushNotificationSupported() {
   return "serviceWorker" in navigator && "PushManager" in window;
