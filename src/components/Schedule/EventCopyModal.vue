@@ -36,9 +36,6 @@ export default {
     defaultDisabled() {
       return this.defaultSelected.map((d) => d.week);
     },
-    loading() {
-      return this.$store.getters.loading;
-    },
   },
   data: () => {
     return {

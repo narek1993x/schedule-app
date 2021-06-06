@@ -85,7 +85,7 @@
         :first-interval="7"
         :interval-count="17"
         :interval-height="120"
-        :events="scheduleEvents"
+        :events="events"
         :event-overlap-mode="mode"
         :event-overlap-threshold="45"
         :event-color="getEventColor"
@@ -144,7 +144,7 @@ import EventModal from "./EventModal.vue";
 import EventDeleteModal from "./EventDeleteModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
-import { isMobile, getWeekDayFromDate, handleScheduleEventTime } from "../../helpers/utils";
+import { isMobile, getWeekDayFromDate, handleEventTime } from "../../helpers/utils";
 import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
@@ -196,8 +196,8 @@ export default {
     loading() {
       return this.$store.getters.loading;
     },
-    scheduleEvents() {
-      return this.$store.getters.scheduleEvents;
+    events() {
+      return this.$store.getters.events;
     },
     title() {
       const { start, end } = this;
@@ -282,18 +282,18 @@ export default {
     handleDuplicateEvent(selected) {
       const scheduleEvent = this.scheduleEvent;
 
-      const scheduleEvents = selected.map((week) => ({
+      const events = selected.map((week) => ({
         ...scheduleEvent,
-        start: handleScheduleEventTime(scheduleEvent.start),
-        end: handleScheduleEventTime(scheduleEvent.end),
+        start: handleEventTime(scheduleEvent.start),
+        end: handleEventTime(scheduleEvent.end),
         week,
       }));
 
-      this.$store.dispatch("addScheduleEvents", scheduleEvents);
+      this.$store.dispatch("addEvents", events);
       this.handleCloseCopyModal();
     },
     handleDeleteEvent() {
-      this.$store.dispatch("removeScheduleEvent", this.deleteScheduleEventId);
+      this.$store.dispatch("removeEvent", this.deleteScheduleEventId);
       this.handleCloseDeleteModal();
     },
     handleSelectWeekDays() {
@@ -301,12 +301,12 @@ export default {
 
       const { content, name, start, end } = this.scheduleEvent;
 
-      this.scheduleEvents.forEach((event) => {
+      this.events.forEach((event) => {
         if (
           event.content === content &&
           event.name === name &&
-          handleScheduleEventTime(event.start) === handleScheduleEventTime(start) &&
-          handleScheduleEventTime(event.end) === handleScheduleEventTime(end)
+          handleEventTime(event.start) === handleEventTime(start) &&
+          handleEventTime(event.end) === handleEventTime(end)
         ) {
           selectedWeekDays.push({
             week: event.week || getWeekDayFromDate(event.date),
@@ -325,7 +325,7 @@ export default {
       };
 
       this.selectedScheduleEvent = newScheduleEvent;
-      this.$store.dispatch("editScheduleEvents", [newScheduleEvent]);
+      this.$store.dispatch("editEvents", [newScheduleEvent]);
     },
     getCurrentTime() {
       return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0;

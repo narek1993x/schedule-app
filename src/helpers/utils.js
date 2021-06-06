@@ -5,7 +5,7 @@ const capitalize = (s) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-export const handleScheduleEventTime = (date) => {
+export const handleEventTime = (date) => {
   if (date && date.length > 10) {
     return date.slice(10).trim();
   }
@@ -18,21 +18,21 @@ export const getWeekDayFromDate = (date) => {
   return typeof newDate === "string" ? newDate.toLowerCase() : newDate;
 };
 
-export const setScheduleEventProps = (event, { start, end }) => {
+export const setEventDates = (event, { start, end }) => {
   return {
     ...event,
     ...(event.permanent
       ? {
           start: `${moment(event.week === "sunday" ? end : start)
             .day(capitalize(event.week))
-            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
+            .format("YYYY-M-DD")} ${handleEventTime(event.start)}`,
           end: `${moment(event.week === "sunday" ? end : start)
             .day(capitalize(event.week))
-            .format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`,
+            .format("YYYY-M-DD")} ${handleEventTime(event.end)}`,
         }
       : {
-          start: `${moment(event.date).format("YYYY-M-DD")} ${handleScheduleEventTime(event.start)}`,
-          end: `${moment(event.date).format("YYYY-M-DD")} ${handleScheduleEventTime(event.end)}`,
+          start: `${moment(event.date).format("YYYY-M-DD")} ${handleEventTime(event.start)}`,
+          end: `${moment(event.date).format("YYYY-M-DD")} ${handleEventTime(event.end)}`,
         }),
   };
 };

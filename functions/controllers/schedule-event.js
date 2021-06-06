@@ -2,9 +2,9 @@ const rootRef = require("../firebase-admin").rootRef;
 
 async function getScheduleList() {
   try {
-    const scheduleEventsRef = rootRef.child("scheduleEvents");
+    const eventsRef = rootRef.child("scheduleEvents");
 
-    const fbVal = await scheduleEventsRef.once("value");
+    const fbVal = await eventsRef.once("value");
     const scheduleEvents = fbVal.val();
 
     const resultScheduleEvents = [];
@@ -14,7 +14,7 @@ async function getScheduleList() {
       for (let itemKey in item) {
         resultScheduleEvents.push({
           ...item[itemKey],
-          id: itemKey
+          id: itemKey,
         });
       }
     }
@@ -26,5 +26,5 @@ async function getScheduleList() {
 }
 
 module.exports = {
-  getScheduleList
+  getScheduleList,
 };

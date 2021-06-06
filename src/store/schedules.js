@@ -1,92 +1,72 @@
-import { scheduleEventsRef } from "../libs/db";
-import { setScheduleEventProps } from "../helpers/utils";
+import { getUserEvents, addUserEvents, updateUserEvents, removeUserEvent } from "../libs/db";
+import { setEventDates } from "../helpers/utils";
 
 export default {
   state: {
-    scheduleEvents: [],
+    events: [],
     startEndDates: {},
   },
   mutations: {
     setStartEndDates: (state, payload) => {
       state.startEndDates = payload;
-      state.scheduleEvents = state.scheduleEvents.map((event) => ({
-        ...setScheduleEventProps(event, payload),
+      state.events = state.events.map((event) => ({
+        ...setEventDates(event, payload),
       }));
     },
-    setScheduleEvents: (state, payload) => {
-      state.scheduleEvents = payload.map((event) => ({
-        ...setScheduleEventProps(event, state.startEndDates),
+    setEvents: (state, payload) => {
+      state.events = payload.map((event) => ({
+        ...setEventDates(event, state.startEndDates),
       }));
     },
-    addScheduleEvent: (state, payload) => {
-      const newScheduleEvent = {
-        ...setScheduleEventProps(payload, state.startEndDates),
-      };
+    addEvents: (state, payload) => {
+      const newEvent = payload.map((event) => ({
+        ...setEventDates(event, state.startEndDates),
+      }));
 
-      state.scheduleEvents = [...state.scheduleEvents, newScheduleEvent];
+      state.events = [...state.events, ...newEvent];
     },
-    editScheduleEvent: (state, payload) => {
-      const scheduleIndex = state.scheduleEvents.findIndex((s) => s.id === payload.id);
+    editEvent: (state, payload) => {
+      const eventIndex = state.events.findIndex((s) => s.id === payload.id);
 
-      state.scheduleEvents = [
-        ...state.scheduleEvents.slice(0, scheduleIndex),
+      state.events = [
+        ...state.events.slice(0, eventIndex),
         {
-          ...state.scheduleEvents[scheduleIndex],
-          ...setScheduleEventProps(payload, state.startEndDates),
+          ...state.events[eventIndex],
+          ...setEventDates(payload, state.startEndDates),
         },
-        ...state.scheduleEvents.slice(scheduleIndex + 1),
+        ...state.events.slice(eventIndex + 1),
       ];
     },
-    removeScheduleEvent: (state, scheduleId) => {
-      const scheduleIndex = state.scheduleEvents.findIndex((s) => s.id === scheduleId);
-      state.scheduleEvents = [
-        ...state.scheduleEvents.slice(0, scheduleIndex),
-        ...state.scheduleEvents.slice(scheduleIndex + 1),
-      ];
+    removeEvent: (state, eventId) => {
+      const eventIndex = state.events.findIndex((s) => s.id === eventId);
+      state.events = [...state.events.slice(0, eventIndex), ...state.events.slice(eventIndex + 1)];
     },
   },
   actions: {
-    async fetchSchedules({ commit, getters }) {
+    async getAllEvents({ commit, getters }) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const fbVal = await scheduleEventsRef.child(getters.user.uid).once("value");
-        const scheduleEvents = fbVal.val();
-
-        const resultScheduleEvents = [];
-        for (let key in scheduleEvents) {
-          resultScheduleEvents.push({
-            ...scheduleEvents[key],
-            id: key,
-          });
-        }
+        const resultEvents = await getUserEvents(getters.user.uid);
 
         commit("setLoading", false);
         commit("setDataIsLoaded", "schedules");
-        commit("setScheduleEvents", resultScheduleEvents);
+        commit("setEvents", resultEvents);
       } catch (error) {
         commit("setLoading", false);
         commit("setError", error.message);
         throw error;
       }
     },
-    async addScheduleEvents({ commit, getters }, scheduleEvents) {
+    async addEvents({ commit, getters }, events) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const newScheduleEvents = await Promise.all(
-          scheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.uid).push(scheduleEvent)),
-        );
+        const resultEvents = await addUserEvents(getters.user.uid, events);
 
-        scheduleEvents.forEach((scheduleEvent, index) => {
-          commit("addScheduleEvent", {
-            ...scheduleEvent,
-            id: newScheduleEvents[index].key,
-          });
-        });
-
+        commit("addEvents", resultEvents);
         commit("setLoading", false);
       } catch (error) {
         commit("setLoading", false);
@@ -94,39 +74,24 @@ export default {
         throw error;
       }
     },
-    async editScheduleEvents({ commit, getters }, scheduleEvents) {
+    async editEvents({ commit, getters }, events) {
       commit("clearError");
       commit("setLoading", true);
 
       try {
-        const newScheduleEvents = scheduleEvents.filter((e) => !e.id);
-        const oldScheduleEvents = scheduleEvents.filter((e) => e.id);
+        const newScheduleEvents = events.filter((e) => !e.id);
+        const oldScheduleEvents = events.filter((e) => e.id);
 
         if (newScheduleEvents.length) {
-          const newEventsResolvedEvents = await Promise.all(
-            newScheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.uid).push(scheduleEvent)),
-          );
-
-          newScheduleEvents.forEach((scheduleEvent, index) => {
-            commit("addScheduleEvent", {
-              ...scheduleEvent,
-              id: newEventsResolvedEvents[index].key,
-            });
-          });
+          const resultEvents = await addUserEvents(getters.user.uid, newScheduleEvents);
+          commit("addEvents", resultEvents);
         }
 
         if (oldScheduleEvents.length) {
-          await Promise.all(
-            oldScheduleEvents.map((scheduleEvent) =>
-              scheduleEventsRef
-                .child(getters.user.uid)
-                .child(scheduleEvent.id)
-                .update(scheduleEvent),
-            ),
-          );
+          await updateUserEvents(getters.user.uid, oldScheduleEvents);
 
-          oldScheduleEvents.forEach((scheduleEvent) => {
-            commit("editScheduleEvent", scheduleEvent);
+          oldScheduleEvents.forEach((event) => {
+            commit("editEvent", event);
           });
         }
 
@@ -137,16 +102,13 @@ export default {
         throw error;
       }
     },
-    async removeScheduleEvent({ commit, getters }, scheduleId) {
+    async removeEvent({ commit, getters }, eventId) {
       commit("clearError");
       commit("setLoading", true);
       try {
-        await scheduleEventsRef
-          .child(getters.user.uid)
-          .child(scheduleId)
-          .remove();
+        await removeUserEvent(getters.user.uid, eventId);
 
-        commit("removeScheduleEvent", scheduleId);
+        commit("removeEvent", eventId);
         commit("setLoading", false);
       } catch (error) {
         commit("setLoading", false);
@@ -156,7 +118,7 @@ export default {
     },
   },
   getters: {
-    scheduleEvents: (state) => state.scheduleEvents,
+    events: (state) => state.events,
     startEndDates: (start) => start.startEndDates,
   },
 };

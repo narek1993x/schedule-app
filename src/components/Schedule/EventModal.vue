@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :dark="dark" :fullscreen="isMobile" v-model="visible" max-width="800px">
+  <v-dialog :dark="dark" :fullscreen="isMobile" :value="visible" @click:outside="closeHandler" max-width="800px">
     <v-card>
       <v-card-title class="ModalTitle">
         <span class="headline"> {{ scheduleEvent ? "Edit" : "Create" }} event</span>
@@ -34,11 +34,11 @@
                     <ColorSelect :dark="dark" :defaultColor="color" :onSelect="colorSelectHandler"></ColorSelect>
                   </v-col>
                   <v-col cols="8" sm="4">
-                    <v-btn-toggle v-model="permanent" dense :dark="dark">
-                      <v-btn :value="false">
+                    <v-btn-toggle class="permanent-toggle" v-model="permanent" dense group :dark="dark">
+                      <v-btn :value="false" :disabled="isPermanentSet" small>
                         One time
                       </v-btn>
-                      <v-btn :value="true">
+                      <v-btn :value="true" :disabled="isPermanentSet" small>
                         Permanent
                       </v-btn>
                     </v-btn-toggle>
@@ -168,7 +168,7 @@
 <script>
 import ColorSelect from "../ColorSelect";
 import WeekSelect from "../WeekSelect";
-import { isMobile, handleScheduleEventTime } from "../../helpers/utils";
+import { isMobile, handleEventTime } from "../../helpers/utils";
 
 export default {
   components: {
@@ -182,8 +182,8 @@ export default {
 
       this.title = name;
       this.content = content;
-      this.startTime = handleScheduleEventTime(start);
-      this.endTime = handleScheduleEventTime(end);
+      this.startTime = handleEventTime(start);
+      this.endTime = handleEventTime(end);
       this.color = color || "blue";
 
       if (permanent) {
@@ -194,12 +194,10 @@ export default {
       }
     }
   },
-  watch: {
-    visible: function(newVisible) {
-      if (!newVisible) this.closeHandler();
-    },
-  },
   computed: {
+    isPermanentSet() {
+      return this.scheduleEvent?.permanent !== undefined;
+    },
     defaultSelectedWeekDays() {
       return this.selectedWeekDays.map((d) => d.week);
     },
@@ -224,7 +222,7 @@ export default {
       endTimerMenu: false,
       startTime: "",
       endTime: "",
-      color: "",
+      color: "blue",
       newSelectedWeekDays: instance.selectedWeekDays.map((d) => d.week),
       titleRules: [(v) => !!v || "Title is required"],
       dateRules: [(v) => !!v || "Date is required"],
@@ -290,7 +288,7 @@ export default {
           });
         }
 
-        const dispatchAction = !!this.scheduleEvent ? "editScheduleEvents" : "addScheduleEvents";
+        const dispatchAction = !!this.scheduleEvent ? "editEvents" : "addEvents";
         this.$store.dispatch(dispatchAction, scheduleEvents);
         this.closeHandler();
       }
@@ -300,6 +298,25 @@ export default {
 </script>
 
 <style lang="scss">
+%btnToggleColors {
+  background-color: #2196f3 !important;
+  color: #fff !important;
+}
+
+.permanent-toggle.theme {
+  &--light,
+  &--dark {
+    .v-btn {
+      &--active {
+        @extend %btnToggleColors;
+      }
+    }
+
+    .v-btn.v-btn--active.v-btn--disabled.v-btn--has-bg {
+      @extend %btnToggleColors;
+    }
+  }
+}
 @media (max-width: 767px) {
   .ModalTitle {
     & .headline {

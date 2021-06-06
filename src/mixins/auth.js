@@ -39,7 +39,7 @@ export const authMixin = {
     handleSignInCallback(isRedirect = true) {
       initializePushNotificationsService();
       this.$store.dispatch("fetchTodos");
-      this.$store.dispatch("fetchSchedules");
+      this.$store.dispatch("getAllEvents");
 
       if (isRedirect) {
         this.$router.push("/");
