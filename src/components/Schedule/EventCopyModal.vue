@@ -1,5 +1,5 @@
 <template>
-  <Modal :width="500" :dark="dark" :visible="showModal" :onClose="handleClose">
+  <Modal :width="500" :dark="dark" :visible="show" :onClose="handleClose">
     <v-card>
       <v-card-title class="headline">Duplicate Event</v-card-title>
       <v-card-text>
@@ -31,7 +31,7 @@ export default {
   components: {
     WeekSelect,
   },
-  props: ["dark", "showModal", "defaultSelected", "onClose", "onDuplicate"],
+  props: ["show", "dark", "loading", "defaultSelected", "onClose", "onDuplicate"],
   computed: {
     defaultDisabled() {
       return this.defaultSelected.map((d) => d.week);

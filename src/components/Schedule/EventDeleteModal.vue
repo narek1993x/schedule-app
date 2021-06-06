@@ -1,5 +1,5 @@
 <template>
-  <Modal v-if="showModal" :width="400" :dark="dark" :visible="showModal" :onClose="onClose">
+  <Modal :width="400" :dark="dark" :visible="show" :onClose="onClose">
     <v-card>
       <v-card-title class="headline">Delete Event</v-card-title>
       <v-card-text>
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  props: ["dark", "showModal", "loading", "onClose", "onDelete"],
+  props: ["show", "dark", "loading", "onClose", "onDelete"],
 };
 </script>
 

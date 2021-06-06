@@ -105,8 +105,9 @@
         </template>
       </v-calendar>
       <Event
-        :isMobile="isMobile"
+        v-if="selectedOpen"
         :show="selectedOpen"
+        :isMobile="isMobile"
         :event="selectedScheduleEvent"
         :eventActivator="selectedElement"
         :onClose="closeEvent"
@@ -116,16 +117,18 @@
         :onReminderToggle="handleReminderToggle"
       ></Event>
       <EventDeleteModal
+        v-if="showDeleteModal"
+        :show="showDeleteModal"
         :dark="dark"
         :loading="loading"
-        :showModal="showConfirmModal"
         :onClose="handleCloseDeleteModal"
         :onDelete="handleDeleteEvent"
       ></EventDeleteModal>
       <EventCopyModal
         v-if="showCopyModal"
+        :show="showCopyModal"
         :dark="dark"
-        :showModal="showCopyModal"
+        :loading="loading"
         :defaultSelected="selectedWeekDays"
         :onClose="handleCloseCopyModal"
         :onDuplicate="handleDuplicateEvent"
@@ -173,7 +176,7 @@ export default {
     shortMonths: false,
     shortWeekdays: false,
     showEventModal: false,
-    showConfirmModal: false,
+    showDeleteModal: false,
     showCopyModal: false,
     deleteScheduleEventId: null,
     scheduleEvent: null,
@@ -258,11 +261,11 @@ export default {
     },
     handleCloseDeleteModal() {
       this.deleteScheduleEventId = null;
-      this.showConfirmModal = false;
+      this.showDeleteModal = false;
     },
     handleOpenDeleteModal(eventId) {
-      this.showConfirmModal = true;
       this.deleteScheduleEventId = eventId;
+      this.showDeleteModal = true;
       this.closeEvent();
     },
     handleCloseEventModal() {
