@@ -1,11 +1,12 @@
-import firebase from "../firebase";
+import firebase from "../libs/firebase";
+import { createUser } from "../libs/db";
 import { User, FirebaseDeviceToken } from "../storage";
 import { removeTokenFromServer } from "../services/api-requests";
 
 function formatUser(user) {
   // const token = await user.getIdToken();
   return {
-    id: user.uid,
+    uid: user.uid,
     email: user.email,
     name: user.displayName,
     photoUrl: user.photoURL,
@@ -14,6 +15,8 @@ function formatUser(user) {
 
 function handleUser(rawUser) {
   const user = formatUser(rawUser);
+
+  createUser(user.uid, user);
   User.set(user);
 
   return user;
@@ -76,8 +79,8 @@ export default {
           .auth()
           .signOut()
           .then(() => {
-            const { id } = User.get();
-            removeTokenFromServer(id);
+            const { uid } = User.get();
+            removeTokenFromServer(uid);
 
             User.remove();
             FirebaseDeviceToken.remove();

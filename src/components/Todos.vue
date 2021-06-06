@@ -93,7 +93,7 @@ export default {
       const todo = {
         text: this.text,
         completed: false,
-        ...(this.user ? { ownerId: this.user.id } : {}),
+        ...(this.user ? { ownerId: this.user.uid } : {}),
       };
       this.$store[this.methodToggle]("addTodo", todo);
       this.text = "";

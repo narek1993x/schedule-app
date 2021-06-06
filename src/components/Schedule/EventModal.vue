@@ -265,7 +265,7 @@ export default {
           end: this.endTime,
           color: this.color,
           reminder: true,
-          ownerId: this.user.id,
+          ownerId: this.user.uid,
         };
 
         const scheduleEvents = [];

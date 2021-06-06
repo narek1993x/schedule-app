@@ -1,4 +1,4 @@
-import { firebaseApp, apps } from "./firebase";
+import { firebaseApp, apps } from "./libs/db";
 import { FirebaseDeviceToken, User } from "./storage";
 import { getDeviceInfo } from "./helpers/utils";
 import { sendTokenToServer } from "./services/api-requests";
@@ -35,7 +35,7 @@ export async function initializePushNotificationsService() {
 
       firebaseToken = await messaging.getToken();
       const response = await sendTokenToServer({
-        userId: user.id,
+        userId: user.uid,
         token: firebaseToken,
         deviceInfo: getDeviceInfo(),
       });
@@ -55,7 +55,7 @@ export async function initializePushNotificationsService() {
         const refreshedToken = await messaging.getToken();
 
         const response = await sendTokenToServer({
-          userId: user.id,
+          userId: user.uid,
           token: refreshedToken,
           deviceInfo: getDeviceInfo(),
           refresh: true,

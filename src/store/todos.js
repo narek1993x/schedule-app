@@ -1,4 +1,4 @@
-import { todosRef } from "../firebase";
+import { todosRef } from "../libs/db";
 
 export default {
   state: {
@@ -29,7 +29,7 @@ export default {
       commit("setLoading", true);
 
       try {
-        const fbVal = await todosRef.child(getters.user.id).once("value");
+        const fbVal = await todosRef.child(getters.user.uid).once("value");
         const todos = fbVal.val();
 
         const resultTodos = [];
@@ -54,7 +54,7 @@ export default {
       commit("setLoading", true);
 
       try {
-        const todo = await todosRef.child(getters.user.id).push(newTodo);
+        const todo = await todosRef.child(getters.user.uid).push(newTodo);
 
         commit("setLoading", false);
         commit("addTodo", {
@@ -73,7 +73,7 @@ export default {
 
       try {
         await todosRef
-          .child(getters.user.id)
+          .child(getters.user.uid)
           .child(id)
           .update({
             completed: !completed,
@@ -95,7 +95,7 @@ export default {
 
       try {
         await todosRef
-          .child(getters.user.id)
+          .child(getters.user.uid)
           .child(todoId)
           .remove();
 
@@ -109,8 +109,6 @@ export default {
     },
   },
   getters: {
-    todos: (state, getters) => {
-      return state.todos.filter((todo) => (getters.user ? !!todo.ownerId : !todo.ownerId));
-    },
+    todos: (state) => state.todos,
   },
 };

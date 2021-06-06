@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/database";
+import "firebase/firestore";
 import "firebase/auth";
 import "firebase/firebase-messaging";
 
@@ -14,12 +15,5 @@ if (!firebase.apps.length) {
     appId: process.env.VUE_APP_FIREBASE_APP_ID,
   });
 }
-
-export const apps = firebase.apps;
-export const firebaseApp = firebase.app("[DEFAULT]");
-
-const rootRef = firebase.database().ref();
-export const todosRef = rootRef.child("todos");
-export const scheduleEventsRef = rootRef.child("scheduleEvents");
 
 export default firebase;

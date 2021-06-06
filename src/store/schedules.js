@@ -1,4 +1,4 @@
-import { scheduleEventsRef } from "../firebase";
+import { scheduleEventsRef } from "../libs/db";
 import { setScheduleEventProps } from "../helpers/utils";
 
 export default {
@@ -51,7 +51,7 @@ export default {
       commit("setLoading", true);
 
       try {
-        const fbVal = await scheduleEventsRef.child(getters.user.id).once("value");
+        const fbVal = await scheduleEventsRef.child(getters.user.uid).once("value");
         const scheduleEvents = fbVal.val();
 
         const resultScheduleEvents = [];
@@ -77,7 +77,7 @@ export default {
 
       try {
         const newScheduleEvents = await Promise.all(
-          scheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.id).push(scheduleEvent)),
+          scheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.uid).push(scheduleEvent)),
         );
 
         scheduleEvents.forEach((scheduleEvent, index) => {
@@ -104,7 +104,7 @@ export default {
 
         if (newScheduleEvents.length) {
           const newEventsResolvedEvents = await Promise.all(
-            newScheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.id).push(scheduleEvent)),
+            newScheduleEvents.map((scheduleEvent) => scheduleEventsRef.child(getters.user.uid).push(scheduleEvent)),
           );
 
           newScheduleEvents.forEach((scheduleEvent, index) => {
@@ -119,7 +119,7 @@ export default {
           await Promise.all(
             oldScheduleEvents.map((scheduleEvent) =>
               scheduleEventsRef
-                .child(getters.user.id)
+                .child(getters.user.uid)
                 .child(scheduleEvent.id)
                 .update(scheduleEvent),
             ),
@@ -142,7 +142,7 @@ export default {
       commit("setLoading", true);
       try {
         await scheduleEventsRef
-          .child(getters.user.id)
+          .child(getters.user.uid)
           .child(scheduleId)
           .remove();
 
