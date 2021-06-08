@@ -3,7 +3,6 @@ export default {
     loading: false,
     error: null,
     loadedData: {
-      todos: false,
       schedules: false,
     },
   },

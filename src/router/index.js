@@ -1,41 +1,37 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Todos from "@/components/Todos";
 import Login from "@/components/Auth/Login";
 import Logout from "@/components/Auth/Logout";
 import Registration from "@/components/Auth/Registration";
-import AuthGuard from "./auth-guard";
+import Landing from "@/components/Landing";
+import { store } from "../store";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/todos",
-    name: "todos",
-    component: Todos,
+    path: "/",
+    name: "Landing",
+    component: Landing,
   },
   {
-    path: "/",
-    name: "schedule",
-    // route level code-splitting
-    // this generates a separate chunk (schedule.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "schedule" */ "../components/Schedule/Schedule"),
-    beforeEnter: AuthGuard,
+    path: "/schedule",
+    name: "Schedule",
+    component: () => import("../components/Schedule/Schedule"),
   },
   {
     path: "/login",
-    name: "login",
+    name: "Login",
     component: Login,
   },
   {
     path: "/logout",
-    name: "logout",
+    name: "Logout",
     component: Logout,
   },
   {
     path: "/registration",
-    name: "reg",
+    name: "Registration",
     component: Registration,
   },
   {
@@ -48,6 +44,18 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const isUserLoggedIn = store.getters.isUserLoggedIn;
+
+  if (to.name === "Schedule" && !isUserLoggedIn) {
+    next({ name: "Login" });
+  } else if (isUserLoggedIn && (to.name === "Login" || to.name === "Registration")) {
+    next({ name: "Landing" });
+  } else {
+    next();
+  }
 });
 
 export default router;

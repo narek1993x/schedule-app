@@ -4,7 +4,6 @@ export const apps = firebase.apps;
 export const firebaseApp = firebase.app("[DEFAULT]");
 
 const rootRef = firebase.database().ref();
-export const todosRef = rootRef.child("todos");
 const eventsRef = rootRef.child("scheduleEvents");
 
 const firestore = firebase.firestore();

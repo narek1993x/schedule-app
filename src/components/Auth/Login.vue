@@ -6,9 +6,7 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title>Login form</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn v-if="isShowForm" small outlined @click="handleShowForm">
-              <v-icon left> mdi-arrow-left </v-icon>Back
-            </v-btn>
+            <v-btn small outlined @click="handleBack"> <v-icon left> mdi-arrow-left </v-icon>Back </v-btn>
           </v-toolbar>
           <v-card-text v-if="isShowForm">
             <v-form @submit.prevent ref="form" id="login-form" v-model="valid" validation>
@@ -84,6 +82,13 @@ export default {
     };
   },
   methods: {
+    handleBack() {
+      if (this.isShowForm) {
+        this.handleShowForm();
+      } else {
+        this.$router.push("/");
+      }
+    },
     handleShowForm() {
       this.isShowForm = !this.isShowForm;
     },

@@ -6,11 +6,9 @@
           <v-toolbar dark color="primary">
             <v-toolbar-title>Registration form</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn v-if="isShowForm" small outlined @click="handleShowForm">
-              <v-icon left> mdi-arrow-left </v-icon>Back
-            </v-btn>
+            <v-btn small outlined to="/"> <v-icon left> mdi-arrow-left </v-icon>Back </v-btn>
           </v-toolbar>
-          <v-card-text v-if="isShowForm">
+          <v-card-text>
             <v-form @submit.prevent ref="form" id="registration-form" v-model="valid" validation>
               <v-text-field
                 prepend-icon="mdi-account"
@@ -40,7 +38,7 @@
               ></v-text-field>
             </v-form>
           </v-card-text>
-          <v-card-actions v-if="isShowForm">
+          <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
               class="mr-2"
@@ -54,13 +52,6 @@
               Sign up
             </v-btn>
           </v-card-actions>
-          <auth-actions
-            v-else
-            :loading="loading"
-            :onEmail="handleShowForm"
-            :onGithub="signInWithGitHub"
-            :onGoogle="signInWithGoogle"
-          ></auth-actions>
         </v-card>
       </v-flex>
     </v-layout>
@@ -69,11 +60,9 @@
 
 <script>
 import { authMixin } from "../../mixins/auth";
-import AuthActions from "./AuthActions";
 
 export default {
   mixins: [authMixin],
-  components: { "auth-actions": AuthActions },
   computed: {
     loading() {
       return this.$store.getters.loading;
@@ -81,7 +70,6 @@ export default {
   },
   data() {
     return {
-      isShowForm: false,
       valid: false,
       email: "",
       password: "",
@@ -98,9 +86,6 @@ export default {
     };
   },
   methods: {
-    handleShowForm() {
-      this.isShowForm = !this.isShowForm;
-    },
     onSubmit() {
       if (this.$refs.form.validate()) {
         this.signInWithEmailPassword(

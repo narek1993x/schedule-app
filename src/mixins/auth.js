@@ -16,8 +16,8 @@ export const authMixin = {
       return this.$store.getters.isUserLoggedIn;
     },
     isDataLoaded() {
-      const { todos, schedules } = this.$store.getters.loadedData;
-      return todos && schedules;
+      const { schedules } = this.$store.getters.loadedData;
+      return schedules;
     },
   },
   methods: {
@@ -42,7 +42,7 @@ export const authMixin = {
       this.$store.dispatch("getAllEvents");
 
       if (isRedirect) {
-        this.$router.push("/");
+        this.$router.push("/schedule");
       }
     },
   },

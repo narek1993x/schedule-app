@@ -65,16 +65,11 @@ export default {
           {
             title: "Schedule",
             icon: "mdi-calendar-outline",
-            url: "/",
+            url: "/schedule",
           },
-          { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
         ];
       }
-      return [
-        { title: "Todos", icon: "mdi-format-list-checks", url: "/todos" },
-        { title: "Login", icon: "mdi-lock", url: "/login" },
-        { title: "Registration", icon: "mdi-face", url: "/registration" },
-      ];
+      return [];
     },
   },
   data() {
@@ -97,6 +92,10 @@ html {
 
 .pointer {
   cursor: pointer;
+}
+
+.break-word {
+  word-break: break-word;
 }
 
 .v-tooltip {
