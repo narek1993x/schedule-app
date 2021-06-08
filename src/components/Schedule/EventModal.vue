@@ -269,8 +269,6 @@ export default {
         const scheduleEvents = [];
 
         if (this.permanent) {
-          const selectedWeekDay = this.week;
-
           this.newSelectedWeekDays.forEach((weekDay) => {
             const weekData = this.selectedWeekDays.find((d) => d.week === weekDay);
             scheduleEvents.push({
