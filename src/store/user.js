@@ -25,6 +25,7 @@ function handleUser(rawUser) {
 export default {
   state: {
     user: User.get(),
+    userUnsubscribeCb: null,
   },
   mutations: {
     setUser(state, payload) {
@@ -32,6 +33,9 @@ export default {
     },
     removeUser(state) {
       state.user = null;
+    },
+    setUserUnsubscribeCb(state, payload) {
+      state.userUnsubscribeCb = payload;
     },
   },
   actions: {
@@ -66,27 +70,30 @@ export default {
       }
     },
     retrieveUser({ commit }) {
-      return firebase.auth().onIdTokenChanged((rawUser) => {
+      const userUnsubscribeCb = firebase.auth().onIdTokenChanged((rawUser) => {
         if (!rawUser) return;
 
         const retrievedUser = handleUser(rawUser);
         commit("setUser", retrievedUser);
       });
-    },
-    async signOut({ commit }) {
-      try {
-        await firebase
-          .auth()
-          .signOut()
-          .then(() => {
-            const { uid } = User.get();
-            removeTokenFromServer(uid);
 
-            User.remove();
-            FirebaseDeviceToken.remove();
-            commit("removeUser");
-          });
+      commit("setUserUnsubscribeCb", userUnsubscribeCb);
+    },
+    async signOut({ commit, getters: { userUnsubscribeCb } }) {
+      commit("setLoading", true);
+      try {
+        const { uid } = User.get();
+
+        userUnsubscribeCb && userUnsubscribeCb();
+        removeTokenFromServer(uid);
+        await firebase.auth().signOut();
+
+        User.remove();
+        FirebaseDeviceToken.remove();
+        commit("removeUser");
+        commit("setLoading", false);
       } catch (error) {
+        commit("setLoading", false);
         commit("setError", err.message);
         throw err;
       }
@@ -98,6 +105,12 @@ export default {
     },
     isUserLoggedIn(state) {
       return state.user !== null;
+    },
+    isRetrieveCalled(state) {
+      return !!state.userUnsubscribeCb;
+    },
+    userUnsubscribeCb(state) {
+      return state.userUnsubscribeCb;
     },
   },
 };

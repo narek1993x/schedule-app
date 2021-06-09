@@ -15,6 +15,9 @@ export const authMixin = {
     isUserLoggedIn() {
       return this.$store.getters.isUserLoggedIn;
     },
+    isRetrieveCalled() {
+      return this.$store.getters.isRetrieveCalled;
+    },
     isDataLoaded() {
       const { schedules } = this.$store.getters.loadedData;
       return schedules;
@@ -36,24 +39,20 @@ export const authMixin = {
         this.$router.push("/");
       });
     },
-    handleSignInCallback(isRedirect = true) {
+    handleSignInCallback() {
       initializePushNotificationsService();
-      this.$store.dispatch("fetchTodos");
       this.$store.dispatch("getAllEvents");
-
-      if (isRedirect) {
-        this.$router.push("/schedule");
-      }
+      this.$router.push("/schedule");
     },
   },
-  beforeCreate() {
-    if (!this.isUserLoggedIn) {
+  created() {
+    if (!this.isRetrieveCalled) {
       this.$store.dispatch("retrieveUser");
     }
   },
-  created() {
+  updated() {
     if (this.isUserLoggedIn && !this.isDataLoaded) {
-      this.handleSignInCallback(false);
+      this.handleSignInCallback();
     }
   },
 };
