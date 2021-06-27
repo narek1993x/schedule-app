@@ -20,6 +20,11 @@ const routes = [
     component: () => import("../components/Schedule/Schedule"),
   },
   {
+    path: "/habits",
+    name: "Habits",
+    component: () => import("../components/Habits/Habits"),
+  },
+  {
     path: "/login",
     name: "Login",
     component: Login,

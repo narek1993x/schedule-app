@@ -19,8 +19,11 @@ export const authMixin = {
       return this.$store.getters.isRetrieveCalled;
     },
     isDataLoaded() {
-      const { schedules } = this.$store.getters.loadedData;
-      return schedules;
+      const { schedules, habits } = this.$store.getters.loadedData;
+      return schedules && habits;
+    },
+    loading() {
+      return this.$store.getters.loading;
     },
   },
   methods: {
@@ -42,7 +45,15 @@ export const authMixin = {
     handleSignInCallback() {
       initializePushNotificationsService();
       this.$store.dispatch("getAllEvents");
-      this.$router.push("/schedule");
+      this.$store.dispatch("getAllHabits");
+
+      const schedulePath = "/schedule";
+      const habitsPath = "/habits";
+      const currentPath = this.$router.history.current.path;
+
+      if (currentPath !== schedulePath && currentPath !== habitsPath) {
+        this.$router.push(schedulePath);
+      }
     },
   },
   created() {
@@ -51,7 +62,7 @@ export const authMixin = {
     }
   },
   updated() {
-    if (this.isUserLoggedIn && !this.isDataLoaded) {
+    if (this.isUserLoggedIn && !this.isDataLoaded && !this.loading) {
       this.handleSignInCallback();
     }
   },

@@ -5,6 +5,7 @@ export const firebaseApp = firebase.app("[DEFAULT]");
 
 const rootRef = firebase.database().ref();
 const eventsRef = rootRef.child("scheduleEvents");
+const habitsRef = rootRef.child("habits");
 
 const firestore = firebase.firestore();
 
@@ -75,6 +76,39 @@ export async function removeUserEvent(uid, eventId) {
       .child(uid)
       .child(eventId)
       .remove();
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getUserHabits(uid) {
+  try {
+    const fbVal = await habitsRef.child(uid).once("value");
+    const events = fbVal.val();
+
+    const resultEvents = [];
+
+    for (let key in events) {
+      resultEvents.push({
+        ...events[key],
+        id: key,
+      });
+    }
+
+    return resultEvents;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function addUserHabit(uid, habit) {
+  try {
+    const newHabit = await habitsRef.child(uid).push(habit);
+
+    return {
+      ...habit,
+      id: newHabit.key,
+    };
   } catch (error) {
     throw error;
   }
