@@ -16,9 +16,9 @@
         :onClose="handleCloseHabitModal"
       />
       <DeleteModal
+        dark
         v-if="showDeleteModal"
         type="habit"
-        dark
         :show="showDeleteModal"
         :loading="loading"
         :onClose="handleCloseDeleteModal"
@@ -26,8 +26,9 @@
       />
       <div class="Habits">
         <Habit
-          v-for="habit in allHabits"
+          v-for="(habit, index) in allHabits"
           :key="habit.id"
+          :index="index + 1"
           :habit="habit"
           :onOpenHabitModal="handleOpenHabitModal"
           :onOpenDeleteModal="handleOpenDeleteModal"
@@ -95,10 +96,12 @@ export default {
 }
 
 .Habits {
+  margin: 0 auto;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 900px;
   height: calc(100vh - 118px);
   padding: 18px;
-  justify-content: center;
-  align-items: flex-start;
 }
 </style>

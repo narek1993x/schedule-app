@@ -3,6 +3,7 @@
     :class="{
       Habit: true,
       [`border-color-${borderColor}`]: true,
+      [`flex-${index % 2 === 0 ? 'start' : 'end'}`]: true,
     }"
   >
     <v-card>
@@ -33,7 +34,7 @@
 
 <script>
 export default {
-  props: ["habit", "onOpenHabitModal", "onOpenDeleteModal"],
+  props: ["habit", "index", "onOpenHabitModal", "onOpenDeleteModal"],
   computed: {
     borderColor() {
       const { types } = this.habit;
@@ -50,9 +51,22 @@ export default {
 
 <style lang="scss">
 .Habit {
-  position: relative;
   border-radius: 6px;
-  flex: 0 1 300px;
+  max-width: 300px;
+  width: 100%;
+  margin-bottom: 32px;
+
+  // &:first-child {
+  //   align-self: center !important;
+  // }
+
+  // &.flex-start {
+  //   align-self: flex-start;
+  // }
+
+  // &.flex-end {
+  //   align-self: flex-end;
+  // }
 
   &.border-color {
     &-que {
