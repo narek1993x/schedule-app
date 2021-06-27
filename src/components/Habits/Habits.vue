@@ -26,9 +26,8 @@
       />
       <div class="Habits">
         <Habit
-          v-for="(habit, index) in allHabits"
+          v-for="habit in allHabits"
           :key="habit.id"
-          :index="index + 1"
           :habit="habit"
           :onOpenHabitModal="handleOpenHabitModal"
           :onOpenDeleteModal="handleOpenDeleteModal"
@@ -96,12 +95,15 @@ export default {
 }
 
 .Habits {
-  margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 900px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: space-between;
+  width: 668px;
   height: calc(100vh - 118px);
+  overflow-y: auto;
+  margin: 0 auto;
   padding: 18px;
+  box-sizing: border-box;
 }
 </style>
