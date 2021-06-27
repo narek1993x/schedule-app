@@ -9,25 +9,44 @@
     <v-sheet>
       <HabitModal
         dark
-        :currentHabit="null"
+        v-if="showHabitsModal"
+        :currentHabit="currentHabit"
         :allHabits="allHabits"
         :visible="showHabitsModal"
         :onClose="handleCloseHabitModal"
       />
-      <ul id="example-1">
-        <li v-for="habit in allHabits" :key="habit.id">
-          {{ habit.title }}
-        </li>
-      </ul>
+      <DeleteModal
+        v-if="showDeleteModal"
+        type="habit"
+        dark
+        :show="showDeleteModal"
+        :loading="loading"
+        :onClose="handleCloseDeleteModal"
+        :onDelete="handleDeleteHabit"
+      />
+      <div class="Habits">
+        <Habit
+          v-for="habit in allHabits"
+          :key="habit.id"
+          :habit="habit"
+          :onOpenHabitModal="handleOpenHabitModal"
+          :onOpenDeleteModal="handleOpenDeleteModal"
+        />
+      </div>
     </v-sheet>
   </v-container>
 </template>
 
 <script>
+import Habit from "./Habit.vue";
 import HabitModal from "./HabitModal.vue";
+import DeleteModal from "../DeleteModal.vue";
+
 export default {
   components: {
+    Habit,
     HabitModal,
+    DeleteModal,
   },
   computed: {
     loading() {
@@ -40,11 +59,31 @@ export default {
   data() {
     return {
       showHabitsModal: false,
+      showDeleteModal: false,
+      deleteHabitId: null,
+      currentHabit: null,
     };
   },
   methods: {
     handleCloseHabitModal() {
       this.showHabitsModal = false;
+      this.currentHabit = null;
+    },
+    handleOpenHabitModal(habit) {
+      this.showHabitsModal = true;
+      this.currentHabit = habit;
+    },
+    handleCloseDeleteModal() {
+      this.showDeleteModal = false;
+      this.deleteHabitId = null;
+    },
+    handleOpenDeleteModal(habitId) {
+      this.showDeleteModal = true;
+      this.deleteHabitId = habitId;
+    },
+    handleDeleteHabit() {
+      this.$store.dispatch("removeHabit", this.deleteHabitId);
+      this.handleCloseDeleteModal();
     },
   },
 };
@@ -53,5 +92,13 @@ export default {
 <style lang="scss">
 .Container {
   padding: 0px !important;
+}
+
+.Habits {
+  display: flex;
+  height: calc(100vh - 118px);
+  padding: 18px;
+  justify-content: center;
+  align-items: flex-start;
 }
 </style>

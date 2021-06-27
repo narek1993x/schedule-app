@@ -113,3 +113,25 @@ export async function addUserHabit(uid, habit) {
     throw error;
   }
 }
+
+export async function updateUserHabit(uid, habit) {
+  try {
+    await habitsRef
+      .child(uid)
+      .child(habit.id)
+      .update(habit);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function removeUserHabit(uid, habitId) {
+  try {
+    await habitsRef
+      .child(uid)
+      .child(habitId)
+      .remove();
+  } catch (error) {
+    throw error;
+  }
+}

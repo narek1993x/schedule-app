@@ -12,7 +12,7 @@
                 <v-text-field
                   v-model="title"
                   label="Title*"
-                  hint="title of event"
+                  hint="title of habit"
                   :rules="titleRules"
                   required
                 ></v-text-field>
@@ -145,7 +145,17 @@ function isCanCombine(values, types) {
 
 export default {
   props: ["visible", "dark", "currentHabit", "allHabits", "onClose"],
-  beforeMount() {},
+  beforeMount() {
+    if (this.currentHabit) {
+      const { title, types, showAfter, start, end } = this.currentHabit;
+
+      this.title = title;
+      this.types = types;
+      this.showAfter = showAfter;
+      this.startTime = start;
+      this.endTime = end;
+    }
+  },
   computed: {
     loading() {
       return this.$store.getters.loading;
@@ -208,9 +218,11 @@ export default {
           showAfter: this.showAfter,
           start: this.startTime,
           end: this.endTime,
+          ...(this.currentHabit && { id: this.currentHabit.id }),
         };
 
-        this.$store.dispatch("addHabit", habit);
+        const dispatchAction = habit.id ? "editHabit" : "addHabit";
+        this.$store.dispatch(dispatchAction, habit);
         this.closeHandler();
       }
     },
