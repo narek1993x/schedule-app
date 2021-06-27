@@ -1,7 +1,7 @@
 <template>
   <Modal :width="400" :dark="dark" :visible="show" :onClose="onClose">
     <v-card>
-      <v-card-title class="headline">Delete {{ type }}</v-card-title>
+      <v-card-title class="headline">Delete {{ capitalizedType }}</v-card-title>
       <v-card-text> Are you sure you want to permanently delete this {{ type }}? </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -17,8 +17,15 @@
 </template>
 
 <script>
+import { capitalize } from "../helpers/utils";
+
 export default {
   props: ["show", "type", "dark", "loading", "onClose", "onDelete"],
+  computed: {
+    capitalizedType() {
+      return capitalize(this.type);
+    },
+  },
 };
 </script>
 
