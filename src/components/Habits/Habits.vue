@@ -23,7 +23,7 @@
         :onClose="handleCloseDeleteModal"
         :onDelete="handleDeleteHabit"
       />
-      <div class="Habits">
+      <div class="Habits" v-if="sortedHabits.length > 0">
         <Habit
           v-for="(habit, index) in sortedHabits"
           :key="habit.id"
@@ -32,6 +32,9 @@
           :onOpenHabitModal="handleOpenHabitModal"
           :onOpenDeleteModal="handleOpenDeleteModal"
         />
+      </div>
+      <div v-else class="Habits Habits--empty-state mt-10 justify-center align-content-center">
+        <div class="subtitle-1 text-center">Habits list are emtpy please add one with + button!</div>
       </div>
     </v-sheet>
   </v-container>
@@ -109,6 +112,18 @@ export default {
   margin: 0 auto;
   padding: 18px;
   box-sizing: border-box;
+
+  &--empty-state {
+    height: 300px;
+    border: 1px solid #9e9e9e;
+    border-radius: 6px;
+  }
+
+  @media screen and (max-width: 768px) {
+    &--empty-state {
+      margin: 0 20px;
+    }
+  }
 
   @media screen and (max-width: 380px) {
     flex-direction: column;
