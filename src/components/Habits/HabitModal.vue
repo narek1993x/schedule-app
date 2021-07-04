@@ -31,13 +31,7 @@
               </v-col>
 
               <v-col cols="12">
-                <v-select
-                  clearable
-                  v-model="showAfter"
-                  :items="allHabitItems"
-                  :rules="showAfterRules"
-                  label="Show after"
-                ></v-select>
+                <v-select v-model="order" :items="allHabitItems" label="Show after"></v-select>
               </v-col>
 
               <v-col cols="12">
@@ -140,18 +134,18 @@ function isCanCombine(values, types) {
   const isQueReward = values.includes(que) && values.includes(reward) && values.length === 2;
   const isRoutineOnly = values.includes(routine) && values.length === 1;
 
-  return isQueReward || isRoutineOnly || values.length > 0;
+  return isQueReward || isRoutineOnly || values.length === 1;
 }
 
 export default {
-  props: ["visible", "dark", "currentHabit", "allHabits", "onClose"],
+  props: ["visible", "dark", "currentHabit", "onClose"],
   beforeMount() {
     if (this.currentHabit) {
-      const { title, types, showAfter, start, end } = this.currentHabit;
+      const { title, types, order, start, end } = this.currentHabit;
 
       this.title = title;
       this.types = types;
-      this.showAfter = showAfter;
+      this.order = order;
       this.startTime = start;
       this.endTime = end;
     }
@@ -161,7 +155,11 @@ export default {
       return this.$store.getters.loading;
     },
     allHabitItems() {
-      return this.allHabits.map((h) => ({ text: h.title, value: h.id }));
+      const habits = [...this.$store.getters.allHabits];
+
+      return habits
+        .filter((h) => !this.currentHabit || h.id !== this.currentHabit.id)
+        .map((h) => ({ text: h.title, value: h.order + 1 }));
     },
   },
   data: (instance) => {
@@ -170,7 +168,7 @@ export default {
       valid: true,
       title: "",
       types: [],
-      showAfter: "",
+      order: 0,
       startTimerMenu: false,
       endTimerMenu: false,
       startTime: "",
@@ -192,7 +190,6 @@ export default {
           return !!v.length || "Type(s) are required";
         },
       ],
-      showAfterRules: [(v) => v === "" || !!v || "Show after must be either '' or habit"],
       startTimeRules: [(v) => !!v || "Start time is required"],
       endTimeRules: [(v) => !!v || "End time is required"],
     };
@@ -202,7 +199,7 @@ export default {
       this.$refs.form.reset();
       this.title = "";
       this.types = [];
-      this.showAfter = "";
+      this.order = 0;
       this.startTime = "";
       this.endTime = "";
     },
@@ -215,7 +212,7 @@ export default {
         const habit = {
           title: this.title,
           types: this.types,
-          showAfter: this.showAfter,
+          order: this.order,
           start: this.startTime,
           end: this.endTime,
           ...(this.currentHabit && { id: this.currentHabit.id }),

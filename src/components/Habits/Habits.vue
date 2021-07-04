@@ -11,7 +11,6 @@
         dark
         v-if="showHabitsModal"
         :currentHabit="currentHabit"
-        :allHabits="allHabits"
         :visible="showHabitsModal"
         :onClose="handleCloseHabitModal"
       />
@@ -26,7 +25,7 @@
       />
       <div class="Habits">
         <Habit
-          v-for="(habit, index) in allHabits"
+          v-for="(habit, index) in sortedHabits"
           :key="habit.id"
           :habit="habit"
           :index="index + 1"
@@ -53,8 +52,9 @@ export default {
     loading() {
       return this.$store.getters.loading;
     },
-    allHabits() {
-      return this.$store.getters.allHabits;
+    sortedHabits() {
+      const habits = [...this.$store.getters.allHabits];
+      return habits.sort((a, b) => a.order - b.order);
     },
   },
   data() {
