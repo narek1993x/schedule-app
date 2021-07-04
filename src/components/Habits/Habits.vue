@@ -44,11 +44,9 @@
         v-else-if="isHabitsLoaded && sortedHabits.length === 0"
         outlined
         elevation="12"
-        class="EmptyList d-flex flex-column align-center justify-center pa-4"
+        class="EmptyList d-flex justify-center pa-4"
       >
-        <v-card-title class="break-word subtitle-2 text-center"
-          >Habit list is emtpy please add with + button!</v-card-title
-        >
+        <v-card-title class="break-word text-center">Habit list is emtpy please add one with + button!</v-card-title>
       </v-card>
     </v-sheet>
   </v-container>
