@@ -10,7 +10,7 @@
     <v-card-title>
       <span class="headline"> {{ habit.title }}</span>
       <v-spacer></v-spacer>
-      <span class="caption"> {{ " " + habit.start + " - " + habit.end }}</span>
+      <span class="caption"> {{ habit.start + " - " + habit.end }}</span>
     </v-card-title>
     <v-card-actions>
       <v-spacer></v-spacer>
