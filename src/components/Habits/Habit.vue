@@ -65,7 +65,7 @@ export default {
     margin-left: 191px;
     margin-right: 191px;
 
-    &::after {
+    &:not(:last-child)::after {
       @extend %arrow;
       bottom: -45px;
       left: calc(50% - 31px);
@@ -73,21 +73,17 @@ export default {
     }
   }
 
-  &.isEven:not(:last-child) {
-    &::after {
-      @extend %arrow;
-      top: calc(50% - 21px);
-      right: -49px;
-    }
+  &.isEven:not(:last-child)::after {
+    @extend %arrow;
+    top: calc(50% - 21px);
+    right: -49px;
   }
 
-  &.isOdd:not(:first-child):not(:last-child) {
-    &::after {
-      @extend %arrow;
-      bottom: -42px;
-      left: -42px;
-      transform: rotate(140deg);
-    }
+  &.isOdd:not(:first-child):not(:last-child)::after {
+    @extend %arrow;
+    bottom: -42px;
+    left: -42px;
+    transform: rotate(140deg);
   }
 
   &.border-color {
@@ -136,7 +132,7 @@ export default {
       margin-right: 0;
     }
 
-    &:first-child,
+    &:first-child:not(:last-child),
     &.isEven:not(:last-child),
     &.isOdd:not(:first-child):not(:last-child) {
       &::after {
