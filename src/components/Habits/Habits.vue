@@ -1,5 +1,11 @@
 <template>
-  <v-container fluid class="Container">
+  <v-container
+    fluid
+    :class="{
+      Container: true,
+      ['empty-state']: sortedHabits.length === 0,
+    }"
+  >
     <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
       <v-btn class="ml-3 mr-6" icon @click.stop="showHabitsModal = true">
         <v-icon size="42">mdi-plus-circle-outline</v-icon>
@@ -33,9 +39,17 @@
           :onOpenDeleteModal="handleOpenDeleteModal"
         />
       </div>
-      <div v-else class="Habits Habits--empty-state mt-10 justify-center align-content-center">
-        <div class="subtitle-1 text-center">Habits list are emtpy please add one with + button!</div>
-      </div>
+
+      <v-card
+        v-else-if="isHabitsLoaded && sortedHabits.length === 0"
+        outlined
+        elevation="12"
+        class="EmptyList d-flex flex-column align-center justify-center pa-4"
+      >
+        <v-card-title class="break-word subtitle-2 text-center"
+          >Habit list is emtpy please add with + button!</v-card-title
+        >
+      </v-card>
     </v-sheet>
   </v-container>
 </template>
@@ -54,6 +68,9 @@ export default {
   computed: {
     loading() {
       return this.$store.getters.loading;
+    },
+    isHabitsLoaded() {
+      return this.$store.getters.loadedData.habits;
     },
     sortedHabits() {
       const habits = [...this.$store.getters.allHabits];
@@ -101,6 +118,16 @@ export default {
     height: calc(100vh - 118px);
     overflow-y: auto;
   }
+
+  &.empty-state &__body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .EmptyList {
+      height: 200px;
+    }
+  }
 }
 
 .Habits {
@@ -112,12 +139,6 @@ export default {
   margin: 0 auto;
   padding: 18px;
   box-sizing: border-box;
-
-  &--empty-state {
-    height: 300px;
-    border: 1px solid #9e9e9e;
-    border-radius: 6px;
-  }
 
   @media screen and (max-width: 768px) {
     &--empty-state {
