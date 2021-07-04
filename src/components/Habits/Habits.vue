@@ -6,7 +6,7 @@
       </v-btn>
     </v-sheet>
     <Loading :loading="loading"></Loading>
-    <v-sheet>
+    <v-sheet class="Container__body">
       <HabitModal
         dark
         v-if="showHabitsModal"
@@ -26,9 +26,10 @@
       />
       <div class="Habits">
         <Habit
-          v-for="habit in allHabits"
+          v-for="(habit, index) in allHabits"
           :key="habit.id"
           :habit="habit"
+          :index="index + 1"
           :onOpenHabitModal="handleOpenHabitModal"
           :onOpenDeleteModal="handleOpenDeleteModal"
         />
@@ -92,6 +93,11 @@ export default {
 <style lang="scss">
 .Container {
   padding: 0px !important;
+
+  &__body {
+    height: calc(100vh - 118px);
+    overflow-y: auto;
+  }
 }
 
 .Habits {
@@ -99,11 +105,14 @@ export default {
   flex-wrap: wrap;
   align-content: flex-start;
   justify-content: space-between;
-  width: 668px;
-  height: calc(100vh - 118px);
-  overflow-y: auto;
+  max-width: 668px;
   margin: 0 auto;
   padding: 18px;
   box-sizing: border-box;
+
+  @media screen and (max-width: 380px) {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
 }
 </style>
