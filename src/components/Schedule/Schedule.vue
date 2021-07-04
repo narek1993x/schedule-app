@@ -116,14 +116,15 @@
         :onOpenCopyModal="handleOpenCopyModal"
         :onReminderToggle="handleReminderToggle"
       ></Event>
-      <EventDeleteModal
+      <DeleteModal
         v-if="showDeleteModal"
+        type="event"
         :show="showDeleteModal"
         :dark="dark"
         :loading="loading"
         :onClose="handleCloseDeleteModal"
         :onDelete="handleDeleteEvent"
-      ></EventDeleteModal>
+      ></DeleteModal>
       <EventCopyModal
         v-if="showCopyModal"
         :show="showCopyModal"
@@ -141,7 +142,7 @@
 import moment from "moment";
 import Event from "./Event.vue";
 import EventModal from "./EventModal.vue";
-import EventDeleteModal from "./EventDeleteModal.vue";
+import DeleteModal from "../DeleteModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
 import { isMobile, getWeekDayFromDate, handleEventTime } from "../../helpers/utils";
@@ -153,7 +154,7 @@ export default {
   components: {
     Event,
     EventModal,
-    EventDeleteModal,
+    DeleteModal,
     EventCopyModal,
     ScheduleSettings,
   },

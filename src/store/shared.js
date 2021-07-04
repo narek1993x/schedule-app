@@ -4,6 +4,7 @@ export default {
     error: null,
     loadedData: {
       schedules: false,
+      habits: false,
     },
   },
   mutations: {

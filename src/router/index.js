@@ -20,6 +20,11 @@ const routes = [
     component: () => import("../components/Schedule/Schedule"),
   },
   {
+    path: "/habits",
+    name: "Habits",
+    component: () => import("../components/Habits/Habits"),
+  },
+  {
     path: "/login",
     name: "Login",
     component: Login,
@@ -49,7 +54,9 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const isUserLoggedIn = store.getters.isUserLoggedIn;
 
-  if (to.name === "Schedule" && !isUserLoggedIn) {
+  const protectedRoutes = ["Schedule", "Habits"];
+
+  if (protectedRoutes.includes(to.name) && !isUserLoggedIn) {
     next({ name: "Login" });
   } else if (isUserLoggedIn && (to.name === "Login" || to.name === "Registration")) {
     next({ name: "Landing" });

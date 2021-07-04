@@ -67,6 +67,11 @@ export default {
             icon: "mdi-calendar-outline",
             url: "/schedule",
           },
+          {
+            title: "Habits",
+            icon: "mdi-domain",
+            url: "/habits",
+          },
         ];
       }
       return [];
