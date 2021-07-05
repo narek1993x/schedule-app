@@ -2,14 +2,25 @@
   <v-container fill-height>
     <v-layout align-center justify-center>
       <v-flex xs12 sm8 md4>
-        <v-card outlined elevation="12" class="d-flex flex-column align-center justify-center pa-4">
+        <v-card
+          outlined
+          elevation="12"
+          style="height: 200px"
+          class="d-flex flex-column align-center justify-center pa-4"
+        >
           <template v-if="isUserLoggedIn">
-            <v-card-title class="break-word">Please continue your work on schedule page!</v-card-title>
+            <v-card-title class="break-word subtitle-1">Please continue your work on `</v-card-title>
             <v-card-actions class="d-flex flex-wrap">
-              <v-btn to="/schedule" outlined color="primary" large>
+              <v-btn to="/schedule" outlined color="primary">
                 <v-icon left medium>mdi-calendar-outline</v-icon>
                 Schedule
               </v-btn>
+              <span class="ml-2 mr-2 subtitle-1">or</span>
+              <v-btn to="/habits" outlined color="primary">
+                <v-icon left medium>mdi-domain</v-icon>
+                Habits
+              </v-btn>
+              <span class="ml-2 subtitle-1">page!</span>
             </v-card-actions>
           </template>
           <template v-else>

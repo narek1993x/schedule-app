@@ -44,9 +44,14 @@
         v-else-if="isHabitsLoaded && sortedHabits.length === 0"
         outlined
         elevation="12"
-        class="EmptyList d-flex justify-center pa-4"
+        class="EmptyList d-flex flex-column align-center justify-center pa-4"
       >
-        <v-card-title class="break-word text-center">Habit list is emtpy please add one with + button!</v-card-title>
+        <v-card-title class="break-word subtitle-1 text-center">Habit list is emtpy!</v-card-title>
+        <v-card-actions>
+          <v-btn outlined color="primary" @click.stop="showHabitsModal = true">
+            Create habit
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-sheet>
   </v-container>
@@ -124,6 +129,12 @@ export default {
 
     .EmptyList {
       height: 200px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    @media screen and (max-width: 768px) {
+      margin: 0 18px;
     }
   }
 }
@@ -137,16 +148,5 @@ export default {
   margin: 0 auto;
   padding: 18px;
   box-sizing: border-box;
-
-  @media screen and (max-width: 768px) {
-    &--empty-state {
-      margin: 0 20px;
-    }
-  }
-
-  @media screen and (max-width: 380px) {
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
 }
 </style>
