@@ -44,7 +44,7 @@ export default {
       const { types } = this.habit;
 
       if (types.length === 2) {
-        return "reward-que";
+        return "reward-cue";
       }
 
       return types[0];
@@ -78,7 +78,7 @@ export default {
   }
 
   &.border-color {
-    &-que {
+    &-cue {
       background: #4caf50;
     }
 
@@ -90,7 +90,7 @@ export default {
       background: #ff9800;
     }
 
-    &-reward-que {
+    &-reward-cue {
       background: linear-gradient(to right, #ff9800 50%, #4caf50 50%);
     }
   }

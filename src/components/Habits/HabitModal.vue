@@ -127,14 +127,14 @@
 import { isMobile } from "../../helpers/utils";
 
 function isCanCombine(values, types) {
-  const que = types.que.value;
+  const cue = types.cue.value;
   const routine = types.routine.value;
   const reward = types.reward.value;
 
-  const isQueReward = values.includes(que) && values.includes(reward) && values.length === 2;
+  const isCueReward = values.includes(cue) && values.includes(reward) && values.length === 2;
   const isRoutineOnly = values.includes(routine) && values.length === 1;
 
-  return isQueReward || isRoutineOnly || values.length === 1;
+  return isCueReward || isRoutineOnly || values.length === 1;
 }
 
 export default {
@@ -174,14 +174,14 @@ export default {
       startTime: "",
       endTime: "",
       typeOptions: {
-        que: { text: "Que", value: "que" },
+        cue: { text: "Cue", value: "cue" },
         routine: { text: "Routine", value: "routine" },
         reward: { text: "Reward", value: "reward" },
       },
       titleRules: [(v) => !!v || "Title is required"],
       typeRules: [
         (v) => {
-          const message = "You can only combine 'Que' with 'Reward'";
+          const message = "You can only combine 'cue' with 'Reward'";
 
           if (!isCanCombine(v, instance.typeOptions)) {
             return message;
