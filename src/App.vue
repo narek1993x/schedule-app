@@ -11,6 +11,13 @@
             <v-list-item-title v-text="link.title"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+
+        <v-list-item>
+          <v-list-item-action>
+            <v-switch :input-value="darkMode" @change="toggleDarkMode" color="secondary"></v-switch>
+          </v-list-item-action>
+          <v-list-item-title>{{ `Dark mode is ${darkMode ? "on" : "off"}` }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -22,6 +29,13 @@
           <span @click="navigate" role="link">Schedule App</span>
         </router-link>
       </v-toolbar-title>
+      <v-switch
+        class="dark-mode-toggler ml-4 mr-4 hidden-sm-and-down"
+        :input-value="darkMode"
+        @change="toggleDarkMode"
+        color="secondary"
+        :label="`Dark mode is ${darkMode ? 'on' : 'off'}`"
+      ></v-switch>
 
       <v-spacer></v-spacer>
 
@@ -59,6 +73,9 @@ export default {
     error() {
       return this.$store.getters.error;
     },
+    darkMode() {
+      return this.$store.getters.darkMode;
+    },
     links() {
       if (this.isUserLoggedIn) {
         return [
@@ -86,6 +103,9 @@ export default {
     closeError() {
       this.$store.dispatch("clearError");
     },
+    toggleDarkMode(value) {
+      this.$store.dispatch("setDarkMode", value);
+    },
   },
 };
 </script>
@@ -93,6 +113,18 @@ export default {
 <style lang="scss">
 html {
   overflow-y: auto !important;
+}
+
+.dark-mode-toggler {
+  .v-input {
+    &__slot {
+      margin-bottom: 0px;
+    }
+  }
+
+  .v-messages {
+    display: none;
+  }
 }
 
 .pointer {

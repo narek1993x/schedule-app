@@ -14,14 +14,14 @@
     <Loading :loading="loading"></Loading>
     <v-sheet class="Container__body">
       <HabitModal
-        dark
+        :dark="darkMode"
         v-if="showHabitsModal"
         :currentHabit="currentHabit"
         :visible="showHabitsModal"
         :onClose="handleCloseHabitModal"
       />
       <DeleteModal
-        dark
+        :dark="darkMode"
         v-if="showDeleteModal"
         type="habit"
         :show="showDeleteModal"
@@ -71,6 +71,9 @@ export default {
   computed: {
     loading() {
       return this.$store.getters.loading;
+    },
+    darkMode() {
+      return this.$store.getters.darkMode;
     },
     isHabitsLoaded() {
       return this.$store.getters.loadedData.habits;

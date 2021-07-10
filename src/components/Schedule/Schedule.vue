@@ -54,14 +54,13 @@
 
       <ScheduleSettings
         :isMobile="isMobile"
-        :dark="dark"
         :type="type"
         :weekdays="weekdays"
         :onSettingsChange="handleSettingsChange"
       ></ScheduleSettings>
       <EventModal
         v-if="showEventModal"
-        :dark="dark"
+        :dark="darkMode"
         :onClose="handleCloseEventModal"
         :visible="showEventModal"
         :selectedWeekDays="selectedWeekDays"
@@ -76,7 +75,7 @@
         v-model="focus"
         :type="type"
         :max-days="7"
-        :dark="dark"
+        :dark="darkMode"
         :weekdays="weekdays"
         :short-months="shortMonths"
         :short-weekdays="shortWeekdays"
@@ -120,7 +119,7 @@
         v-if="showDeleteModal"
         type="event"
         :show="showDeleteModal"
-        :dark="dark"
+        :dark="darkMode"
         :loading="loading"
         :onClose="handleCloseDeleteModal"
         :onDelete="handleDeleteEvent"
@@ -128,7 +127,7 @@
       <EventCopyModal
         v-if="showCopyModal"
         :show="showCopyModal"
-        :dark="dark"
+        :dark="darkMode"
         :loading="loading"
         :defaultSelected="selectedWeekDays"
         :onClose="handleCloseCopyModal"
@@ -146,7 +145,6 @@ import DeleteModal from "../DeleteModal.vue";
 import EventCopyModal from "./EventCopyModal.vue";
 import ScheduleSettings from "./ScheduleSettings";
 import { isMobile, getWeekDayFromDate, handleEventTime } from "../../helpers/utils";
-import { DarkMode } from "../../storage";
 
 const weekdaysDefault = [1, 2, 3, 4, 5, 6, 0];
 
@@ -159,7 +157,6 @@ export default {
     ScheduleSettings,
   },
   data: () => ({
-    dark: !!DarkMode.get(),
     type: isMobile() ? "day" : "week",
     weekdays: weekdaysDefault,
     isMobile: isMobile(),
@@ -182,11 +179,6 @@ export default {
     deleteScheduleEventId: null,
     scheduleEvent: null,
   }),
-  watch: {
-    dark: function(newDark) {
-      DarkMode.set(newDark);
-    },
-  },
   computed: {
     todayText() {
       return moment().format("dddd, MMM D");
@@ -196,6 +188,9 @@ export default {
     },
     loading() {
       return this.$store.getters.loading;
+    },
+    darkMode() {
+      return this.$store.getters.darkMode;
     },
     events() {
       return this.$store.getters.events;

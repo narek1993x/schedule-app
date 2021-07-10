@@ -9,13 +9,6 @@
 
       <v-card>
         <v-list>
-          <v-list-item>
-            <v-list-item-action>
-              <v-switch :input-value="dark" @change="onSettingsChange($event, 'dark')" color="secondary"></v-switch>
-            </v-list-item-action>
-            <v-list-item-title>Enable dark mode</v-list-item-title>
-          </v-list-item>
-
           <v-list-item v-if="isMobile">
             <v-list-item-action>
               <v-btn width="200px" outlined class="mr-2" color="grey darken-2" @click="onSettingsChange('', 'focus')">
@@ -61,7 +54,7 @@
 
 <script>
 export default {
-  props: ["isMobile", "dark", "type", "weekdays", "onSettingsChange"],
+  props: ["isMobile", "type", "weekdays", "onSettingsChange"],
   data: (instance) => ({
     menu: false,
     typeOptions: [

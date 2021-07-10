@@ -1,3 +1,5 @@
+import { DarkMode } from "../storage";
+
 export default {
   state: {
     loading: false,
@@ -6,6 +8,7 @@ export default {
       schedules: false,
       habits: false,
     },
+    darkMode: false || !!DarkMode.get(),
   },
   mutations: {
     setDataIsLoaded(state, payload) {
@@ -17,6 +20,9 @@ export default {
     setError(state, payload) {
       state.error = payload;
     },
+    setDarkMode(state, payload) {
+      state.darkMode = payload;
+    },
     clearError(state) {
       state.error = null;
     },
@@ -24,6 +30,10 @@ export default {
   actions: {
     clearError({ commit }) {
       commit("clearError");
+    },
+    setDarkMode({ commit }, toggle) {
+      DarkMode.set(toggle);
+      commit("setDarkMode", toggle);
     },
   },
   getters: {
@@ -35,6 +45,9 @@ export default {
     },
     loadedData(state) {
       return state.loadedData;
+    },
+    darkMode(state) {
+      return state.darkMode;
     },
   },
 };
