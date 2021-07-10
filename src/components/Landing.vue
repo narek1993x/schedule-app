@@ -11,26 +11,26 @@
           <template v-if="isUserLoggedIn">
             <v-card-title class="break-word subtitle-1">Please continue your work on `</v-card-title>
             <v-card-actions class="d-flex flex-wrap">
-              <v-btn to="/schedule" outlined color="primary">
+              <v-btn class="ma-2" to="/schedule" outlined color="primary">
                 <v-icon left medium>mdi-calendar-outline</v-icon>
                 Schedule
               </v-btn>
-              <span class="ml-2 mr-2 subtitle-1">or</span>
-              <v-btn to="/habits" outlined color="primary">
+              <span class="subtitle-1">or</span>
+              <v-btn class="ma-2" to="/habits" outlined color="primary">
                 <v-icon left medium>mdi-domain</v-icon>
                 Habits
               </v-btn>
-              <span class="ml-2 subtitle-1">page!</span>
+              <span class="subtitle-1">page!</span>
             </v-card-actions>
           </template>
           <template v-else>
-            <v-card-title class="break-word">Please authorize to continue!</v-card-title>
+            <v-card-title class="break-word subtitle-1">Please authorize to continue!</v-card-title>
             <v-card-actions class="d-flex flex-wrap">
-              <v-btn to="/login" outlined color="primary" large>
+              <v-btn class="ma-2" to="/login" outlined color="primary">
                 <v-icon left medium>mdi-lock</v-icon>
                 Login
               </v-btn>
-              <v-btn to="/registration" outlined color="primary" large>
+              <v-btn class="ma-2" to="/registration" outlined color="primary">
                 <v-icon left medium>mdi-face</v-icon>
                 Registration
               </v-btn>

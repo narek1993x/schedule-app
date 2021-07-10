@@ -69,6 +69,10 @@ export default {
   position: relative;
 
   .Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
     background-color: #fff;
     border-radius: 0.9em;
   }
@@ -122,6 +126,12 @@ export default {
     .v-card {
       &__title {
         padding: 8px;
+
+        .headline {
+          font-size: 1rem !important;
+          line-height: 1.5rem !important;
+          width: 100%;
+        }
       }
     }
 
