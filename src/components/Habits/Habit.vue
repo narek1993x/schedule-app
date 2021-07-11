@@ -5,6 +5,7 @@
       [`border-color-${habit.type}`]: true,
       isOdd: index % 2 !== 0,
       isEven: index % 2 === 0,
+      dark,
     }"
   >
     <div class="Card">
@@ -38,16 +39,30 @@
 
 <script>
 export default {
-  props: ["index", "habit", "onOpenHabitModal", "onOpenDeleteModal"],
+  props: ["index", "dark", "habit", "onOpenHabitModal", "onOpenDeleteModal"],
 };
 </script>
 
 <style lang="scss">
-%arrow {
+%line {
   position: absolute;
-  content: "\27F6";
-  font-size: 30px;
-  color: #9e9e9e;
+  content: "";
+}
+
+@mixin left-to-right-line($color: #9e9e9e) {
+  &::before {
+    @extend %line;
+    border: solid 3px transparent;
+    border-color: transparent $color transparent transparent;
+    border-radius: 0 0 50px 0;
+  }
+
+  &::after {
+    @extend %line;
+    border: solid 3px transparent;
+    border-color: transparent transparent transparent $color;
+    border-radius: 50px 0 0 0;
+  }
 }
 
 .Habit {
@@ -56,6 +71,21 @@ export default {
   padding: 3px;
   border-radius: 1em;
   position: relative;
+
+  &.dark {
+    .Card {
+      background-color: #1e1e1e;
+    }
+
+    &:first-child:not(:last-child),
+    &.isOdd:not(:first-child):not(:last-child) {
+      @include left-to-right-line(#fff);
+    }
+
+    &.isEven:not(:last-child)::after {
+      background-color: #fff;
+    }
+  }
 
   .Card {
     display: flex;
@@ -88,25 +118,50 @@ export default {
     margin-left: 191px;
     margin-right: 191px;
 
-    &:not(:last-child)::after {
-      @extend %arrow;
-      bottom: -45px;
-      left: calc(50% - 31px);
-      transform: rotate(135deg);
+    &:not(:last-child) {
+      @include left-to-right-line;
+
+      &::before {
+        left: calc(50% - 21px);
+        bottom: -23px;
+        width: 22px;
+        height: 20px;
+      }
+
+      &::after {
+        bottom: -40px;
+        left: calc(-25% - 5px);
+        width: calc(75% - 10px);
+        height: 20px;
+      }
     }
   }
 
   &.isEven:not(:last-child)::after {
-    @extend %arrow;
-    top: calc(50% - 21px);
-    right: -49px;
+    @extend %line;
+    top: calc(50% - 1.5px);
+    right: -50%;
+    width: 120px;
+    height: 3px;
+    background-color: #9e9e9e;
   }
 
-  &.isOdd:not(:first-child):not(:last-child)::after {
-    @extend %arrow;
-    bottom: -42px;
-    left: -42px;
-    transform: rotate(140deg);
+  &.isOdd:not(:first-child):not(:last-child) {
+    @include left-to-right-line;
+
+    &::before {
+      left: calc(50% - 21px);
+      bottom: -23px;
+      width: 22px;
+      height: 20px;
+    }
+
+    &::after {
+      bottom: -40px;
+      left: calc(-100% - 10px);
+      width: calc(100% + 120px);
+      height: 20px;
+    }
   }
 
   @media screen and (max-width: 640px) {
@@ -130,23 +185,18 @@ export default {
     }
 
     &:first-child:not(:last-child)::after {
-      font-size: 20px;
-      left: calc(50% - 15px);
-      bottom: -32px;
-      transform: rotate(120deg);
+      left: -22px;
+      width: calc(50% + 8px);
     }
 
     &.isEven:not(:last-child)::after {
-      font-size: 20px;
-      top: calc(50% - 15px);
-      right: -35px;
+      right: -36px;
+      width: 32px;
     }
 
     &.isOdd:not(:first-child):not(:last-child)::after {
-      font-size: 20px;
-      bottom: -25px;
-      left: -20px;
-      transform: rotate(130deg);
+      left: calc(-50% - 42px);
+      width: calc(100% + 28px);
     }
   }
 }

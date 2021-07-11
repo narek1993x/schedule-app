@@ -12,7 +12,7 @@
       </v-btn>
     </v-sheet>
     <Loading :loading="loading"></Loading>
-    <v-sheet class="Container__body">
+    <v-sheet class="Container__body" :dark="darkMode">
       <HabitModal
         v-if="showHabitsModal"
         :dark="darkMode"
@@ -33,6 +33,7 @@
         <Habit
           v-for="(habit, index) in sortedHabits"
           :key="habit.id"
+          :dark="darkMode"
           :habit="habit"
           :index="index + 1"
           :onOpenHabitModal="handleOpenHabitModal"
