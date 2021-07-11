@@ -3,7 +3,7 @@
     fluid
     :class="{
       Container: true,
-      ['empty-state']: sortedHabits.length === 0,
+      ['empty-state']: isHabitsLoaded && sortedHabits.length === 0,
     }"
   >
     <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
@@ -49,7 +49,7 @@
       >
         <v-card-title class="break-word subtitle-1 text-center">Habit list is emtpy!</v-card-title>
         <v-card-actions>
-          <v-btn outlined color="primary" @click.stop="showHabitsModal = true">
+          <v-btn outlined :dark="darkMode" @click.stop="showHabitsModal = true">
             Create habit
           </v-btn>
         </v-card-actions>
@@ -136,9 +136,15 @@ export default {
       max-width: 400px;
       width: 100%;
     }
+  }
 
-    @media screen and (max-width: 768px) {
-      margin: 0 18px;
+  @media screen and (max-width: 640px) {
+    &__body {
+      height: calc(100vh - 110px);
+    }
+
+    &.empty-state &__body {
+      padding: 0 18px;
     }
   }
 }
