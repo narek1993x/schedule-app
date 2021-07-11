@@ -37,6 +37,16 @@ export const setEventDates = (event, { start, end }) => {
   };
 };
 
+export const addMinutesToTime = (time, minutes) => {
+  const format = "YYYY-MM-DD";
+  const timeFormat = "HH:mm";
+  const today = moment().format(format);
+
+  return moment(`${today} ${time}`, `${format} ${timeFormat}`)
+    .add(minutes, "minutes")
+    .format(timeFormat);
+};
+
 export const isMobile = () => {
   return !!(
     window.navigator.userAgent.match(/Android/i) ||

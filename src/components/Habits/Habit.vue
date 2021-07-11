@@ -2,7 +2,7 @@
   <div
     :class="{
       Habit: true,
-      [`border-color-${borderColor}`]: true,
+      [`border-color-${habit.type}`]: true,
       isOdd: index % 2 !== 0,
       isEven: index % 2 === 0,
     }"
@@ -11,7 +11,7 @@
       <v-card-title>
         <span class="headline"> {{ habit.title }}</span>
         <v-spacer></v-spacer>
-        <span class="caption"> {{ habit.start + " - " + habit.end }}</span>
+        <span class="caption"> {{ habit.start }}</span>
       </v-card-title>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -39,17 +39,6 @@
 <script>
 export default {
   props: ["index", "habit", "onOpenHabitModal", "onOpenDeleteModal"],
-  computed: {
-    borderColor() {
-      const { types } = this.habit;
-
-      if (types.length === 2) {
-        return "reward-cue";
-      }
-
-      return types[0];
-    },
-  },
 };
 </script>
 
@@ -90,7 +79,7 @@ export default {
       background: #ff9800;
     }
 
-    &-reward-cue {
+    &-cue-reward {
       background: linear-gradient(to right, #ff9800 50%, #4caf50 50%);
     }
   }

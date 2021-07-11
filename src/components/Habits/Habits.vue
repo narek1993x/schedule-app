@@ -14,16 +14,16 @@
     <Loading :loading="loading"></Loading>
     <v-sheet class="Container__body">
       <HabitModal
-        :dark="darkMode"
         v-if="showHabitsModal"
+        :dark="darkMode"
         :currentHabit="currentHabit"
         :visible="showHabitsModal"
         :onClose="handleCloseHabitModal"
       />
       <DeleteModal
-        :dark="darkMode"
         v-if="showDeleteModal"
         type="habit"
+        :dark="darkMode"
         :show="showDeleteModal"
         :loading="loading"
         :onClose="handleCloseDeleteModal"

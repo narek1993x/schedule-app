@@ -20,22 +20,20 @@
 
               <v-col cols="12">
                 <v-select
-                  multiple
                   chips
                   clearable
-                  v-model="types"
+                  v-model="type"
                   :items="Object.values(typeOptions)"
                   :rules="typeRules"
-                  label="Type(s)*"
+                  label="Type*"
                 ></v-select>
               </v-col>
 
               <v-col cols="12">
-                <v-select v-model="order" :items="allHabitItems" label="Show after"></v-select>
-              </v-col>
-
-              <v-col cols="12">
                 <v-row class="d-flex">
+                  <v-col cols="12" sm="6">
+                    <v-select v-model="order" :items="allHabitItems" label="Show after"></v-select>
+                  </v-col>
                   <v-col cols="12" sm="6">
                     <v-menu
                       ref="startTimer"
@@ -51,8 +49,7 @@
                       <template v-slot:activator="{ on }">
                         <v-text-field
                           v-model="startTime"
-                          :rules="startTimeRules"
-                          label="Start*"
+                          label="Start"
                           prepend-icon="mdi-timer"
                           readonly
                           v-on="on"
@@ -61,46 +58,10 @@
                       <v-time-picker
                         v-if="startTimerMenu"
                         v-model="startTime"
-                        ampm-in-title
                         header-color="#3c3c3c"
                         scrollable
                         full-width
-                        :max="endTime"
                         @click:minute="$refs.startTimer.save(startTime)"
-                      ></v-time-picker>
-                    </v-menu>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-menu
-                      ref="endTimer"
-                      v-model="endTimerMenu"
-                      :close-on-content-click="false"
-                      :nudge-right="30"
-                      :return-value.sync="endTime"
-                      transition="scale-transition"
-                      offset-y
-                      max-width="290px"
-                      min-width="280px"
-                    >
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
-                          v-model="endTime"
-                          :rules="endTimeRules"
-                          label="End*"
-                          prepend-icon="mdi-timer"
-                          readonly
-                          v-on="on"
-                        ></v-text-field>
-                      </template>
-                      <v-time-picker
-                        v-if="endTimerMenu"
-                        v-model="endTime"
-                        scrollable
-                        header-color="#3c3c3c"
-                        full-width
-                        :min="startTime"
-                        ampm-in-title
-                        @click:minute="$refs.endTimer.save(endTime)"
                       ></v-time-picker>
                     </v-menu>
                   </v-col>
@@ -124,30 +85,45 @@
 </template>
 
 <script>
-import { isMobile } from "../../helpers/utils";
+import { isMobile, addMinutesToTime } from "../../helpers/utils";
 
-function isCanCombine(values, types) {
-  const cue = types.cue.value;
-  const routine = types.routine.value;
-  const reward = types.reward.value;
+function getDisabledTypeOptions(options, protectedValue) {
+  const disabledOptions = {};
 
-  const isCueReward = values.includes(cue) && values.includes(reward) && values.length === 2;
-  const isRoutineOnly = values.includes(routine) && values.length === 1;
+  Object.keys(options).forEach((key) => {
+    const option = options[key];
+    disabledOptions[key] = option;
 
-  return isCueReward || isRoutineOnly || values.length === 1;
+    if (protectedValue !== option.value) {
+      disabledOptions[key].disabled = true;
+    }
+  });
+
+  return disabledOptions;
+}
+
+function isChooseRoutine(lastHabit, typeOptions) {
+  return lastHabit.type === typeOptions.cue.value || lastHabit.type === typeOptions["cue-reward"].value;
 }
 
 export default {
   props: ["visible", "dark", "currentHabit", "onClose"],
   beforeMount() {
     if (this.currentHabit) {
-      const { title, types, order, start, end } = this.currentHabit;
+      const { title, type, order, start } = this.currentHabit;
 
       this.title = title;
-      this.types = types;
+      this.type = type;
       this.order = order;
       this.startTime = start;
-      this.endTime = end;
+    } else if (this.lastHabit) {
+      this.order = this.lastHabit.order + 1;
+      this.startTime = addMinutesToTime(this.lastHabit.start, 30);
+
+      if (isChooseRoutine(this.lastHabit, this.typeOptions)) {
+        this.type = this.typeOptions.routine.value;
+        this.typeOptions = getDisabledTypeOptions(this.typeOptions, this.type);
+      }
     }
   },
   computed: {
@@ -161,47 +137,38 @@ export default {
         .filter((h) => !this.currentHabit || h.id !== this.currentHabit.id)
         .map((h) => ({ text: h.title, value: h.order + 1 }));
     },
+    lastHabit() {
+      const habits = [...this.$store.getters.allHabits];
+      return habits[habits.length - 1];
+    },
   },
-  data: (instance) => {
+  data: () => {
     return {
       isMobile: isMobile(),
       valid: true,
       title: "",
-      types: [],
+      type: "",
       order: 0,
       startTimerMenu: false,
-      endTimerMenu: false,
       startTime: "",
-      endTime: "",
       typeOptions: {
         cue: { text: "Cue", value: "cue" },
         routine: { text: "Routine", value: "routine" },
         reward: { text: "Reward", value: "reward" },
+        "cue-reward": { text: "Cue Reward", value: "cue-reward" },
       },
       titleRules: [(v) => !!v || "Title is required"],
-      typeRules: [
-        (v) => {
-          const message = "You can only combine 'cue' with 'Reward'";
-
-          if (!isCanCombine(v, instance.typeOptions)) {
-            return message;
-          }
-
-          return !!v.length || "Type(s) are required";
-        },
-      ],
+      typeRules: [(v) => !!v || "Type is required"],
       startTimeRules: [(v) => !!v || "Start time is required"],
-      endTimeRules: [(v) => !!v || "End time is required"],
     };
   },
   methods: {
     clear() {
       this.$refs.form.reset();
       this.title = "";
-      this.types = [];
+      this.type = "";
       this.order = 0;
       this.startTime = "";
-      this.endTime = "";
     },
     closeHandler() {
       this.clear();
@@ -211,10 +178,9 @@ export default {
       if (this.$refs.form.validate()) {
         const habit = {
           title: this.title,
-          types: this.types,
+          type: this.type,
           order: this.order,
           start: this.startTime,
-          end: this.endTime,
           ...(this.currentHabit && { id: this.currentHabit.id }),
         };
 
