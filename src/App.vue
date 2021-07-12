@@ -21,7 +21,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app dark color="primary">
+    <v-app-bar app dark :color="darkMode ? 'accent' : 'primary'">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="hidden-md-and-up"></v-app-bar-nav-icon>
 
       <v-toolbar-title>
@@ -104,8 +104,12 @@ export default {
       this.$store.dispatch("clearError");
     },
     toggleDarkMode(value) {
+      this.$vuetify.theme.dark = value;
       this.$store.dispatch("setDarkMode", value);
     },
+  },
+  created() {
+    this.$vuetify.theme.dark = this.darkMode;
   },
 };
 </script>

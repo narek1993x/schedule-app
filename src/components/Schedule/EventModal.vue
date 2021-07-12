@@ -103,8 +103,7 @@
                       <v-time-picker
                         v-if="startTimerMenu"
                         v-model="startTime"
-                        ampm-in-title
-                        header-color="#3c3c3c"
+                        header-color="primary"
                         scrollable
                         full-width
                         :max="endTime"
@@ -138,10 +137,9 @@
                         v-if="endTimerMenu"
                         v-model="endTime"
                         scrollable
-                        header-color="#3c3c3c"
+                        header-color="primary"
                         full-width
                         :min="startTime"
-                        ampm-in-title
                         @click:minute="$refs.endTimer.save(endTime)"
                       ></v-time-picker>
                     </v-menu>

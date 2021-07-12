@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="Container">
-    <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
+    <v-sheet tile height="54" class="d-flex justify-space-between align-center">
       <v-btn class="ml-3 mr-6" icon @click.stop="showEventModal = true">
         <v-icon size="42">mdi-plus-circle-outline</v-icon>
       </v-btn>

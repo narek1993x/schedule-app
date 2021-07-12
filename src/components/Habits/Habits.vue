@@ -6,7 +6,7 @@
       ['empty-state']: isHabitsLoaded && sortedHabits.length === 0,
     }"
   >
-    <v-sheet tile height="54" color="grey lighten-3" class="d-flex justify-space-between align-center">
+    <v-sheet tile height="54" class="Container__subheader d-flex justify-space-between align-center">
       <v-btn class="ml-3 mr-6" icon @click.stop="showHabitsModal = true">
         <v-icon size="42">mdi-plus-circle-outline</v-icon>
       </v-btn>
@@ -120,6 +120,10 @@ export default {
 <style lang="scss">
 .Container {
   padding: 0px !important;
+
+  &__subheader {
+    border-bottom: 1px solid #9e9e9e !important;
+  }
 
   &__body {
     height: calc(100vh - 118px);

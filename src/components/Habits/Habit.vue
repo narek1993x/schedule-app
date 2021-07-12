@@ -74,7 +74,7 @@ export default {
 
   &.dark {
     .Card {
-      background-color: #1e1e1e;
+      background-color: #303030;
     }
 
     &:first-child:not(:last-child),
