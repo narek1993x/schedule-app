@@ -52,14 +52,20 @@ export default {
 @mixin left-to-right-line($color: #9e9e9e) {
   &::before {
     @extend %line;
-    border: solid 3px transparent;
+    left: calc(50% - 21px);
+    bottom: -23px;
+    height: 20px;
+    width: 22px;
+    border: 3px solid transparent;
     border-color: transparent $color transparent transparent;
     border-radius: 0 0 50px 0;
   }
 
   &::after {
     @extend %line;
-    border: solid 3px transparent;
+    bottom: -40px;
+    height: 20px;
+    border: 3px solid transparent;
     border-color: transparent transparent transparent $color;
     border-radius: 50px 0 0 0;
   }
@@ -121,18 +127,9 @@ export default {
     &:not(:last-child) {
       @include left-to-right-line;
 
-      &::before {
-        left: calc(50% - 21px);
-        bottom: -23px;
-        width: 22px;
-        height: 20px;
-      }
-
       &::after {
-        bottom: -40px;
-        left: calc(-25% - 5px);
-        width: calc(75% - 10px);
-        height: 20px;
+        left: calc(-53px - 15px);
+        width: calc(50% + 53px);
       }
     }
   }
@@ -140,8 +137,8 @@ export default {
   &.isEven:not(:last-child)::after {
     @extend %line;
     top: calc(50% - 1.5px);
-    right: -50%;
-    width: 120px;
+    right: calc(-50% - 4px);
+    width: 126px;
     height: 3px;
     background-color: #9e9e9e;
   }
@@ -149,18 +146,9 @@ export default {
   &.isOdd:not(:first-child):not(:last-child) {
     @include left-to-right-line;
 
-    &::before {
-      left: calc(50% - 21px);
-      bottom: -23px;
-      width: 22px;
-      height: 20px;
-    }
-
     &::after {
-      bottom: -40px;
-      left: calc(-100% - 10px);
-      width: calc(100% + 120px);
-      height: 20px;
+      left: calc(-50% - 119px - 15px);
+      width: calc(100% + 119px);
     }
   }
 
@@ -190,8 +178,8 @@ export default {
     }
 
     &.isEven:not(:last-child)::after {
-      right: -36px;
-      width: 32px;
+      right: -37px;
+      width: 34px;
     }
 
     &.isOdd:not(:first-child):not(:last-child)::after {

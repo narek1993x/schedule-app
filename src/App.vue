@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <v-navigation-drawer app temporary v-model="drawer">
-      <v-list class="d-flex flex-column" height="100%">
-        <v-list-item v-for="link of links" :key="link.title" :to="link.url" style="flex: 0 0 48px">
+      <v-list>
+        <v-list-item v-for="link of links" :key="link.title" :to="link.url">
           <v-list-item-action>
             <v-icon>{{ link.icon }}</v-icon>
           </v-list-item-action>
@@ -11,8 +11,8 @@
             <v-list-item-title v-text="link.title"></v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-spacer></v-spacer>
-        <v-list-item style="flex: 0 0 48px">
+        <v-divider></v-divider>
+        <v-list-item>
           <v-list-item-action>
             <v-switch :input-value="darkMode" @change="toggleDarkMode" color="secondary"></v-switch>
           </v-list-item-action>
