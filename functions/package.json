@@ -17,7 +17,7 @@
     "cron": "^1.8.2",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
-    "firebase-admin": "^8.10.0",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.7.0",
     "lodash": "^4.17.21",
     "moment": "^2.25.3"
